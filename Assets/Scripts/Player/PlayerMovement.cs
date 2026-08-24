@@ -1,70 +1,86 @@
 using UnityEngine;
 
-[System.Serializable]
-public class PlayerMovement
+[RequireComponent(typeof(Rigidbody), typeof(AudioSource))]
+public class PlayerMovement : MonoBehaviour
 {
-    [Header("Move Settings")]
-    public float moveSpeed = 7f;
-    public float gravity = -20f;
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private AudioClip moveSfx;
+    private float currentSpeed;
+    private Rigidbody rb;
+    private AudioSource audioSource;
+    private Vector3 input;
+    private Vector3 lastMoveDirection;
+    private bool wasMoving;
+    public Animator animator;
+    public SpriteRenderer sr;
 
-    [Header("Jump Settings")]
-    public float jumpHeight = 2.5f;
-
-    [Header("Dash Settings")]
-    public float dashSpeed = 20f;
-    public float dashDuration = 0.2f;
-    public float dashCooldown = 1f;
-
-    private Vector3 verticalVelocity;
-    private Vector3 dashDirection;
-    private float dashTimer;
-    private float cooldownTimer;
-
-    public bool IsDashing { get; private set; }
-
-    public Vector3 CalculateVelocity(Vector3 moveInput, bool isGrounded, bool jumpPressed, bool dashPressed, Transform playerTransform)
+    void Awake()
     {
-        // 1. �Ѵ��� Cooldown ᴪ
-        if (cooldownTimer > 0) cooldownTimer -= Time.deltaTime;
+        rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.loop = true;
+        audioSource.playOnAwake = false;
+        if (moveSfx != null) audioSource.clip = moveSfx;
+    }
 
-        // 2. ʶҹ� Dashing
-        if (IsDashing)
+    void Update()
+    {
+        HandleInput();
+        Animate();
+    }
+
+    public void HandleInput()
+    {
+        // รับค่าแกนนอน (A/D) และแกนตั้ง (W/S)
+        input.x = Input.GetAxisRaw("Horizontal");
+        input.z = Input.GetAxisRaw("Vertical"); // เก็บค่า W/S ไว้ในแกน Z ของ 3D
+        
+        if (input.sqrMagnitude > 1) input.Normalize();
+
+        if (input.x > 0) sr.flipX = false;
+        else if (input.x < 0) sr.flipX = true;
+
+        if (input != Vector3.zero) lastMoveDirection = input;
+
+        bool isMoving = input != Vector3.zero;
+        if (isMoving && !wasMoving)
         {
-            dashTimer -= Time.deltaTime;
-            if (dashTimer <= 0) IsDashing = false;
-            return dashDirection * dashSpeed;
-        }
-
-        // ������� Dash
-        if (dashPressed && cooldownTimer <= 0)
-        {
-            IsDashing = true;
-            dashTimer = dashDuration;
-            cooldownTimer = dashCooldown;
-
-            // �������� Input ���ᴪ仢�ҧ˹�ҵ���Ф�
-            dashDirection = moveInput.sqrMagnitude > 0.01f ? moveInput.normalized : playerTransform.forward;
-            return dashDirection * dashSpeed;
-        }
-
-        // 3. �ӹǳ�����������Һ (X, Z)
-        Vector3 horizontalVelocity = moveInput.normalized * moveSpeed;
-
-        // 4. �ӹǳ�ç�����ǧ��С�á��ⴴ (Y)
-        if (isGrounded)
-        {
-            if (verticalVelocity.y < 0) verticalVelocity.y = -2f;
-
-            if (jumpPressed)
+            if (moveSfx != null && !audioSource.isPlaying)
             {
-                verticalVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                audioSource.Play();
             }
         }
-        else
+        else if (!isMoving && wasMoving)
         {
-            verticalVelocity.y += gravity * Time.deltaTime;
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
         }
+        wasMoving = isMoving;
+    }
 
-        return horizontalVelocity + verticalVelocity;
+    void FixedUpdate()
+    {
+        // คำนวณความเร็วรวมเพื่อส่งให้ Animator
+        currentSpeed = new Vector2(input.x, input.z).magnitude * moveSpeed;
+
+        // ใช้ Rigidbody ควบคุมการเคลื่อนที่ทั้งแกน X และ Z
+        // ส่วนแกน Y ให้ใช้ความเร็วเดิมของ Rigidbody (เผื่อกรณีมีแรงโน้มถ่วงหรือการตกจากที่สูง)
+        rb.linearVelocity = new Vector3(input.x * moveSpeed, rb.linearVelocity.y, input.z * moveSpeed);
+    }
+    
+    public void Animate()
+    {
+        if (animator == null) return;
+        animator.SetFloat("MoveX", lastMoveDirection.x);
+        animator.SetFloat("MoveZ", lastMoveDirection.z);
+        animator.SetFloat("Speed", currentSpeed);
+    }
+
+    public void StopVelocity()
+    {
+        input = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
     }
 }
