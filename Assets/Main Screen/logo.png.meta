@@ -1,0 +1,425 @@
+fileFormatVersion: 2
+guid: 22e751678dccaa84393237b2d31f2d27
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1251435029855713157
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_0"
+  - first:
+      213: -8310379770012069773
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_1"
+  - first:
+      213: 7653044067729583521
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_2"
+  - first:
+      213: 5350713933551126728
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_3"
+  - first:
+      213: 4261157717624266022
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_4"
+  - first:
+      213: -4611570947149900344
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_5"
+  - first:
+      213: 8132224512231957968
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_6"
+  - first:
+      213: 6043021478609635350
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_7"
+  - first:
+      213: -8028547162800094692
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_8"
+  - first:
+      213: -2494414421196769897
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_9"
+  - first:
+      213: -4069606319403847368
+    second: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+      (2)_10"
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_0"
+      rect:
+        serializedVersion: 2
+        x: 719
+        y: 669
+        width: 92
+        height: 122
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 587b70e778dfd5110800000000000000
+      internalID: 1251435029855713157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_1"
+      rect:
+        serializedVersion: 2
+        x: 810
+        y: 668
+        width: 77
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37096d321a99bac80800000000000000
+      internalID: -8310379770012069773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_2"
+      rect:
+        serializedVersion: 2
+        x: 886
+        y: 669
+        width: 75
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1adae633803153a60800000000000000
+      internalID: 7653044067729583521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_3"
+      rect:
+        serializedVersion: 2
+        x: 957
+        y: 669
+        width: 101
+        height: 109
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c84c0829fd814a40800000000000000
+      internalID: 5350713933551126728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_4"
+      rect:
+        serializedVersion: 2
+        x: 1057
+        y: 667
+        width: 73
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62d98ea1e5ca22b30800000000000000
+      internalID: 4261157717624266022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_5"
+      rect:
+        serializedVersion: 2
+        x: 1126
+        y: 669
+        width: 85
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c55e9e18a86000c0800000000000000
+      internalID: -4611570947149900344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_6"
+      rect:
+        serializedVersion: 2
+        x: 756
+        y: 511
+        width: 92
+        height: 122
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d56f458b177bd070800000000000000
+      internalID: 8132224512231957968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_7"
+      rect:
+        serializedVersion: 2
+        x: 848
+        y: 511
+        width: 76
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 618459a74002dd350800000000000000
+      internalID: 6043021478609635350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_8"
+      rect:
+        serializedVersion: 2
+        x: 919
+        y: 511
+        width: 101
+        height: 109
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1284da74eed49090800000000000000
+      internalID: -8028547162800094692
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_9"
+      rect:
+        serializedVersion: 2
+        x: 1020
+        y: 509
+        width: 73
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79574f5cc4f026dd0800000000000000
+      internalID: -2494414421196769897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3
+        (2)_10"
+      rect:
+        serializedVersion: 2
+        x: 1089
+        y: 511
+        width: 85
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 831bf3c3d9ad587c0800000000000000
+      internalID: -4069606319403847368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_0": 1251435029855713157
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_1": -8310379770012069773
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_10": -4069606319403847368
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_2": 7653044067729583521
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_3": 5350713933551126728
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_4": 4261157717624266022
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_5": -4611570947149900344
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_6": 8132224512231957968
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_7": 6043021478609635350
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_8": -8028547162800094692
+      "\u0E2A\u0E33\u0E40\u0E19\u0E32\u0E02\u0E2D\u0E07 Sprout Scout V.0.3 (2)_9": -2494414421196769897
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
