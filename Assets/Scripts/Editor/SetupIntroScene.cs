@@ -9,8 +9,18 @@ public class SetupIntroScene
     [MenuItem("Tools/SproutScout/Setup Intro Scene with Dustmotes")]
     public static void RunSetup()
     {
+        SetupScene("Assets/Prefabs/Intro_Cinematic_Canvas.prefab");
+    }
+
+    [MenuItem("Tools/SproutScout/Setup Original Intro Scene with Dustmotes")]
+    public static void RunOriginalSetup()
+    {
+        SetupScene("Assets/Prefabs/Original_Intro_Cinematic_Canvas.prefab");
+    }
+
+    private static void SetupScene(string canvasPrefabPath)
+    {
         string scenePath = "Assets/Scenes/IntroScene.unity";
-        string canvasPrefabPath = "Assets/Prefabs/Intro_Cinematic_Canvas.prefab";
         string dustmotesPrefabPath = "Assets/Image/Dustmotes.prefab";
 
         // 1. Open the IntroScene
@@ -21,7 +31,7 @@ public class SetupIntroScene
             return;
         }
 
-        Debug.Log("[SetupIntroScene] Setting up IntroScene with Dustmotes...");
+        Debug.Log($"[SetupIntroScene] Setting up IntroScene using prefab: {canvasPrefabPath}...");
 
         // 2. Find or setup the Main Camera
         Camera mainCamera = Camera.main;
@@ -39,7 +49,7 @@ public class SetupIntroScene
         // Clear existing instances to prevent duplicates
         foreach (var canvas in Object.FindObjectsOfType<Canvas>())
         {
-            if (canvas.gameObject.name.StartsWith("Intro Cinematic Canvas"))
+            if (canvas.gameObject.name.StartsWith("Intro Cinematic Canvas") || canvas.gameObject.name.StartsWith("Original Intro Cinematic Canvas"))
             {
                 Object.DestroyImmediate(canvas.gameObject);
             }
@@ -60,7 +70,7 @@ public class SetupIntroScene
             return;
         }
         GameObject canvasInstance = (GameObject)PrefabUtility.InstantiatePrefab(canvasPrefab);
-        canvasInstance.name = "Intro Cinematic Canvas";
+        canvasInstance.name = canvasPrefab.name; // Keep prefab name to match sorting checks
 
         // Configure Canvas to Screen Space - Camera for proper 3D sorting
         Canvas canvasComp = canvasInstance.GetComponent<Canvas>();
