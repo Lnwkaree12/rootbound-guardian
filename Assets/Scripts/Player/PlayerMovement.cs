@@ -1,328 +1,73 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody), typeof(AudioSource))]
+[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private AudioClip moveSfx;
-    private float currentSpeed;
-    private Rigidbody rb;
-    private AudioSource audioSource;
-    private Vector3 input;
-    private Vector3 lastMoveDirection = Vector3.back; // default forward direction
-    private bool wasMoving;
-    public Animator animator;
-    public SpriteRenderer sr;
-
-    [Header("Stats Reference")]
-    private PlayerStats playerStats;
-
-    [Header("Attack Settings")]
-    [SerializeField] private float attackDuration = 0.3f;
-    private bool isAttacking = false;
-    private float attackTimer = 0f;
-
-    [Header("Jump Settings")]
-    [SerializeField] private float jumpForce = 8f;
-    private bool isGrounded = true;
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed = 7f;
+    [SerializeField] private float gravity = -20f;
 
     [Header("Dash Settings")]
-    [SerializeField] private float dashSpeed = 25f;
-    [SerializeField] private float dashDuration = 0.25f;
-    [SerializeField] private float dashCooldown = 0.6f;
-    private bool isDashing = false;
-    private float dashTimer = 0f;
-    private float dashCooldownTimer = 0f;
-    private Vector3 dashDirection;
+    [SerializeField] private float dashSpeed = 20f;
 
-    [Header("Pickup Settings")]
-    [SerializeField] private float pickupDuration = 0.35f;
-    private bool isPickingUp = false;
-    private float pickupTimer = 0f;
+    private CharacterController controller;
+    private Vector3 verticalVelocity;
 
-    void Awake()
+    public bool IsGrounded => controller.isGrounded;
+
+    private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            // Freeze rotation on X, Y, and Z axes to prevent tipping over
-            rb.constraints = RigidbodyConstraints.FreezeRotation;
-        }
-        audioSource = GetComponent<AudioSource>();
-        audioSource.loop = true;
-        audioSource.playOnAwake = false;
-        if (moveSfx != null) audioSource.clip = moveSfx;
-
-        // Auto-assign references if not set in Inspector
-        if (animator == null) animator = GetComponent<Animator>();
-        if (animator == null) animator = GetComponentInChildren<Animator>();
-        if (sr == null) sr = GetComponent<SpriteRenderer>();
-        if (sr == null) sr = GetComponentInChildren<SpriteRenderer>();
-
-        // Disable root motion to prevent the animator from freezing physics movement
-        if (animator != null) animator.applyRootMotion = false;
-        
-        // Find PlayerStats component
-        playerStats = GetComponent<PlayerStats>();
-        if (playerStats == null) playerStats = GetComponentInParent<PlayerStats>();
-        if (playerStats == null) playerStats = FindObjectOfType<PlayerStats>();
+        controller = GetComponent<CharacterController>();
     }
 
-    void Update()
+    private void LateUpdate()
     {
-        // Handle Dash Cooldown Timer
-        if (dashCooldownTimer > 0f)
-        {
-            dashCooldownTimer -= Time.deltaTime;
-        }
-
-        // Handle Active Dash State (Ignore input and updates during active dash)
-        if (isDashing)
-        {
-            return;
-        }
-
-        // Handle Active Pickup State (Ignore input and updates during picking up)
-        if (isPickingUp)
-        {
-            pickupTimer += Time.deltaTime;
-            if (pickupTimer >= pickupDuration)
-            {
-                isPickingUp = false;
-            }
-            return;
-        }
-
-        // Handle Active Attack State
-        if (isAttacking)
-        {
-            attackTimer += Time.deltaTime;
-            if (attackTimer >= attackDuration)
-            {
-                isAttacking = false;
-            }
-            return;
-        }
-
-        // Trigger Dash on Left Shift (Requires 20 Stamina)
-        if (Input.GetKeyDown(KeyCode.LeftShift) && dashCooldownTimer <= 0f)
-        {
-            if (playerStats == null || playerStats.ConsumeStamina(20f))
-            {
-                StartDash();
-                return;
-            }
-            else
-            {
-                Debug.Log("[PlayerMovement] Not enough stamina to dash!");
-            }
-        }
-
-        // Trigger Jump on Space
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            StartJump();
-            return;
-        }
-
-        // Trigger attack on Left Click (Mouse 0)
-        if (Input.GetMouseButtonDown(0))
-        {
-            StartAttack();
-            return;
-        }
-
-        // Trigger Pickup on F
-        if (Input.GetKeyDown(KeyCode.F) && isGrounded)
-        {
-            StartPickup();
-            return;
-        }
-
-        HandleInput();
-        Animate();
+        // ล็อกไม่ให้หมุนเบี้ยวสำหรับมุมมอง 2D / Top-Down
+        transform.rotation = Quaternion.identity;
     }
 
-    private void StartAttack()
+    // สั่งเดินปกติ
+    public void Move(Vector2 inputDirection)
     {
-        Debug.Log("[PlayerMovement] Attack triggered! (คลิกซ้ายแล้ว)");
-        isAttacking = true;
-        attackTimer = 0f;
-        StopVelocity();
+        ApplyGravity();
 
-        // ลดเลือดตัวเอง 3 หน่วยทุกครั้งที่โจมตีเพื่อเชื่อม HP bar
-        if (playerStats != null)
-        {
-            playerStats.TakeDamage(3f);
-        }
+        Vector3 move = new Vector3(inputDirection.x, 0, inputDirection.y);
+        Vector3 finalVelocity = (move * moveSpeed) + verticalVelocity;
 
-        if (animator != null)
+        if (controller.enabled)
         {
-            Debug.Log("[PlayerMovement] Playing animation: AttackDown");
-            animator.Play("AttackDown");
-        }
-        else
-        {
-            Debug.LogError("[PlayerMovement] Cannot play animation because animator is NULL!");
+            controller.Move(finalVelocity * Time.deltaTime);
         }
     }
 
-    private void StartJump()
+    // สั่งพุ่งแดช
+    public void Dash(Vector3 direction)
     {
-        Debug.Log("[PlayerMovement] Jump triggered! (กระโดดแล้ว)");
-        // Apply vertical velocity for physics jump
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
-        isGrounded = false;
-        
-        if (animator != null)
+        ApplyGravity();
+
+        Vector3 finalVelocity = (direction * dashSpeed) + verticalVelocity;
+
+        if (controller.enabled)
         {
-            Debug.Log("[PlayerMovement] Playing animation: Jump");
-            animator.Play("Jump");
+            controller.Move(finalVelocity * Time.deltaTime);
         }
     }
 
-    private void StartDash()
+    // คำนวณแรงโน้มถ่วง (ตกเหว/แตะพื้น)
+    private void ApplyGravity()
     {
-        Debug.Log("[PlayerMovement] Dash triggered! (พุ่งตัวแล้ว)");
-        isDashing = true;
-        dashTimer = 0f;
-        dashCooldownTimer = dashCooldown;
-        
-        // Dash in the direction of current input, or the last moved direction if standing still
-        dashDirection = input != Vector3.zero ? input.normalized : lastMoveDirection.normalized;
-        
-        if (animator != null)
+        if (controller.isGrounded && verticalVelocity.y < 0)
         {
-            Debug.Log("[PlayerMovement] Playing animation: Dash");
-            animator.Play("Dash");
+            verticalVelocity.y = -2f;
         }
+        verticalVelocity.y += gravity * Time.deltaTime;
     }
 
-    public void HandleInput()
+    // ระบบวาร์ปตำแหน่งปลอดภัย (ใช้ตอนตกเหว)
+    public void Teleport(Vector3 newPosition)
     {
-        // รับค่าแกนนอน (A/D) และแกนตั้ง (W/S)
-        input.x = Input.GetAxisRaw("Horizontal");
-        input.z = Input.GetAxisRaw("Vertical"); // เก็บค่า W/S ไว้ในแกน Z ของ 3D
-        
-        if (input.sqrMagnitude > 1) input.Normalize();
-
-        if (input.x > 0) sr.flipX = false;
-        else if (input.x < 0) sr.flipX = true;
-
-        if (input != Vector3.zero) lastMoveDirection = input;
-
-        bool isMoving = input != Vector3.zero;
-        if (isMoving && !wasMoving)
-        {
-            if (moveSfx != null && !audioSource.isPlaying)
-            {
-                audioSource.Play();
-            }
-        }
-        else if (!isMoving && wasMoving)
-        {
-            if (audioSource.isPlaying)
-            {
-                audioSource.Stop();
-            }
-        }
-        wasMoving = isMoving;
-    }
-
-    void FixedUpdate()
-    {
-        // Simple ground check based on vertical velocity of Rigidbody
-        isGrounded = Mathf.Abs(rb.linearVelocity.y) < 0.05f;
-
-        if (isDashing)
-        {
-            // Update physics-based dash timer in FixedUpdate
-            dashTimer += Time.fixedDeltaTime;
-            if (dashTimer >= dashDuration)
-            {
-                isDashing = false;
-                rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f); // Stop dash speed
-            }
-            else
-            {
-                // Maintain high horizontal speed during dash, keeping physics Y gravity intact
-                rb.linearVelocity = new Vector3(dashDirection.x * dashSpeed, rb.linearVelocity.y, dashDirection.z * dashSpeed);
-            }
-            return;
-        }
-
-        if (isPickingUp)
-        {
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
-            return;
-        }
-
-        if (isAttacking)
-        {
-            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
-            return;
-        }
-
-        // คำนวณความเร็วรวมเพื่อส่งให้ Animator
-        currentSpeed = new Vector2(input.x, input.z).magnitude * moveSpeed;
-
-        // ใช้ Rigidbody ควบคุมการเคลื่อนที่ทั้งแกน X และ Z
-        // ส่วนแกน Y ให้ใช้ความเร็วเดิมของ Rigidbody (เผื่อกรณีมีแรงโน้มถ่วงหรือการตกจากที่สูง)
-        rb.linearVelocity = new Vector3(input.x * moveSpeed, rb.linearVelocity.y, input.z * moveSpeed);
-    }
-    
-    public void Animate()
-    {
-        if (animator == null) return;
-        animator.SetFloat("MoveX", lastMoveDirection.x);
-        animator.SetFloat("MoveZ", lastMoveDirection.z);
-        animator.SetFloat("Speed", currentSpeed);
-    }
-
-    public void StopVelocity()
-    {
-        input = Vector3.zero;
-        rb.linearVelocity = Vector3.zero;
-    }
-
-    private void StartPickup()
-    {
-        Debug.Log("[PlayerMovement] StartPickup triggered! (เล่นแอนิเมชั่นและเช็คเก็บกุญแจ)");
-        isPickingUp = true;
-        pickupTimer = 0f;
-        StopVelocity();
-
-        if (animator != null)
-        {
-            animator.Play("Pickup");
-        }
-
-        TryInteract();
-    }
-
-    private void TryInteract()
-    {
-        // Search for nearby Key or other interactables within 1.5 units
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1.5f);
-        foreach (var col in hitColliders)
-        {
-            // Check for KeyPickup script
-            KeyPickup key = col.GetComponent<KeyPickup>();
-            if (key != null)
-            {
-                if (QuestManager.Instance != null)
-                {
-                    QuestManager.Instance.CollectKey();
-                }
-                else
-                {
-                    QuestManager qm = FindObjectOfType<QuestManager>();
-                    if (qm != null) qm.CollectKey();
-                }
-                Debug.Log("[PlayerMovement] Successfully interacted and collected the Key!");
-                Destroy(col.gameObject);
-                break;
-            }
-        }
+        controller.enabled = false;
+        transform.position = newPosition;
+        controller.enabled = true;
     }
 }
