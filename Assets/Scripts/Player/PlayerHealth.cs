@@ -82,4 +82,14 @@ public class PlayerHealth : MonoBehaviour
         isInvulnerable = false;
         onHealthChanged?.Invoke(currentHealth, maxHealth);
     }
+
+    public void Heal(int healAmount)
+    {
+        if (currentHealth <= 0) return; // ถ้าตายแล้วไม่ต้องฮีล
+
+        currentHealth += healAmount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth); // ไม่ให้เลือดเกิน MaxHealth
+
+        onHealthChanged?.Invoke(currentHealth, maxHealth); // อัปเดต หลอดเลือด UI
+    }
 }

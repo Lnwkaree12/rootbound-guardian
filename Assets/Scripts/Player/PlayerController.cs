@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
 
     private PlayerInputHandler inputHandler;
     private PlayerMovement movement; // เปลี่ยนชื่อตัวแปรให้อ่านง่ายขึ้น
+    private PlayerAnimation playerAnim;
 
     private bool isDashing;
     private float dashTimer;
@@ -18,6 +19,7 @@ public class PlayerController : MonoBehaviour
     {
         inputHandler = GetComponent<PlayerInputHandler>();
         movement = GetComponent<PlayerMovement>();
+        playerAnim = GetComponent<PlayerAnimation>();
     }
 
     private void Update()
@@ -65,8 +67,14 @@ public class PlayerController : MonoBehaviour
             dashDirection = moveDir.normalized;
         }
 
+        if (playerAnim != null) playerAnim.TriggerDash();
+
         isDashing = true;
         dashTimer = dashDuration;
+
+        // สั่ง Trigger แดชครั้งเดียวทันที
+       
+
         inputHandler.ResetDashFlag();
     }
 }

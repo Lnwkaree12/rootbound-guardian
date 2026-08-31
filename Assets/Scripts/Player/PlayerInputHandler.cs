@@ -8,6 +8,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     public Vector2 MoveInput { get; private set; }
     public bool DashPressed { get; private set; }
+    public bool InteractPressed { get; private set; }
 
     private InputAction moveAction;
     private InputAction dashAction;
@@ -48,5 +49,24 @@ public class PlayerInputHandler : MonoBehaviour
     public void ResetDashFlag()
     {
         DashPressed = false;
+    }
+
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            InteractPressed = true;
+        }
+    }
+
+    public void ResetInteractFlag()
+    {
+        InteractPressed = false;
+    }
+
+    private void LateUpdate()
+    {
+        // รีเซ็ตค่าเพื่อไม่ให้กดค้างข้ามเฟรม
+        InteractPressed = false;
     }
 }
