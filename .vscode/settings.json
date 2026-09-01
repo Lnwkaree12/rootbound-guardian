@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "rootbound-guardian.slnx"
+    "dotnet.defaultSolution": "RootboundGuardian.slnx"
 }
