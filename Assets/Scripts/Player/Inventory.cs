@@ -59,4 +59,15 @@ public class Inventory : MonoBehaviour
             items.RemoveAt(index);
         }
     }
+
+    public List<ItemData> GetItems()
+    {
+        return items; // สมมติว่าใน Inventory คุณใช้ List<ItemData> items
+    }
+
+    public void LoadSavedItems(List<ItemData> savedItems)
+    {
+        items = new List<ItemData>(savedItems);
+        //UpdateUI(); // เรียกฟังก์ชันอัปเดตหน้าจอ UI กระเป๋าของคุณ (ถ้ามี)
+    }
 }

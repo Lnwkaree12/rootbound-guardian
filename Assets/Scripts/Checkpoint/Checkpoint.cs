@@ -2,17 +2,17 @@ using UnityEngine;
 
 public class Checkpoint : MonoBehaviour
 {
-    private bool isActivated = false;
-
     private void OnTriggerEnter(Collider other)
     {
-        // เช็กว่าวัตถุที่มาชนคือ Player
-        if (!isActivated && other.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            isActivated = true;
-            CheckpointManager.Instance.SetCheckpoint(transform.position);
+            PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
+            Inventory inventory = other.GetComponentInParent<Inventory>();
 
-            // สามารถใส่ Effect หรือเปิดไฟเสาเซฟตรงนี้ได้
+            if (CheckpointManager.Instance != null)
+            {
+                CheckpointManager.Instance.SaveCheckpoint(transform.position, health, inventory);
+            }
         }
     }
 }

@@ -1,42 +1,62 @@
+using System.Collections;
 using UnityEngine;
 
 public class ItemObject : MonoBehaviour
 {
+    [Header("Item Settings")]
+    [SerializeField] private string itemID; // ตั้ง ID ไม่ให้ซ้ำกันใน Inspector (เช่น Key_Room1, Potion_01)
     [SerializeField] private ItemData itemData;
-
-    // ลากกลุ่ม Interaction_Prompt ทั้งหมดมาใส่ที่นี่ใน Inspector
     [SerializeField] private GameObject interactionPrompt;
 
+    private bool isCollected = false;
     private bool isPlayerInRange = false;
     private Inventory playerInventory;
     private PlayerInputHandler inputHandler;
+    private PlayerAnimation playerAnimation;
 
-    private void Awake()
+    public string ItemID => itemID;
+
+    private void OnValidate()
     {
-        // ปิด Prompt ไปก่อนในตอนเริ่มเกม
-        if (interactionPrompt != null)
+        // สุ่ม ID อัตโนมัติถ้ายังไม่ได้ตั้งค่าใน Inspector
+        if (string.IsNullOrEmpty(itemID))
         {
-            interactionPrompt.SetActive(false);
+            itemID = System.Guid.NewGuid().ToString();
         }
     }
 
     private void Update()
     {
-        // ตรวจสอบว่าผู้เล่นอยู่ในระยะ และมีการกดปุ่ม Interact (F) หรือไม่
-        if (isPlayerInRange && inputHandler != null && inputHandler.InteractPressed)
+        if (!isCollected && isPlayerInRange && inputHandler != null && inputHandler.InteractPressed)
         {
-            CollectItem();
-            inputHandler.ResetInteractFlag();
+            StartCoroutine(CollectSequence());
         }
     }
 
-    private void CollectItem()
+    private IEnumerator CollectSequence()
     {
-        if (playerInventory != null)
+        isCollected = true;
+
+        if (interactionPrompt != null) interactionPrompt.SetActive(false);
+        if (playerAnimation != null) playerAnimation.PlayPickUpAnimation();
+        if (playerInventory != null) playerInventory.AddItem(itemData);
+
+        // ส่งสัญญาณบอก CheckpointManager ว่าไอเทมชิ้นนี้ถูกเก็บไปแล้ว
+        if (CheckpointManager.Instance != null)
         {
-            playerInventory.AddItem(itemData);
-            Destroy(gameObject); // เก็บแล้วลบออกจากฉาก
+            CheckpointManager.Instance.MarkItemAsPicked(itemID);
         }
+
+        yield return new WaitForSeconds(0.5f);
+
+        // ซ่อนไอเทมแทนการ Destroy
+        gameObject.SetActive(false);
+    }
+
+    public void ResetItemState(bool shouldBeActive)
+    {
+        isCollected = !shouldBeActive;
+        gameObject.SetActive(shouldBeActive);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -46,9 +66,9 @@ public class ItemObject : MonoBehaviour
             isPlayerInRange = true;
             playerInventory = other.GetComponentInParent<Inventory>();
             inputHandler = other.GetComponentInParent<PlayerInputHandler>();
+            playerAnimation = other.GetComponentInParent<PlayerAnimation>();
 
-            // เปิด Prompt ที่มีมิติขึ้นมา
-            if (interactionPrompt != null)
+            if (interactionPrompt != null && !isCollected)
             {
                 interactionPrompt.SetActive(true);
             }
@@ -62,8 +82,8 @@ public class ItemObject : MonoBehaviour
             isPlayerInRange = false;
             playerInventory = null;
             inputHandler = null;
+            playerAnimation = null;
 
-            // ปิด Prompt ลงเมื่อผู้เล่นเดินออก
             if (interactionPrompt != null)
             {
                 interactionPrompt.SetActive(false);

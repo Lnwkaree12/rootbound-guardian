@@ -9,8 +9,9 @@ public class PlayerAnimation : MonoBehaviour
     // Animator Parameter Hashes
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int MoveXHash = Animator.StringToHash("MoveX");
-    private static readonly int MoveYHash = Animator.StringToHash("MoveY");
+    private static readonly int MoveYHash = Animator.StringToHash("MoveZ");
     private static readonly int DashHash = Animator.StringToHash("Dash");
+    private static readonly int PickupHash = Animator.StringToHash("Pickup");
 
     private void Awake()
     {
@@ -46,11 +47,16 @@ public class PlayerAnimation : MonoBehaviour
     }
 
     // ฟังก์ชันสั่งแอนิเมชันตาย
-    public void TriggerDeath()
+    //public void TriggerDeath()
+    //{
+    //    if (animator != null)
+    //    {
+    //        animator.SetTrigger("IsDead");
+    //    }
+    //}
+
+    public void PlayPickUpAnimation()
     {
-        if (animator != null)
-        {
-            animator.SetTrigger("IsDead");
-        }
+        animator.SetTrigger("Pickup");
     }
 }
