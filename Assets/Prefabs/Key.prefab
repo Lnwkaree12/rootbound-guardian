@@ -126,8 +126,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fba39f60488ad04e824097a544dfd73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemObject
+  itemID: 6099446c-ebb2-4fba-9b61-821db4af01a7
   itemData: {fileID: 11400000, guid: 5e70f2f338d6c194bb6e797cd8bb6845, type: 2}
   interactionPrompt: {fileID: 2194567842663953592}
+  pickupSFX: {fileID: 8300000, guid: cd146c4f38a0c6a48a73535b1ce2bbd4, type: 3}
+  soundVolume: 1
 --- !u!1 &2194567842663953592
 GameObject:
   m_ObjectHideFlags: 0

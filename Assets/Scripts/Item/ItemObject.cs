@@ -1,12 +1,16 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using UnityEngine;
 
 public class ItemObject : MonoBehaviour
 {
     [Header("Item Settings")]
-    [SerializeField] private string itemID; // µ—Èß ID ‰¡Ë„ÀÈ´È”°—π„π Inspector (‡™Ëπ Key_Room1, Potion_01)
+    [SerializeField] private string itemID;
     [SerializeField] private ItemData itemData;
     [SerializeField] private GameObject interactionPrompt;
+
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip pickupSFX; // ‡πÉ‡∏™‡πà‡πÑ‡∏ü‡∏•‡πå‡πÄ‡∏™‡∏µ‡∏¢‡∏á‡∏ï‡∏≠‡∏ô‡πÄ‡∏Å‡πá‡∏ö‡πÑ‡∏≠‡πÄ‡∏ó‡∏°‡∏ó‡∏µ‡πà‡∏ô‡∏µ‡πà
+    [SerializeField][Range(0f, 1f)] private float soundVolume = 1.0f; // ‡∏õ‡∏£‡∏±‡∏ö‡∏Ñ‡∏ß‡∏≤‡∏°‡∏î‡∏±‡∏á
 
     private bool isCollected = false;
     private bool isPlayerInRange = false;
@@ -18,7 +22,6 @@ public class ItemObject : MonoBehaviour
 
     private void OnValidate()
     {
-        //  ÿË¡ ID Õ—µ‚π¡—µ‘∂È“¬—ß‰¡Ë‰¥Èµ—Èß§Ë“„π Inspector
         if (string.IsNullOrEmpty(itemID))
         {
             itemID = System.Guid.NewGuid().ToString();
@@ -39,9 +42,15 @@ public class ItemObject : MonoBehaviour
 
         if (interactionPrompt != null) interactionPrompt.SetActive(false);
         if (playerAnimation != null) playerAnimation.PlayPickUpAnimation();
+
+        // üîä ‡πÄ‡∏•‡πà‡∏ô‡πÄ‡∏™‡∏µ‡∏¢‡∏á‡πÄ‡∏Å‡πá‡∏ö‡πÑ‡∏≠‡πÄ‡∏ó‡∏° ‡∏ì ‡∏ï‡∏≥‡πÅ‡∏´‡∏ô‡πà‡∏á‡∏Ç‡∏≠‡∏á‡πÑ‡∏≠‡πÄ‡∏ó‡∏°
+        if (pickupSFX != null)
+        {
+            AudioSource.PlayClipAtPoint(pickupSFX, transform.position, soundVolume);
+        }
+
         if (playerInventory != null) playerInventory.AddItem(itemData);
 
-        //  Ëß —≠≠“≥∫Õ° CheckpointManager «Ë“‰Õ‡∑¡™‘Èππ’È∂Ÿ°‡°Á∫‰ª·≈È«
         if (CheckpointManager.Instance != null)
         {
             CheckpointManager.Instance.MarkItemAsPicked(itemID);
@@ -49,7 +58,6 @@ public class ItemObject : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        // ´ËÕπ‰Õ‡∑¡·∑π°“√ Destroy
         gameObject.SetActive(false);
     }
 
