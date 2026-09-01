@@ -4,6 +4,13 @@ public class DamageDealer : MonoBehaviour
 {
     [SerializeField] private int damage = 10;
     [SerializeField] private bool destroyOnImpact = false; // ติ๊กถูกถ้าเป็นลูกกระสุนที่ชนแล้วหายไป
+    [SerializeField] private float lifetime = 3f;
+
+    private void Start()
+    {
+       if (destroyOnImpact)
+        Destroy(gameObject, lifetime);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
