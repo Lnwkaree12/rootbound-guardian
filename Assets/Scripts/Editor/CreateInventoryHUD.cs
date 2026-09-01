@@ -142,7 +142,7 @@ public class CreateInventoryHUD
         Image quickIconImg = quickIconGO.AddComponent<Image>();
         quickIconImg.sprite = potionSprite;
         quickIconImg.preserveAspect = true;
-        RectTransform quickIconRect = quickIconGO.AddComponent<RectTransform>();
+        RectTransform quickIconRect = quickIconGO.GetComponent<RectTransform>();
         quickIconRect.anchorMin = new Vector2(0f, 0.5f);
         quickIconRect.anchorMax = new Vector2(0f, 0.5f);
         quickIconRect.pivot = new Vector2(0f, 0.5f);

@@ -10,17 +10,19 @@ public class DungeonSceneConfigurator
     [MenuItem("Tools/SproutScout/Configure Dungeon Lighting and Post-Processing")]
     public static void ConfigureDungeonScene()
     {
-        string scenePath = "Assets/Scenes/map.unity";
-        
-        // 1. Open the scene
-        var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+        var scene = EditorSceneManager.GetActiveScene();
         if (!scene.IsValid())
         {
-            Debug.LogError($"[DungeonConfigurator] Could not open scene at {scenePath}");
+            Debug.LogError("[DungeonConfigurator] No active scene found!");
             return;
         }
 
-        Debug.Log("[DungeonConfigurator] Setting up dungeon environment...");
+        string scenePath = scene.path;
+        Debug.Log($"[DungeonConfigurator] Setting up dungeon environment for active scene: {scene.name} ({scenePath})...");
+
+        // Configure Ambient Lighting (make environment pitch black / very dark blue-indigo)
+        RenderSettings.ambientMode = AmbientMode.Flat;
+        RenderSettings.ambientLight = new Color(0.015f, 0.015f, 0.03f, 1f); // Cool dark blue ambient
 
         // 2. Configure Directional Light (make it dim, dark blue moonlit ambient)
         Light dirLight = null;
@@ -36,52 +38,69 @@ public class DungeonSceneConfigurator
 
         if (dirLight != null)
         {
-            dirLight.intensity = 0.05f; // Very dim
+            dirLight.intensity = 0.03f; // Very dim
             dirLight.color = new Color(0.12f, 0.15f, 0.25f); // Cool dark blue
+            dirLight.shadows = LightShadows.Soft;
             EditorUtility.SetDirty(dirLight);
             Debug.Log("[DungeonConfigurator] Dimmed Directional Light for dark dungeon atmosphere.");
         }
 
-        // 3. Spawn point lights with flickering at key coordinates
-        Vector3[] lightPositions = new Vector3[]
+        // Enable soft shadows on all Point and Spot lights in the scene (lanterns, torches)
+        int updatedLightsCount = 0;
+        foreach (var l in lights)
         {
-            new Vector3(0.0f, 1.8f, 0.0f),       // Near Starting Area / Camera
-            new Vector3(18.14f, 1.8f, 10.74f),   // Near Cube (1)
-            new Vector3(14.23f, 1.8f, 19.55f),   // Near Cube
-            new Vector3(209.7f, 2.2f, 61.82f),   // Near corridor-wide-corner
-            new Vector3(221.7f, 1.8f, 30.29f)    // Near Cube (2)
-        };
-
-        // Clear any existing point lights we spawned before to avoid duplicates
-        foreach (var l in Object.FindObjectsOfType<Light>())
-        {
-            if (l.type == LightType.Point && l.gameObject.name.StartsWith("DungeonPointLight"))
+            if (l.type == LightType.Point || l.type == LightType.Spot)
             {
-                Object.DestroyImmediate(l.gameObject);
+                l.shadows = LightShadows.Soft;
+                EditorUtility.SetDirty(l);
+                updatedLightsCount++;
             }
         }
+        Debug.Log($"[DungeonConfigurator] Configured soft shadows on {updatedLightsCount} scene lights.");
 
-        for (int i = 0; i < lightPositions.Length; i++)
+        // 3. Spawn point lights with flickering at key coordinates (only if we are in the main "map" scene)
+        if (scene.name == "map")
         {
-            GameObject lightGO = new GameObject($"DungeonPointLight_{i + 1}");
-            lightGO.transform.position = lightPositions[i];
+            Vector3[] lightPositions = new Vector3[]
+            {
+                new Vector3(0.0f, 1.8f, 0.0f),       // Near Starting Area / Camera
+                new Vector3(18.14f, 1.8f, 10.74f),   // Near Cube (1)
+                new Vector3(14.23f, 1.8f, 19.55f),   // Near Cube
+                new Vector3(209.7f, 2.2f, 61.82f),   // Near corridor-wide-corner
+                new Vector3(221.7f, 1.8f, 30.29f)    // Near Cube (2)
+            };
 
-            Light pLight = lightGO.AddComponent<Light>();
-            pLight.type = LightType.Point;
-            pLight.color = new Color(1.0f, 0.62f, 0.23f); // Warm torch-like orange
-            pLight.intensity = 2.2f;
-            pLight.range = i == 4 ? 10f : 8f; // Cube (2) area gets a slightly larger range
-            pLight.shadows = LightShadows.Soft; // Enable soft shadows for beautiful visuals
+            // Clear any existing point lights we spawned before to avoid duplicates
+            foreach (var l in Object.FindObjectsOfType<Light>())
+            {
+                if (l.type == LightType.Point && l.gameObject.name.StartsWith("DungeonPointLight"))
+                {
+                    Object.DestroyImmediate(l.gameObject);
+                }
+            }
 
-            // Attach LightFlicker script
-            LightFlicker flicker = lightGO.AddComponent<LightFlicker>();
-            flicker.minIntensity = 1.6f;
-            flicker.maxIntensity = 2.6f;
-            flicker.flickerSpeed = 0.08f;
-            flicker.jitterPosition = true;
-            flicker.jitterRange = 0.04f;
+            for (int i = 0; i < lightPositions.Length; i++)
+            {
+                GameObject lightGO = new GameObject($"DungeonPointLight_{i + 1}");
+                lightGO.transform.position = lightPositions[i];
 
-            Debug.Log($"[DungeonConfigurator] Spawned Flickering Point Light {i + 1} at: {lightPositions[i]}");
+                Light pLight = lightGO.AddComponent<Light>();
+                pLight.type = LightType.Point;
+                pLight.color = new Color(1.0f, 0.62f, 0.23f); // Warm torch-like orange
+                pLight.intensity = 2.2f;
+                pLight.range = i == 4 ? 10f : 8f; // Cube (2) area gets a slightly larger range
+                pLight.shadows = LightShadows.Soft; // Enable soft shadows for beautiful visuals
+
+                // Attach LightFlicker script
+                LightFlicker flicker = lightGO.AddComponent<LightFlicker>();
+                flicker.minIntensity = 1.6f;
+                flicker.maxIntensity = 2.6f;
+                flicker.flickerSpeed = 0.08f;
+                flicker.jitterPosition = true;
+                flicker.jitterRange = 0.04f;
+
+                Debug.Log($"[DungeonConfigurator] Spawned Flickering Point Light {i + 1} at: {lightPositions[i]}");
+            }
         }
 
         // 4. Configure Post-Processing
