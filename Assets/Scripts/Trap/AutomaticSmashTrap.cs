@@ -12,6 +12,10 @@ public class AutomaticSmashTrap : MonoBehaviour
     [SerializeField] private float waitTimeAtBottom = 1f; // เวลารอที่พื้นก่อนขึ้น
     [SerializeField] private float waitTimeAtTop = 2f;    // เวลารอก่อนเริ่มทุบใหม่
 
+    [Header("ระบบเสียง (Audio)")]
+    [SerializeField] private AudioSource audioSource; // ตัวเล่นเสียง
+    [SerializeField] private AudioClip smashSound;   // เสียงทุบกระแทกพื้น
+
     private Vector3 startPosition;
     private Vector3 targetPosition;
 
@@ -21,6 +25,12 @@ public class AutomaticSmashTrap : MonoBehaviour
         startPosition = transform.position;
         // คำนวณตำแหน่งเป้าหมายด้านล่าง
         targetPosition = startPosition + Vector3.down * smashDistance;
+
+        // ถ้าไม่ได้แนบ AudioSource มา ให้ลองหาใน GameObject ตัวนี้
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
 
         // เริ่มทำงาน loop อัตโนมัติ
         StartCoroutine(TrapLoop());
@@ -42,6 +52,9 @@ public class AutomaticSmashTrap : MonoBehaviour
                 yield return null; // รอเฟรมถัดไป
             }
 
+            // เล่นเสียงกระแทกพื้นเมื่อทุบลงมาถึงจุดล่างสุด
+            PlaySmashSound();
+
             // 3. เมื่อถึงจุดล่างสุด ให้รอสักพัก
             yield return new WaitForSeconds(waitTimeAtBottom);
 
@@ -51,6 +64,21 @@ public class AutomaticSmashTrap : MonoBehaviour
                 transform.position = Vector3.MoveTowards(transform.position, startPosition, riseSpeed * Time.deltaTime);
                 yield return null; // รอเฟรมถัดไป
             }
+        }
+    }
+
+    private void PlaySmashSound()
+    {
+        if (smashSound == null) return;
+
+        if (audioSource != null)
+        {
+            audioSource.PlayOneShot(smashSound);
+        }
+        else
+        {
+            // หากไม่มี AudioSource จะเล่นเสียงแบบ 3D ณ ตำแหน่งที่กระแทกพื้น
+            AudioSource.PlayClipAtPoint(smashSound, transform.position);
         }
     }
 

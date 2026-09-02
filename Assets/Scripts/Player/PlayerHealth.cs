@@ -12,6 +12,11 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private float invulnerabilityDuration = 1f;
     private bool isInvulnerable = false;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip hurtSound;
+    [SerializeField] private AudioClip deathSound;
+
     [Header("Events")]
     public UnityEvent<int, int> onHealthChanged;
     public UnityEvent onDeath;
@@ -22,6 +27,7 @@ public class PlayerHealth : MonoBehaviour
     private void Awake()
     {
         currentHealth = maxHealth;
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -44,6 +50,7 @@ public class PlayerHealth : MonoBehaviour
         }
         else
         {
+            PlaySound(hurtSound); // เล่นเสียงตอนโดนดาเมจ
             StartCoroutine(InvulnerabilityRoutine());
         }
     }
@@ -57,22 +64,20 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
+        PlaySound(deathSound); // เล่นเสียงตาย
         onDeath?.Invoke();
         Debug.Log("Player Died!");
 
-        // เรียกใช้งานระบบ Respawn
         Respawn();
     }
 
     private void Respawn()
     {
-        // 1. วาร์ปตัวละครไปจุด Save
         if (CheckpointManager.Instance != null)
         {
             CheckpointManager.Instance.RespawnPlayer(gameObject);
         }
 
-        // 2. เติมเลือดกลับมาเต็ม
         ResetHealth();
     }
 
@@ -85,11 +90,19 @@ public class PlayerHealth : MonoBehaviour
 
     public void Heal(int healAmount)
     {
-        if (currentHealth <= 0) return; // ถ้าตายแล้วไม่ต้องฮีล
+        if (currentHealth <= 0) return;
 
         currentHealth += healAmount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth); // ไม่ให้เลือดเกิน MaxHealth
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
-        onHealthChanged?.Invoke(currentHealth, maxHealth); // อัปเดต หลอดเลือด UI
+        onHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
     }
 }

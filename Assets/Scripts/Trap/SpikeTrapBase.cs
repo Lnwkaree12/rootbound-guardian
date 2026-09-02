@@ -17,6 +17,10 @@ public class SpikeTrapBase : MonoBehaviour
     [SerializeField] private float activeTime = 1f;
     [SerializeField] private float cooldownTime = 2f;
 
+    [Header("ระบบเสียง (Audio)")]
+    [SerializeField] private AudioSource audioSource; // ตัวเล่นเสียง
+    [SerializeField] private AudioClip popUpSound;   // เสียงตอนหนามพุ่งขึ้นมา
+
     private Vector3 hiddenPosition;
     private Vector3 targetPosition;
 
@@ -33,6 +37,12 @@ public class SpikeTrapBase : MonoBehaviour
         // คำนวณตำแหน่งที่หนามจะพุ่งขึ้นมา
         targetPosition = hiddenPosition + spikeTransform.up * spikeUpDistance;
 
+        // ถ้าไม่ได้ใส่ AudioSource ให้หาใน Object ตัวนี้อัตโนมัติ
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
         StartCoroutine(SpikeLoop());
     }
 
@@ -41,6 +51,9 @@ public class SpikeTrapBase : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(cooldownTime);
+
+            // เล่นเสียงตอนเริ่มพุ่งขึ้นมา
+            PlayPopUpSound();
 
             // พุ่งขึ้น
             while (Vector3.Distance(spikeTransform.position, targetPosition) > 0.01f)
@@ -59,6 +72,21 @@ public class SpikeTrapBase : MonoBehaviour
                 yield return null;
             }
             spikeTransform.position = hiddenPosition;
+        }
+    }
+
+    private void PlayPopUpSound()
+    {
+        if (popUpSound == null) return;
+
+        if (audioSource != null)
+        {
+            audioSource.PlayOneShot(popUpSound);
+        }
+        else
+        {
+            // หากไม่มี AudioSource เล่นเสียง 3D ณ จุดหนาม
+            AudioSource.PlayClipAtPoint(popUpSound, transform.position);
         }
     }
 }

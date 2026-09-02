@@ -8,10 +8,16 @@ public class DoorController : MonoBehaviour
     public Transform doorPanel;
 
     [Header("Door Settings")]
-    public float openAngle = -90f; // Swing inwards
+    public float openAngle = -90f;
     public float openSpeed = 3.5f;
-    public float interactRadius = 3.0f; // Interaction radius (scaled by door scale)
-    public bool autoUnlockOnContact = true; // Also unlock when player touches/approaches the door with key
+    public float interactRadius = 3.0f;
+    public bool autoUnlockOnContact = true;
+
+    [Header("Key Requirement Settings")]
+    [Tooltip("ระบุชื่อของกุญแจที่ต้องใช้ (ถ้าปล่อยว่างไว้ ขอแค่เป็น ItemType.Key อันไหนก็ได้จะใช้เปิดได้เลย)")]
+    public string requiredKeyName = "";
+    [Tooltip("ต้องการให้ลบกุญแจออกจาก Inventory เมื่อใช้งานสำเร็จหรือไม่")]
+    public bool consumeKeyOnUse = true;
 
     [Header("Audio")]
     public AudioClip doorOpenSfx;
@@ -40,7 +46,6 @@ public class DoorController : MonoBehaviour
             closedRotation = doorPanel.localRotation;
             openRotation = Quaternion.Euler(0f, openAngle, 0f) * closedRotation;
 
-            // Also attach a helper to the door panel child so solid collisions forward to this controller
             DoorPanelCollisionForwarder forwarder = doorPanel.GetComponent<DoorPanelCollisionForwarder>();
             if (forwarder == null)
             {
@@ -57,9 +62,7 @@ public class DoorController : MonoBehaviour
             audioSource.spatialBlend = 0.5f;
         }
 
-        // Cache player reference
         cachedPlayer = FindObjectOfType<PlayerMovement>();
-
         SetupFloatingPrompt();
     }
 
@@ -67,7 +70,6 @@ public class DoorController : MonoBehaviour
     {
         if (promptObject != null) return;
 
-        // Create a lightweight WorldSpace Canvas above the door
         GameObject promptCanvasGO = new GameObject("DoorPromptCanvas");
         promptCanvasGO.transform.SetParent(transform, false);
         promptCanvasGO.transform.localPosition = new Vector3(0f, 2.35f, 0f);
@@ -78,7 +80,6 @@ public class DoorController : MonoBehaviour
         canvasRect.sizeDelta = new Vector2(300f, 60f);
         promptCanvasGO.transform.localScale = new Vector3(0.012f, 0.012f, 0.012f);
 
-        // Dark background for prompt
         GameObject bgGO = new GameObject("Background");
         bgGO.transform.SetParent(promptCanvasGO.transform, false);
         Image bgImg = bgGO.AddComponent<Image>();
@@ -88,17 +89,16 @@ public class DoorController : MonoBehaviour
         bgRect.anchorMax = Vector2.one;
         bgRect.sizeDelta = Vector2.zero;
 
-        // Text
         GameObject textGO = new GameObject("Text");
         textGO.transform.SetParent(bgGO.transform, false);
         promptText = textGO.AddComponent<Text>();
-        
+
         Font customFont = Resources.Load<Font>("Itim-Regular");
         if (customFont == null)
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             customFont = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Itim-Regular.ttf");
-            #endif
+#endif
         }
         if (customFont == null)
         {
@@ -122,7 +122,6 @@ public class DoorController : MonoBehaviour
 
     void Update()
     {
-        // Smoothly rotate the door panel to open/closed rotation
         if (doorPanel != null)
         {
             Quaternion targetRot = isOpen ? openRotation : closedRotation;
@@ -138,10 +137,8 @@ public class DoorController : MonoBehaviour
             return;
         }
 
-        // Proximity distance check to player (Fail-safe fallback so physics setup issues never prevent interaction)
         CheckProximityToPlayer();
 
-        // Check if player has the key to update prompt text
         if (playerInRange)
         {
             bool hasKey = CheckPlayerHasKey();
@@ -154,20 +151,18 @@ public class DoorController : MonoBehaviour
                     if (hasKey)
                     {
                         promptText.text = "🗝️ กด [F] เพื่อไขประตู (มีกุญแจแล้ว)";
-                        promptText.color = new Color(0.4f, 1f, 0.4f); // Light green
+                        promptText.color = new Color(0.4f, 1f, 0.4f);
                     }
                     else
                     {
                         promptText.text = "🔒 ประตูล็อคอยู่! (ต้องหากุญแจก่อน)";
-                        promptText.color = new Color(1f, 0.6f, 0.4f); // Light orange/red
+                        promptText.color = new Color(1f, 0.6f, 0.4f);
                     }
                 }
             }
 
-            // If player presses F, interact!
             if (Input.GetKeyDown(KeyCode.F))
             {
-                Debug.Log("[DoorController] KeyCode.F pressed while player in range!");
                 TryOpenDoor();
             }
         }
@@ -189,20 +184,15 @@ public class DoorController : MonoBehaviour
         }
 
         float dist = Vector3.Distance(transform.position, cachedPlayer.transform.position);
-
-        // Account for door scale (e.g. door scale 5.4 means effective range is larger)
         float maxScale = Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z, 1f);
         float effectiveRadius = Mathf.Max(interactRadius * maxScale, 6.5f);
 
         if (dist <= effectiveRadius)
         {
             playerInRange = true;
-
-            // Auto unlock if player gets very close while carrying the key
             float touchRadius = Mathf.Max(2.5f * maxScale, 4.0f);
             if (autoUnlockOnContact && dist <= touchRadius && CheckPlayerHasKey() && !isOpen)
             {
-                Debug.Log($"[DoorController] Player close proximity ({dist:F2}m <= {touchRadius:F2}m). Auto-unlocking door!");
                 TryOpenDoor();
             }
         }
@@ -214,7 +204,6 @@ public class DoorController : MonoBehaviour
 
     void LateUpdate()
     {
-        // Billboard effect: Make the prompt face the camera
         if (promptObject != null && promptObject.activeSelf)
         {
             Camera cam = Camera.main;
@@ -225,59 +214,103 @@ public class DoorController : MonoBehaviour
         }
     }
 
+    // ========================================================================
+    // 🔑 การเชื่อมต่อกับคลาส Inventory
+    // ========================================================================
+
+    private Inventory GetPlayerInventory()
+    {
+        if (cachedPlayer == null)
+        {
+            cachedPlayer = FindObjectOfType<PlayerMovement>();
+        }
+
+        if (cachedPlayer != null)
+        {
+            return cachedPlayer.GetComponent<Inventory>();
+        }
+
+        return FindObjectOfType<Inventory>();
+    }
+
     private bool CheckPlayerHasKey()
     {
-        if (QuestManager.Instance != null)
+        Inventory inventory = GetPlayerInventory();
+        if (inventory == null) return false;
+
+        foreach (ItemData item in inventory.Items)
         {
-            return QuestManager.Instance.hasKey;
+            if (item == null) continue;
+
+            // เช็กว่าเป็น ItemType.Key
+            if (item.itemType == ItemType.Key)
+            {
+                // ถ้าไม่ได้ระบุชื่อกุญแจเฉพาะ ถือว่าใช้กุญแจอะไรก็เปิดได้
+                if (string.IsNullOrEmpty(requiredKeyName))
+                {
+                    return true;
+                }
+                // ถ้ามีระบุชื่อกุญแจเฉพาะ ต้องชื่อตรงกัน
+                else if (item.itemName == requiredKeyName)
+                {
+                    return true;
+                }
+            }
         }
-        QuestManager qm = FindObjectOfType<QuestManager>();
-        return qm != null && qm.hasKey;
+
+        return false;
     }
+
+    private void ConsumeKeyFromInventory()
+    {
+        if (!consumeKeyOnUse) return;
+
+        Inventory inventory = GetPlayerInventory();
+        if (inventory == null) return;
+
+        for (int i = 0; i < inventory.Items.Count; i++)
+        {
+            ItemData item = inventory.Items[i];
+            if (item != null && item.itemType == ItemType.Key)
+            {
+                if (string.IsNullOrEmpty(requiredKeyName) || item.itemName == requiredKeyName)
+                {
+                    Debug.Log($"[DoorController] Consumed key: {item.itemName}");
+                    inventory.RemoveItem(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    // ========================================================================
 
     public void TryOpenDoor()
     {
         if (isOpen) return;
 
-        bool hasKey = CheckPlayerHasKey();
-
-        if (hasKey)
+        if (CheckPlayerHasKey())
         {
             isOpen = true;
-            Debug.Log("[DoorController] Key verified! Door unlocked and opening...");
+            Debug.Log("[DoorController] Key found in Inventory! Opening door...");
 
-            if (promptObject != null)
-            {
-                promptObject.SetActive(false);
-            }
+            if (promptObject != null) promptObject.SetActive(false);
 
-            // Set all colliders on the door and children to trigger so the player can walk through
             Collider[] colliders = GetComponentsInChildren<Collider>();
             foreach (Collider c in colliders)
             {
                 c.isTrigger = true;
             }
 
-            // Update Quest status
-            if (QuestManager.Instance != null)
-            {
-                QuestManager.Instance.UseKeyOnDoor();
-            }
-            else
-            {
-                QuestManager qm = FindObjectOfType<QuestManager>();
-                if (qm != null) qm.UseKeyOnDoor();
-            }
+            // ลบกุญแจออกจากกระเป๋าเมื่อเปิดประตู
+            ConsumeKeyFromInventory();
 
-            // Play door opening sound
             PlayDoorOpenAudio();
-
-            // Trigger Victory / Win UI!
             TriggerWinUI();
         }
         else
         {
-            Debug.Log("[DoorController] The door is locked! You need to find the key first.");
+            Debug.Log("[DoorController] No matching key found in Inventory.");
             StartCoroutine(FlashLockedPrompt());
         }
     }
@@ -289,8 +322,6 @@ public class DoorController : MonoBehaviour
 
         if (wum == null)
         {
-            // Auto-create WinUIManager dynamically if missing from scene
-            Debug.Log("[DoorController] Creating WinUIManager in scene dynamically...");
             GameObject wumGO = new GameObject("WinUIManager_Auto");
             wum = wumGO.AddComponent<WinUIManager>();
         }
@@ -359,7 +390,6 @@ public class DoorController : MonoBehaviour
         return clip;
     }
 
-    // Comprehensive Player Check: handles root, parent, children, tags, and names!
     public bool IsPlayer(Collider other)
     {
         if (other == null) return false;
@@ -381,7 +411,6 @@ public class DoorController : MonoBehaviour
 
         playerInTrigger = true;
         playerInRange = true;
-        Debug.Log($"[DoorController] Player contacted door ({other.gameObject.name}).");
 
         if (autoUnlockOnContact && CheckPlayerHasKey() && !isOpen)
         {
@@ -389,44 +418,21 @@ public class DoorController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        HandlePlayerContact(other);
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        HandlePlayerContact(other);
-    }
-
+    private void OnTriggerEnter(Collider other) => HandlePlayerContact(other);
+    private void OnTriggerStay(Collider other) => HandlePlayerContact(other);
     private void OnTriggerExit(Collider other)
     {
-        if (IsPlayer(other))
-        {
-            playerInTrigger = false;
-        }
+        if (IsPlayer(other)) playerInTrigger = false;
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        HandlePlayerContact(collision.collider);
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        HandlePlayerContact(collision.collider);
-    }
-
+    private void OnCollisionEnter(Collision collision) => HandlePlayerContact(collision.collider);
+    private void OnCollisionStay(Collision collision) => HandlePlayerContact(collision.collider);
     private void OnCollisionExit(Collision collision)
     {
-        if (IsPlayer(collision.collider))
-        {
-            playerInTrigger = false;
-        }
+        if (IsPlayer(collision.collider)) playerInTrigger = false;
     }
 }
 
-// Small helper attached to DoorPanel child to forward any solid physics collisions to the parent DoorController
 public class DoorPanelCollisionForwarder : MonoBehaviour
 {
     public DoorController parentDoor;

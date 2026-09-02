@@ -12,12 +12,17 @@ public class PlayerMovement : MonoBehaviour
 
     private CharacterController controller;
     private Vector3 verticalVelocity;
+    private float originalStepOffset;
 
-    public bool IsGrounded => controller.isGrounded;
+    public bool IsGrounded => controller != null && controller.isGrounded;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        if (controller != null)
+        {
+            originalStepOffset = controller.stepOffset;
+        }
     }
 
     private void LateUpdate()
@@ -29,31 +34,30 @@ public class PlayerMovement : MonoBehaviour
     // สั่งเดินปกติ
     public void Move(Vector2 inputDirection)
     {
+        if (controller == null || !controller.enabled) return;
+
+        controller.stepOffset = originalStepOffset;
         ApplyGravity();
 
         Vector3 move = new Vector3(inputDirection.x, 0, inputDirection.y);
         Vector3 finalVelocity = (move * moveSpeed) + verticalVelocity;
 
-        if (controller.enabled)
-        {
-            controller.Move(finalVelocity * Time.deltaTime);
-        }
+        controller.Move(finalVelocity * Time.deltaTime);
     }
 
     // สั่งพุ่งแดช
     public void Dash(Vector3 direction)
     {
-        ApplyGravity();
+        if (controller == null || !controller.enabled) return;
 
-        Vector3 finalVelocity = (direction * dashSpeed) + verticalVelocity;
+        verticalVelocity.y = 0f;
+        controller.stepOffset = 0.8f;
 
-        if (controller.enabled)
-        {
-            controller.Move(finalVelocity * Time.deltaTime);
-        }
+        Vector3 finalVelocity = direction * dashSpeed;
+        controller.Move(finalVelocity * Time.deltaTime);
     }
 
-    // คำนวณแรงโน้มถ่วง (ตกเหว/แตะพื้น)
+    // คำนวณแรงโน้มถ่วง
     private void ApplyGravity()
     {
         if (controller.isGrounded && verticalVelocity.y < 0)
@@ -63,9 +67,17 @@ public class PlayerMovement : MonoBehaviour
         verticalVelocity.y += gravity * Time.deltaTime;
     }
 
-    // ระบบวาร์ปตำแหน่งปลอดภัย (ใช้ตอนตกเหว)
+    // หยุดแรงเคลื่อนที่ทั้งหมดทันที (ใช้ตอนเปิด Win UI หรือ Pause)
+    public void StopVelocity()
+    {
+        verticalVelocity = Vector3.zero;
+    }
+
+    // ระบบวาร์ปตำแหน่งปลอดภัย
     public void Teleport(Vector3 newPosition)
     {
+        if (controller == null) return;
+
         controller.enabled = false;
         transform.position = newPosition;
         controller.enabled = true;

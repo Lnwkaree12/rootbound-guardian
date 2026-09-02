@@ -20,6 +20,16 @@ public class Inventory : MonoBehaviour
 
         items.Add(newItem);
         Debug.Log($"Picked up: {newItem.itemName}");
+
+        // เชื่อมต่อกับ QuestManager เมื่อเก็บกุญแจ
+        if (newItem.itemType == ItemType.Key)
+        {
+            if (QuestManager.Instance != null)
+            {
+                QuestManager.Instance.CollectKey();
+            }
+        }
+
         return true;
     }
 
@@ -37,7 +47,6 @@ public class Inventory : MonoBehaviour
                 PlayerHealth health = GetComponent<PlayerHealth>();
                 if (health != null)
                 {
-                    // เปลี่ยนเป็น healAmount ให้ตรงกับ ItemData.cs
                     health.Heal(itemToUse.healAmount);
                     Debug.Log($"Used {itemToUse.itemName}, Healed {itemToUse.healAmount} HP");
                     RemoveItem(index);
@@ -46,7 +55,15 @@ public class Inventory : MonoBehaviour
 
             case ItemType.Key:
                 Debug.Log($"Used Key: {itemToUse.itemName}");
-                // สามารถสั่งเปิดประตู หรือส่ง Event ไปที่ระบบประตูได้ตรงนี้
+
+                // เชื่อมต่อกับ QuestManager เมื่อใช้กุญแจไขประตู
+                if (QuestManager.Instance != null)
+                {
+                    QuestManager.Instance.UseKeyOnDoor();
+                }
+
+                // ลบกุญแจออกจากกระเป๋าหลังจากใช้งานสำเร็จ
+                RemoveItem(index);
                 break;
         }
     }
@@ -60,14 +77,25 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    // ตรวจสอบว่ามีกุญแจอยู่ในกระเป๋าหรือไม่
+    public bool HasKey()
+    {
+        return items.Exists(item => item != null && item.itemType == ItemType.Key);
+    }
+
     public List<ItemData> GetItems()
     {
-        return items; // สมมติว่าใน Inventory คุณใช้ List<ItemData> items
+        return items;
     }
 
     public void LoadSavedItems(List<ItemData> savedItems)
     {
         items = new List<ItemData>(savedItems);
-        //UpdateUI(); // เรียกฟังก์ชันอัปเดตหน้าจอ UI กระเป๋าของคุณ (ถ้ามี)
+
+        // ตรวจสอบว่าในข้อมูลที่โหลดมามีกุญแจหรือไม่ เพื่ออัปเดต QuestManager ให้ถูกต้อง
+        if (HasKey() && QuestManager.Instance != null)
+        {
+            QuestManager.Instance.CollectKey();
+        }
     }
 }

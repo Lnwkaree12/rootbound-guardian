@@ -12,8 +12,18 @@ public class ArrowTrap : MonoBehaviour
     [SerializeField] private float fireRate = 2f;         // ระยะเวลาเว้นช่วงระหว่างการยิง (วินาที)
     [SerializeField] private float arrowLifetime = 5f;     // ทำลายลูกธนูทิ้งหลังจากกี่วินาที (กันเกมกระตุก)
 
+    [Header("ระบบเสียง (Audio)")]
+    [SerializeField] private AudioSource audioSource; // ตัวเล่นเสียง (ถ้าไม่ใส่ สคริปต์จะหาให้อัตโนมัติ)
+    [SerializeField] private AudioClip shootSound;   // ไฟล์เสียงยิงธนู
+
     private void Start()
     {
+        // ถ้าไม่ได้ลาก AudioSource มาใส่ ให้ลองหาจาก GameObject ตัวนี้อัตโนมัติ
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
         // เริ่มทำงานยิงอัตโนมัติซ้ำๆ
         StartCoroutine(AutoShootLoop());
     }
@@ -42,8 +52,27 @@ public class ArrowTrap : MonoBehaviour
             rb.linearVelocity = spawnPoint.forward * shootForce; // ถ้าใช้ Unity เวอร์ชั่นเก่ากว่า 2023.3 ให้ใช้ rb.velocity
         }
 
-        // 3. สั่งทำลายลูกธนูอัตโนมัติเมื่อผ่านไปตามเวลาที่ตั้งไว้ เพื่อไม่ให้รก Scene
+        // 3. เล่นเสียงยิงธนู
+        PlayShootSound();
+
+        // 4. สั่งทำลายลูกธนูอัตโนมัติเมื่อผ่านไปตามเวลาที่ตั้งไว้ เพื่อไม่ให้รก Scene
         Destroy(arrow, arrowLifetime);
+    }
+
+    private void PlayShootSound()
+    {
+        if (shootSound == null) return;
+
+        // เล่นเสียงที่ตำแหน่ง spawnPoint (รองรับ Spatial Blend / เสียง 3D ตามระยะห่าง)
+        if (audioSource != null)
+        {
+            audioSource.PlayOneShot(shootSound);
+        }
+        else
+        {
+            // หากไม่ได้ใส่ AudioSource สคริปต์จะเล่นเสียง 3D ณ จุด spawnPoint ให้ทันที
+            AudioSource.PlayClipAtPoint(shootSound, spawnPoint.position);
+        }
     }
 
     // วาดเส้นแนวการยิงในหน้า Scene เพื่อให้ตั้งทิศทางง่ายขึ้น

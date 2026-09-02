@@ -9,6 +9,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1394947563871316053, guid: b408caddd2dbe5b49a443be3599fea5a, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1394947563871316053, guid: b408caddd2dbe5b49a443be3599fea5a, type: 3}
       propertyPath: staminaBarImage
       value: 
       objectReference: {fileID: 0}
@@ -59,6 +63,10 @@ PrefabInstance:
     - target: {fileID: 6248809792200467440, guid: b408caddd2dbe5b49a443be3599fea5a, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 6267138979132816041, guid: b408caddd2dbe5b49a443be3599fea5a, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6597930929453354210, guid: b408caddd2dbe5b49a443be3599fea5a, type: 3}
       propertyPath: m_Name
