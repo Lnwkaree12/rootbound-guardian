@@ -28,8 +28,10 @@ public class SpawnQuestDoorInScene
         string scenePath = "Assets/Scenes/map.unity";
         string prefabPath = "Assets/Prefabs/Door.prefab";
 
-        // Open scene dynamically if not active or force is requested
         var activeScene = EditorSceneManager.GetActiveScene();
+        if (!activeScene.IsValid()) return;
+
+        // If force requested and not on map.unity, we can still spawn in the current active scene or map
         if (activeScene.path != scenePath && !force) return;
 
         GameObject doorPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -56,7 +58,7 @@ public class SpawnQuestDoorInScene
 
         EditorSceneManager.MarkSceneDirty(activeScene);
         EditorSceneManager.SaveScene(activeScene);
-        Debug.Log("[SpawnDoor] Spawned Quest Door in scene map.unity at: (8.0f, 0.0f, 0.0f)");
+        Debug.Log($"[SpawnDoor] Spawned Quest Door in scene {activeScene.name} at: (8.0f, 0.0f, 0.0f)");
     }
 }
 #endif

@@ -302,12 +302,28 @@ public class PlayerMovement : MonoBehaviour
 
     private void TryInteract()
     {
-        // Search for nearby Key or other interactables within 1.5 units
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1.5f);
+        // 1. Check if any DoorController is within interactive distance (e.g. 7.5 units)
+        DoorController[] allDoors = FindObjectsOfType<DoorController>();
+        foreach (var d in allDoors)
+        {
+            float doorScale = Mathf.Max(d.transform.lossyScale.x, d.transform.lossyScale.z, 1f);
+            float maxDoorReach = Mathf.Max(d.interactRadius * doorScale, 7.5f);
+            if (Vector3.Distance(transform.position, d.transform.position) <= maxDoorReach)
+            {
+                Debug.Log("[PlayerMovement] Interacting with DoorController on [F] key press!");
+                d.TryOpenDoor();
+                return;
+            }
+        }
+
+        // 2. Search for nearby Key or other interactables within 5.5 units (scaled to character)
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 5.5f);
         foreach (var col in hitColliders)
         {
-            // Check for KeyPickup script
+            // Check for KeyPickup script on self or parent
             KeyPickup key = col.GetComponent<KeyPickup>();
+            if (key == null) key = col.GetComponentInParent<KeyPickup>();
+
             if (key != null)
             {
                 if (QuestManager.Instance != null)
@@ -320,7 +336,7 @@ public class PlayerMovement : MonoBehaviour
                     if (qm != null) qm.CollectKey();
                 }
                 Debug.Log("[PlayerMovement] Successfully interacted and collected the Key!");
-                Destroy(col.gameObject);
+                Destroy(key.gameObject);
                 break;
             }
         }
