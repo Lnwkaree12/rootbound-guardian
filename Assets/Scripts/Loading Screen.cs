@@ -41,10 +41,10 @@ public class LoadingManager : MonoBehaviour
     public string sceneToLoad = "SafeZone";
     
     [Tooltip("Minimum time the loading screen must be visible (for smooth visualization).")]
-    public float minimumLoadTime = 4f;
+    public float minimumLoadTime = 5.5f;
     
     [Tooltip("If true, the game will wait for player input after loading is complete.")]
-    public bool waitForInputToStart = true;
+    public bool waitForInputToStart = false;
     
     [Header("Gameplay Tips")]
     [Tooltip("Gameplay tips or lore text that will rotate during loading.")]
@@ -101,6 +101,10 @@ public class LoadingManager : MonoBehaviour
         try
         {
             operation = SceneManager.LoadSceneAsync(sceneToLoad);
+            if (operation != null)
+            {
+                operation.allowSceneActivation = false;
+            }
         }
         catch (System.Exception e)
         {

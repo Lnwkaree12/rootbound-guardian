@@ -28,8 +28,9 @@ public class SpawnQuestKeyInScene
         string scenePath = "Assets/Scenes/map.unity";
         string prefabPath = "Assets/Prefabs/Key.prefab";
 
-        // Open scene dynamically if not active or force is requested
         var activeScene = EditorSceneManager.GetActiveScene();
+        if (!activeScene.IsValid()) return;
+
         if (activeScene.path != scenePath && !force) return;
 
         GameObject keyPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -55,7 +56,7 @@ public class SpawnQuestKeyInScene
 
         EditorSceneManager.MarkSceneDirty(activeScene);
         EditorSceneManager.SaveScene(activeScene);
-        Debug.Log("[SpawnKey] Spawned Quest Key in scene map.unity at: (18.14f, 1.2f, 10.74f)");
+        Debug.Log($"[SpawnKey] Spawned Quest Key in scene {activeScene.name} at: (18.14f, 1.2f, 10.74f)");
     }
 }
 #endif

@@ -1024,8 +1024,8 @@ MonoBehaviour:
   fadeCanvasGroup: {fileID: 0}
   pressKeyPrompt: {fileID: 0}
   sceneToLoad: IntroScene
-  minimumLoadTime: 4
-  waitForInputToStart: 1
+  minimumLoadTime: 5.5
+  waitForInputToStart: 0
   gameTips:
   - 'Tip: Sprout Scouts must avoid dangerous roots!'
   - 'Tip: Collect water to stay hydrated and keep moving.'
@@ -4303,7 +4303,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 504, y: -513}
+  m_AnchoredPosition: {x: 578, y: -513}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1771309135

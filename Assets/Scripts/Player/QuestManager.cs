@@ -81,4 +81,16 @@ public class QuestManager : MonoBehaviour
             }
         }
     }
+
+    public void UseKeyOnDoor()
+    {
+        if (questDescText == null) FindQuestUIReferences();
+
+        if (questDescText != null)
+        {
+            questDescText.text = "🚪 ไขประตูดันเจี้ยนสำเร็จ! (1/1)";
+            questDescText.color = new Color(1f, 0.85f, 0.2f); // Gold
+        }
+        Debug.Log("[QuestManager] Key used on door! Quest cleared.");
+    }
 }
