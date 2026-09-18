@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 1953469678036649443}
   - component: {fileID: 8023078674573080028}
   - component: {fileID: 1830090229681436556}
+  - component: {fileID: 7649121720225849218}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -362,6 +363,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
   maxSlots: 10
   items: []
+--- !u!81 &7649121720225849218
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4389765043622299808}
+  m_Enabled: 1
 --- !u!1 &5551271543905125926
 GameObject:
   m_ObjectHideFlags: 0
@@ -454,7 +463,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5551271543905125926}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!114 &5962603828776526282
 MonoBehaviour:
   m_ObjectHideFlags: 0
