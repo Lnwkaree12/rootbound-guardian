@@ -47,7 +47,7 @@ public class Inventory : MonoBehaviour
                 PlayerHealth health = GetComponent<PlayerHealth>();
                 if (health != null)
                 {
-                    health.Heal(itemToUse.healAmount);
+                    //health.Heal(itemToUse.healAmount);
                     Debug.Log($"Used {itemToUse.itemName}, Healed {itemToUse.healAmount} HP");
                     RemoveItem(index);
                 }

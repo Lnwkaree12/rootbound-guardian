@@ -20,7 +20,6 @@ GameObject:
   - component: {fileID: 8204653507344247518}
   - component: {fileID: 7532572160159764220}
   - component: {fileID: 8961521778176737692}
-  - component: {fileID: 1953469678036649443}
   - component: {fileID: 8023078674573080028}
   - component: {fileID: 1830090229681436556}
   - component: {fileID: 7649121720225849218}
@@ -159,13 +158,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHealth: 100
+  currentHealth: 0
+  isInSafeZone: 1
+  gasDamagePerTick: 5
+  gasTickInterval: 1
+  healPerTick: 10
+  healTickInterval: 0.5
   invulnerabilityDuration: 1
+  respawnDelay: 1.5
+  respawnHealth: 15
   audioSource: {fileID: 3534316861868819802}
   hurtSound: {fileID: 0}
   deathSound: {fileID: 8300000, guid: e62b2be43b06576418e00a2cc73122ea, type: 3}
   onHealthChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -314,29 +333,6 @@ MonoBehaviour:
   footstepSound: {fileID: 0}
   fallSound: {fileID: 0}
   fallThresholdSpeed: -2
---- !u!114 &1953469678036649443
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4389765043622299808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96413e2162971604bb9744e5867ff60f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  maxHealth: 100
-  invulnerabilityDuration: 1
-  audioSource: {fileID: 0}
-  hurtSound: {fileID: 0}
-  deathSound: {fileID: 0}
-  onHealthChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  onDeath:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &8023078674573080028
 MonoBehaviour:
   m_ObjectHideFlags: 0

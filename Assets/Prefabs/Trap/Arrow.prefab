@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a71659466554f3488dd2de894059404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
-  damageAmount: 10
+  damageAmount: 50
   onHitPlayer:
     m_PersistentCalls:
       m_Calls: []
@@ -222,7 +222,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49ee7ce43f369644685cc6b42591647e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArrowProjectile
-  shootForce: 30
+  speed: 30
   maxLifetime: 5
-  arrowPrefabKey: {fileID: 5202853184061124919}
   damageDealer: {fileID: 505238617117226819}
