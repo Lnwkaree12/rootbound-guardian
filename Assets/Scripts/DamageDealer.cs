@@ -1,44 +1,31 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DamageDealer : MonoBehaviour
 {
-    [SerializeField] private int damage = 10;
-    [SerializeField] private bool destroyOnImpact = false; // ติ๊กถูกถ้าเป็นลูกกระสุนที่ชนแล้วหายไป
-    [SerializeField] private float lifetime = 3f;
+    [SerializeField] private int damageAmount = 10;
 
-    private void Start()
-    {
-       if (destroyOnImpact)
-        Destroy(gameObject, lifetime);
-    }
+    // ส่ง Event ออกไปเมื่อชนโดน Player
+    public UnityEvent onHitPlayer;
 
     private void OnTriggerEnter(Collider other)
     {
-        // ค้นหา PlayerHealth จากตัวที่มาชน หรือตัว Parent ของมัน
-        PlayerHealth playerHealth = other.GetComponentInParent<PlayerHealth>();
+        HandleDamage(other.gameObject);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        HandleDamage(collision.gameObject);
+    }
+
+    private void HandleDamage(GameObject target)
+    {
+        PlayerHealth playerHealth = target.GetComponentInParent<PlayerHealth>();
 
         if (playerHealth != null)
         {
-            playerHealth.TakeDamage(damage);
-
-            if (destroyOnImpact)
-            {
-                Destroy(gameObject);
-            }
-        }
-    }
-
-    // กรณีที่ใช้ Collision (Collider ไม่ได้ติ๊ก Is Trigger)
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.TryGetComponent<PlayerHealth>(out PlayerHealth playerHealth))
-        {
-            playerHealth.TakeDamage(damage);
-
-            if (destroyOnImpact)
-            {
-                Destroy(gameObject);
-            }
+            playerHealth.TakeDamage(damageAmount);
+            onHitPlayer?.Invoke(); // แจ้งว่าชนโดน Player แล้วนะ
         }
     }
 }

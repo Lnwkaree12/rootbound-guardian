@@ -121,9 +121,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArrowTrap
   arrowPrefab: {fileID: 5202853184061124919, guid: bf64f75b3ed17bc478fe1073f4e06f83, type: 3}
   spawnPoint: {fileID: 2482372636503064921}
-  shootForce: 30
   fireRate: 2
-  arrowLifetime: 5
+  isActiveOnStart: 1
   audioSource: {fileID: 8781547493946488189}
   shootSound: {fileID: 8300000, guid: 448ba3bccc47592468579efd0c219a64, type: 3}
 --- !u!82 &8781547493946488189

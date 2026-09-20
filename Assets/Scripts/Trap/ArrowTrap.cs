@@ -1,31 +1,66 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 public class ArrowTrap : MonoBehaviour
 {
     [Header("สิ่งของและตำแหน่ง")]
-    [SerializeField] private GameObject arrowPrefab; // Prefab ลูกธนู
+    [SerializeField] private GameObject arrowPrefab; // Prefab ลูกธนู (Key สำหรับ ObjectPoolManager)
     [SerializeField] private Transform spawnPoint;   // จุดยิงลูกธนู (SpawnPoint)
 
     [Header("การตั้งค่าการยิง")]
-    [SerializeField] private float shootForce = 30f;      // ความเร็ว/แรงส่งของลูกธนู
     [SerializeField] private float fireRate = 2f;         // ระยะเวลาเว้นช่วงระหว่างการยิง (วินาที)
-    [SerializeField] private float arrowLifetime = 5f;     // ทำลายลูกธนูทิ้งหลังจากกี่วินาที (กันเกมกระตุก)
+    [SerializeField] private bool isActiveOnStart = true; // ให้เริ่มยิงทันทีเมื่อเข้าเกมหรือไม่
 
     [Header("ระบบเสียง (Audio)")]
-    [SerializeField] private AudioSource audioSource; // ตัวเล่นเสียง (ถ้าไม่ใส่ สคริปต์จะหาให้อัตโนมัติ)
+    [SerializeField] private AudioSource audioSource; // ตัวเล่นเสียง
     [SerializeField] private AudioClip shootSound;   // ไฟล์เสียงยิงธนู
 
-    private void Start()
+    private Coroutine shootCoroutine;
+    private WaitForSeconds waitForFireRate;
+
+    private void Awake()
     {
-        // ถ้าไม่ได้ลาก AudioSource มาใส่ ให้ลองหาจาก GameObject ตัวนี้อัตโนมัติ
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
         }
 
-        // เริ่มทำงานยิงอัตโนมัติซ้ำๆ
-        StartCoroutine(AutoShootLoop());
+        if (spawnPoint == null)
+        {
+            spawnPoint = transform;
+        }
+
+        waitForFireRate = new WaitForSeconds(fireRate);
+    }
+
+    private void OnEnable()
+    {
+        if (isActiveOnStart)
+        {
+            StartShooting();
+        }
+    }
+
+    private void OnDisable()
+    {
+        StopShooting();
+    }
+
+    public void StartShooting()
+    {
+        if (shootCoroutine == null)
+        {
+            shootCoroutine = StartCoroutine(AutoShootLoop());
+        }
+    }
+
+    public void StopShooting()
+    {
+        if (shootCoroutine != null)
+        {
+            StopCoroutine(shootCoroutine);
+            shootCoroutine = null;
+        }
     }
 
     private IEnumerator AutoShootLoop()
@@ -33,55 +68,55 @@ public class ArrowTrap : MonoBehaviour
         while (true)
         {
             ShootArrow();
-            // รอเวลาตามค่า fireRate ก่อนยิงนัดถัดไป
-            yield return new WaitForSeconds(fireRate);
+            yield return waitForFireRate;
         }
     }
 
     private void ShootArrow()
     {
-        if (arrowPrefab == null || spawnPoint == null) return;
+        if (arrowPrefab == null || spawnPoint == null || ObjectPoolManager.Instance == null) return;
 
-        // 1. สร้างลูกธนูขึ้นมาจากตำแหน่ง และ ทิศทาง ของ spawnPoint
-        GameObject arrow = Instantiate(arrowPrefab, spawnPoint.position, spawnPoint.rotation);
+        // 1. ดึงลูกธนูจาก ObjectPoolManager
+        GameObject arrow = ObjectPoolManager.Instance.Spawn(arrowPrefab, spawnPoint.position, spawnPoint.rotation);
 
-        // 2. ดึง Rigidbody ของลูกธนูแล้วเพิ่มแรงส่งไปทิศทางด้านหน้า (forward)
-        Rigidbody rb = arrow.GetComponent<Rigidbody>();
-        if (rb != null)
+        if (arrow != null)
         {
-            rb.linearVelocity = spawnPoint.forward * shootForce; // ถ้าใช้ Unity เวอร์ชั่นเก่ากว่า 2023.3 ให้ใช้ rb.velocity
+            // 2. บังคับ Set Position และ Rotation ให้ Rigidbody โดยตรงอีกที
+            if (arrow.TryGetComponent<Rigidbody>(out Rigidbody rb))
+            {
+                rb.position = spawnPoint.position;
+                rb.rotation = spawnPoint.rotation;
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+
+                // บังคับดันไปตามทิศทางหน้าปากกระบอกยิง
+                rb.linearVelocity = spawnPoint.forward * 30f;
+            }
         }
 
-        // 3. เล่นเสียงยิงธนู
         PlayShootSound();
-
-        // 4. สั่งทำลายลูกธนูอัตโนมัติเมื่อผ่านไปตามเวลาที่ตั้งไว้ เพื่อไม่ให้รก Scene
-        Destroy(arrow, arrowLifetime);
     }
 
     private void PlayShootSound()
     {
         if (shootSound == null) return;
 
-        // เล่นเสียงที่ตำแหน่ง spawnPoint (รองรับ Spatial Blend / เสียง 3D ตามระยะห่าง)
         if (audioSource != null)
         {
             audioSource.PlayOneShot(shootSound);
         }
         else
         {
-            // หากไม่ได้ใส่ AudioSource สคริปต์จะเล่นเสียง 3D ณ จุด spawnPoint ให้ทันที
             AudioSource.PlayClipAtPoint(shootSound, spawnPoint.position);
         }
     }
 
-    // วาดเส้นแนวการยิงในหน้า Scene เพื่อให้ตั้งทิศทางง่ายขึ้น
     private void OnDrawGizmosSelected()
     {
-        if (spawnPoint != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawRay(spawnPoint.position, spawnPoint.forward * 5f);
-        }
+        Transform pointToDraw = (spawnPoint != null) ? spawnPoint : transform;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(pointToDraw.position, pointToDraw.forward * 5f);
+        Gizmos.DrawWireSphere(pointToDraw.position, 0.15f);
     }
 }
