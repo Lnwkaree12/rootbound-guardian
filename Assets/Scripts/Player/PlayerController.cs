@@ -1,4 +1,4 @@
-using UnityEngine;
+๏ปฟusing UnityEngine;
 
 [RequireComponent(typeof(PlayerInputHandler))]
 [RequireComponent(typeof(PlayerMovement))]
@@ -6,10 +6,12 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Dash Settings")]
     [SerializeField] private float dashDuration = 0.2f;
+    [SerializeField] private int dashHealthCost = 10;
 
     [Header("Audio Settings")]
-    [SerializeField] private AudioSource audioSource;       // สำหรับเสียงเอฟเฟกต์ชั่วคราว (Dash, Fall)
-    [SerializeField] private AudioSource footstepAudioSource; // สำหรับเสียงเดินโดยเฉพาะ (ป้องกันเสียงทับกัน)
+    [SerializeField] private AudioSource audioSource;         // เธชเธณเธซเธฃเธฑเธเน€เธชเธตเธขเธเน€เธญเธเน€เธเธเธ•เนเธ—เธฑเนเธงเนเธ (Fall)
+    [SerializeField] private AudioSource footstepAudioSource; // เธชเธณเธซเธฃเธฑเธเน€เธชเธตเธขเธเน€เธ”เธดเธ
+    [SerializeField] private AudioSource dashAudioSource;     // ๐‘ เนเธขเธ AudioSource เธชเธณเธซเธฃเธฑเธเน€เธชเธตเธขเธ Dash เนเธ”เธขเน€เธเธเธฒเธฐ
     [SerializeField] private AudioClip dashSound;
     [SerializeField] private AudioClip footstepSound;
     [SerializeField] private AudioClip fallSound;
@@ -23,6 +25,7 @@ public class PlayerController : MonoBehaviour
     private PlayerInputHandler inputHandler;
     private PlayerMovement movement;
     private PlayerAnimation playerAnim;
+    private PlayerHealth playerHealth;
 
     private bool isDashing;
     private float dashTimer;
@@ -33,19 +36,27 @@ public class PlayerController : MonoBehaviour
         inputHandler = GetComponent<PlayerInputHandler>();
         movement = GetComponent<PlayerMovement>();
         playerAnim = GetComponent<PlayerAnimation>();
+        playerHealth = GetComponent<PlayerHealth>();
 
         characterController = GetComponent<CharacterController>();
         rb = GetComponent<Rigidbody>();
 
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
 
-        // ปรับแก้ตรงนี้: หาก FootstepAudioSource ไม่ถูกตั้งค่า หรือเผลอใช้ตัวเดียวกับ audioSource
-        // ให้สร้าง AudioSource ตัวใหม่แยกต่างหากทันที
+        // เธ•เธฃเธงเธเธชเธญเธเนเธฅเธฐเธชเธฃเนเธฒเธ AudioSource เธชเธณเธซเธฃเธฑเธ Footstep เธซเธฒเธเธขเธฑเธเนเธกเนเธกเธต
         if (footstepAudioSource == null || footstepAudioSource == audioSource)
         {
             footstepAudioSource = gameObject.AddComponent<AudioSource>();
             footstepAudioSource.loop = false;
             footstepAudioSource.playOnAwake = false;
+        }
+
+        // ๐‘ เธ•เธฃเธงเธเธชเธญเธเนเธฅเธฐเธชเธฃเนเธฒเธ AudioSource เธชเธณเธซเธฃเธฑเธ Dash เนเธ”เธขเน€เธเธเธฒเธฐ
+        if (dashAudioSource == null || dashAudioSource == audioSource)
+        {
+            dashAudioSource = gameObject.AddComponent<AudioSource>();
+            dashAudioSource.loop = false;
+            dashAudioSource.playOnAwake = false;
         }
     }
 
@@ -57,7 +68,7 @@ public class PlayerController : MonoBehaviour
         if (isDashing)
         {
             movement.Dash(dashDirection);
-            StopFootstepSound(); // หยุดเสียงเดินทันทีเมื่อกำลังแดช
+            StopFootstepSound(); // เธซเธขเธธเธ”เน€เธชเธตเธขเธเน€เธ”เธดเธเธ—เธฑเธเธ—เธตเน€เธกเธทเนเธญเธเธณเธฅเธฑเธเนเธ”เธ
         }
         else
         {
@@ -71,12 +82,10 @@ public class PlayerController : MonoBehaviour
         bool isGrounded = (characterController != null) ? characterController.isGrounded : true;
         bool isMoving = inputHandler.MoveInput.sqrMagnitude > 0.01f;
 
-        // เช็คว่าอยู่บนพื้น และกำลังเคลื่อนที่
         if (isGrounded && isMoving)
         {
             if (footstepSound != null && footstepAudioSource != null)
             {
-                // ถ้าเสียงเดินไม่ได้กำลังเล่นอยู่ ให้เริ่มเล่น
                 if (!footstepAudioSource.isPlaying)
                 {
                     footstepAudioSource.clip = footstepSound;
@@ -86,7 +95,6 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            // ถ้าหยุดเดิน หรือ ลอยอยู่บนอากาศ ให้หยุดเล่นเสียงเดินทันที
             StopFootstepSound();
         }
     }
@@ -148,6 +156,23 @@ public class PlayerController : MonoBehaviour
 
     private void StartDash()
     {
+        // ๐” เน€เธฅเนเธเน€เธชเธตเธขเธ Dash เธเนเธฒเธ AudioSource เธเธญเธ Dash เนเธ”เธขเธ•เธฃเธ
+        if (dashSound != null && dashAudioSource != null)
+        {
+            Debug.Log("Dash Sound Played!"); // ๐‘ เธ”เธนเนเธ Console เธงเนเธฒเธเนเธญเธเธงเธฒเธกเธเธตเนเธเธถเนเธเนเธซเธกเน€เธกเธทเนเธญเธเธ” Dash
+            dashAudioSource.PlayOneShot(dashSound);
+        }
+        else
+        {
+            Debug.LogWarning("Dash Sound เธซเธฃเธทเธญ Dash AudioSource เธขเธฑเธเนเธกเนเนเธ”เนเธ•เธฑเนเธเธเนเธฒ!");
+        }
+
+        // ๐ฉธ เธซเธฑเธเน€เธฅเธทเธญเธ”เน€เธกเธทเนเธญเธเธ” Dash
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(dashHealthCost);
+        }
+
         Vector2 input = inputHandler.MoveInput;
         Vector3 moveDir = new Vector3(input.x, 0, input.y);
 
@@ -161,8 +186,6 @@ public class PlayerController : MonoBehaviour
         }
 
         if (playerAnim != null) playerAnim.TriggerDash();
-
-        PlaySound(dashSound);
 
         isDashing = true;
         dashTimer = dashDuration;

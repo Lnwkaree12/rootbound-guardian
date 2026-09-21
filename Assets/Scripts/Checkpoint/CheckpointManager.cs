@@ -37,23 +37,27 @@ public class CheckpointManager : MonoBehaviour
         }
     }
 
-    // เรียกเมื่อผู้เล่นแตะจุดเซฟ
-    public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp, Inventory inventoryComp)
+    // เรียกเมื่อผู้เล่นกดเซฟที่ต้นไม้
+    public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp = null, Inventory inventoryComp = null)
     {
         lastCheckpointPosition = checkpointPos;
         hasCheckpoint = true;
 
-        // 1. บันทึกข้อมูลผู้เล่น
-        currentSaveData = new PlayerDataSave
+        // 1. บันทึกข้อมูลผู้เล่น (ถ้าส่ง Component มา)
+        if (healthComp != null || inventoryComp != null)
         {
-            savedHealth = healthComp.MaxHealth,
-            savedItems = new List<ItemData>(inventoryComp.GetItems())
-        };
+            currentSaveData = new PlayerDataSave
+            {
+                // เซฟค่าเลือดปัจจุบันแทน MaxHealth
+                savedHealth = healthComp != null ? healthComp.CurrentHealth : 100,
+                savedItems = inventoryComp != null ? new List<ItemData>(inventoryComp.GetItems()) : new List<ItemData>()
+            };
+        }
 
         // 2. ล็อกรายชื่อไอเทมที่ถูกเก็บ ณ วินาทีที่เซฟ
         savedPickedItemIDs = new HashSet<string>(currentPickedItemIDs);
 
-        Debug.Log("บันทึกจุดเซฟเรียบร้อย!");
+        Debug.Log($"[CheckpointManager] บันทึกจุดเซฟสำเร็จที่ตำแหน่ง: {checkpointPos}");
     }
 
     // เรียกเมื่อผู้เล่นตาย (Respawn)
@@ -69,7 +73,10 @@ public class CheckpointManager : MonoBehaviour
 
         // 2. คืนค่าเลือดและกระเป๋าเดินทาง
         PlayerHealth health = player.GetComponent<PlayerHealth>();
-        if (health != null) health.ResetHealth();
+        if (health != null)
+        {
+            health.ResetHealth(); // จะตั้งค่าเลือดตาม respawnHealth ที่ตั้งไว้ใน PlayerHealth
+        }
 
         Inventory inventory = player.GetComponent<Inventory>();
         if (inventory != null && currentSaveData != null)
@@ -84,8 +91,6 @@ public class CheckpointManager : MonoBehaviour
         ItemObject[] allItems = FindObjectsByType<ItemObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (ItemObject item in allItems)
         {
-            // ถ้า ID ของไอเทมชิ้นนี้อยู่ในรายการที่เซฟไปแล้ว ให้ซ่อนไว้ (false)
-            // ถ้าไม่อยู่ในรายการ ให้แสดงกลับมาวางบนพื้น (true)
             bool isAlreadyPickedBeforeSave = savedPickedItemIDs.Contains(item.ItemID);
             item.ResetItemState(!isAlreadyPickedBeforeSave);
         }

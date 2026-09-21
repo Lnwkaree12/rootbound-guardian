@@ -587,33 +587,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3534316861868819802, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
-      propertyPath: MaxDistance
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 3534316861868819802, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
-      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4389765043622299808, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 7634131980565009664, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
-      propertyPath: healPerTick
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7634131980565009664, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
-      propertyPath: respawnDelay
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7634131980565009664, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
-      propertyPath: gasDamagePerTick
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7634131980565009664, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
-      propertyPath: invulnerabilityDuration
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7634131980565009664, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
       propertyPath: onHealthChanged.m_PersistentCalls.m_Calls.Array.size
