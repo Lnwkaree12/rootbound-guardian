@@ -5,6 +5,7 @@ public class TreeSavePoint : MonoBehaviour
     [Header("Tree Status")]
     [SerializeField] private bool isRestored = false; // สถานะว่าต้นไม้ถูกฟื้นฟูหรือยัง
     private bool isPlayerInRange = false;
+    [SerializeField] private bool healsOxygen = true; // ถ้าติ๊กจะเปิดการฟื้น Oxygen เมื่อฟื้นต้นไม้
 
     [Header("UI Prompts (Optional)")]
     [SerializeField] private GameObject interactPromptUI;
@@ -45,12 +46,12 @@ public class TreeSavePoint : MonoBehaviour
 
         UpdateTreeVisual();
 
-        if (playerTransform != null)
+        if (playerTransform != null && healsOxygen)
         {
-            PlayerHealth playerHealth = playerTransform.GetComponent<PlayerHealth>();
-            if (playerHealth != null)
+            PlayerOxygen playerOxygen = playerTransform.GetComponent<PlayerOxygen>();
+            if (playerOxygen != null)
             {
-                playerHealth.UpdateSafeZoneState(true);
+                playerOxygen.UpdateSafeZoneState(true);
             }
         }
     }
@@ -91,6 +92,16 @@ public class TreeSavePoint : MonoBehaviour
             else
             {
                 Debug.Log("กด [Interact/E] เพื่อบันทึกเกม");
+
+                // ถ้าต้นไม้ฟื้นแล้วและถูกตั้งค่าให้ฟื้น Oxygen จะเปิด Safe Zone
+                if (isRestored && healsOxygen)
+                {
+                    PlayerOxygen playerOxygen = other.GetComponentInParent<PlayerOxygen>();
+                    if (playerOxygen != null)
+                    {
+                        playerOxygen.UpdateSafeZoneState(true);
+                    }
+                }
             }
         }
     }
@@ -104,6 +115,16 @@ public class TreeSavePoint : MonoBehaviour
             inputHandler = null;
 
             if (interactPromptUI != null) interactPromptUI.SetActive(false);
+
+            // ออกจากวง Safe Zone (ถ้าต้นไม้ถูกตั้งค่าให้ฟื้น Oxygen)
+            if (isRestored && healsOxygen)
+            {
+                PlayerOxygen playerOxygen = other.GetComponentInParent<PlayerOxygen>();
+                if (playerOxygen != null)
+                {
+                    playerOxygen.UpdateSafeZoneState(false);
+                }
+            }
         }
     }
 }

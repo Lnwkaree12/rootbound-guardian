@@ -185,6 +185,7 @@ GameObject:
   - component: {fileID: 8023078674573080028}
   - component: {fileID: 1830090229681436556}
   - component: {fileID: 7649121720225849218}
+  - component: {fileID: 4418683475671264755}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -323,10 +324,6 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   isInSafeZone: 1
-  gasDamagePerTick: 5
-  gasTickInterval: 1
-  healPerTick: 10
-  healTickInterval: 0.5
   invulnerabilityDuration: 1
   respawnDelay: 1.5
   respawnHealth: 15
@@ -393,6 +390,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   dashDuration: 0.2
   dashHealthCost: 10
+  dashOxygenCost: 15
   audioSource: {fileID: 8544269323940799470}
   footstepAudioSource: {fileID: 5631970890555151421}
   dashAudioSource: {fileID: 5524489954739152985}
@@ -513,6 +511,44 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4389765043622299808}
   m_Enabled: 1
+--- !u!114 &4418683475671264755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4389765043622299808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54957469b941e754983b406987c33036, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerOxygen
+  maxOxygen: 100
+  currentOxygen: 0
+  drainPerTick: 5
+  drainTickInterval: 1
+  regenPerTick: 10
+  regenTickInterval: 0.5
+  healthDamagePerTickWhenDepleted: 5
+  damageTickIntervalWhenDepleted: 1
+  onOxygenChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onOxygenDepleted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5551271543905125926
 GameObject:
   m_ObjectHideFlags: 0

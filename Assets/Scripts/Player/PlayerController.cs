@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [Header("Dash Settings")]
     [SerializeField] private float dashDuration = 0.2f;
     [SerializeField] private int dashHealthCost = 10;
+    [SerializeField] private int dashOxygenCost = 15;
 
     [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;         // สำหรับเสียงเอฟเฟกต์ทั่วไป (Fall)
@@ -26,6 +27,7 @@ public class PlayerController : MonoBehaviour
     private PlayerMovement movement;
     private PlayerAnimation playerAnim;
     private PlayerHealth playerHealth;
+    private PlayerOxygen playerOxygen;
 
     private bool isDashing;
     private float dashTimer;
@@ -37,6 +39,7 @@ public class PlayerController : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         playerAnim = GetComponent<PlayerAnimation>();
         playerHealth = GetComponent<PlayerHealth>();
+        playerOxygen = GetComponent<PlayerOxygen>();
 
         characterController = GetComponent<CharacterController>();
         rb = GetComponent<Rigidbody>();
@@ -167,8 +170,12 @@ public class PlayerController : MonoBehaviour
             Debug.LogWarning("Dash Sound หรือ Dash AudioSource ยังไม่ได้ตั้งค่า!");
         }
 
-        // 🩸 หักเลือดเมื่อกด Dash
-        if (playerHealth != null)
+        // 🫧 ลด Oxygen เมื่อกด Dash (fallback เป็นหักเลือดถ้าไม่มี PlayerOxygen)
+        if (playerOxygen != null)
+        {
+            playerOxygen.ConsumeOxygen(dashOxygenCost);
+        }
+        else if (playerHealth != null)
         {
             playerHealth.TakeDamage(dashHealthCost);
         }

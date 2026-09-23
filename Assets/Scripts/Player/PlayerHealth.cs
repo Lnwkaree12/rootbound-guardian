@@ -8,12 +8,8 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private int currentHealth;
 
-    [Header("Gas & Safe Zone Settings")]
+    [Header("Safe Zone Settings")]
     [SerializeField] private bool isInSafeZone = true; // เริ่มเกมให้อยู่ในจุดเซฟก่อน
-    [SerializeField] private int gasDamagePerTick = 5;  // ดาเมจก๊าซพิษต่อครั้ง
-    [SerializeField] private float gasTickInterval = 1f; // หักเลือดทุกๆ กี่วินาที
-    [SerializeField] private int healPerTick = 10;      // เลือดเพิ่มขึ้นทีละเท่าไหร่ในจุดเซฟ
-    [SerializeField] private float healTickInterval = 0.5f; // เพิ่มเลือดทุกๆ กี่วินาที
 
     [Header("i-Frame Settings")]
     [SerializeField] private float invulnerabilityDuration = 1f;
@@ -33,6 +29,8 @@ public class PlayerHealth : MonoBehaviour
     public UnityEvent onDeath;
 
     private Coroutine healthRoutine;
+    private PlayerOxygen oxygenComponent;
+    private Coroutine bleedRoutine;
 
     public int CurrentHealth => currentHealth;
     public int MaxHealth => maxHealth;
@@ -42,6 +40,7 @@ public class PlayerHealth : MonoBehaviour
     {
         currentHealth = maxHealth;
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
+        oxygenComponent = GetComponent<PlayerOxygen>();
     }
 
     private void Start()
@@ -50,6 +49,7 @@ public class PlayerHealth : MonoBehaviour
         onHealthChanged?.Invoke(currentHealth, maxHealth);
 
         // เริ่มเช็กลูปเลือด (สูดอากาศพิษ / ฟื้นฟู) ทันทีที่เริ่มเกม
+        // PlayerHealth no longer heals in safe zones; oxygen handles regeneration.
         UpdateSafeZoneState(isInSafeZone);
     }
 
@@ -77,6 +77,53 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    // Apply damage over time (used for traps/bleed).
+    // Example: damagePerTick=2, tickInterval=0.5f, tickCount=5 will deal 10 damage over 2.5s.
+    public void ApplyDamageOverTime(int damagePerTick, float tickInterval, int tickCount)
+    {
+        if (damagePerTick <= 0 || tickInterval <= 0f || tickCount <= 0) return;
+
+        if (bleedRoutine != null)
+        {
+            StopCoroutine(bleedRoutine);
+        }
+        bleedRoutine = StartCoroutine(BleedRoutine(damagePerTick, tickInterval, tickCount));
+    }
+
+    // Convenience: split totalDamage into tickCount chunks (ceil division)
+    public void ApplyTotalDamageOverTime(int totalDamage, int tickCount, float tickInterval)
+    {
+        if (totalDamage <= 0 || tickCount <= 0) return;
+        int perTick = Mathf.CeilToInt((float)totalDamage / tickCount);
+        ApplyDamageOverTime(perTick, tickInterval, tickCount);
+    }
+
+    private IEnumerator BleedRoutine(int damagePerTick, float tickInterval, int tickCount)
+    {
+        for (int i = 0; i < tickCount; i++)
+        {
+            yield return new WaitForSeconds(tickInterval);
+
+            if (currentHealth <= 0) break;
+
+            currentHealth -= damagePerTick;
+            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+            Debug.Log($"[Bleed] รับความเสียหายต่อเนื่อง {damagePerTick} เลือด: {currentHealth}/{maxHealth}");
+            onHealthChanged?.Invoke(currentHealth, maxHealth);
+
+            PlaySound(hurtSound);
+
+            if (currentHealth <= 0)
+            {
+                Die();
+                yield break;
+            }
+        }
+
+        bleedRoutine = null;
+    }
+
     // ==========================================
     // 🌬️ ระบบ Safe Zone และ อากาศพิษ
     // ==========================================
@@ -91,48 +138,20 @@ public class PlayerHealth : MonoBehaviour
 
         if (isInSafeZone)
         {
-            Debug.Log("[Safe Zone] เข้าสู่จุดปลอดภัย: หยุดลดเลือด และเริ่มเพิ่มเลือด");
-            healthRoutine = StartCoroutine(HealingRoutine());
+            Debug.Log("[Safe Zone] เข้าสู่จุดปลอดภัย: ระบบจะไม่เพิ่มเลือดโดยตรง แต่จะเพิ่ม Oxygen เท่านั้น");
         }
         else
         {
-            Debug.Log("[Gas Zone] ออกจากจุดเซฟ: เริ่มสูดก๊าซพิษ เลือดค่อยๆ ลดลง!");
-            healthRoutine = StartCoroutine(PoisonGasRoutine());
+            Debug.Log("[Danger Zone] ออกจากจุดเซฟ: ระบบ Oxygen จะลดค่าออกซิเจนแทนเลือด");
         }
-    }
 
+        // แจ้งให้ระบบ Oxygen ด้วย (ถ้ามี)
+        oxygenComponent?.UpdateSafeZoneState(safe);
+    }
     private IEnumerator PoisonGasRoutine()
     {
-        while (!isInSafeZone && currentHealth > 0)
-        {
-            yield return new WaitForSeconds(gasTickInterval);
-
-            currentHealth -= gasDamagePerTick;
-            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-            Debug.Log($"[Gas Harm] สูดก๊าซพิษ! เลือดเหลือ: {currentHealth}/{maxHealth}");
-            onHealthChanged?.Invoke(currentHealth, maxHealth);
-
-            if (currentHealth <= 0)
-            {
-                Die();
-                yield break;
-            }
-        }
-    }
-
-    private IEnumerator HealingRoutine()
-    {
-        while (isInSafeZone && currentHealth < maxHealth && currentHealth > 0)
-        {
-            yield return new WaitForSeconds(healTickInterval);
-
-            currentHealth += healPerTick;
-            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-            Debug.Log($"[Safe Heal] พักในจุดเซฟ เลือดเพิ่มเป็น: {currentHealth}/{maxHealth}");
-            onHealthChanged?.Invoke(currentHealth, maxHealth);
-        }
+        // ปรากฎว่าโค้ดการหักเลือดจากก๊าซย้ายไปไว้ที่ PlayerOxygen
+        yield break;
     }
 
     private IEnumerator InvulnerabilityRoutine()
@@ -163,7 +182,8 @@ public class PlayerHealth : MonoBehaviour
             CheckpointManager.Instance.RespawnPlayer(gameObject);
         }
 
-        ResetHealth();
+        // หลังจาก Respawn แล้ว รีเซ็ตเลือดเป็นเต็มแต่ไม่กระทบค่า Oxygen
+        ResetHealthAfterRespawn();
     }
 
     public void ResetHealth()
@@ -178,6 +198,16 @@ public class PlayerHealth : MonoBehaviour
         // เมื่อเกิดใหม่ให้ถือว่าอยู่ในจุดเซฟ (จะเริ่มเด้งเลือดเพิ่มจาก respawnHealth ไปตามเวลา)
         UpdateSafeZoneState(true);
         Debug.Log($"[ResetHealth] เกิดใหม่แล้ว! รีเซ็ตเลือดเป็น {currentHealth}/{maxHealth}");
+    }
+
+    // เรียกเมื่อ Respawn เพื่อรีเซ็ตเลือดเต็มโดยไม่เพิ่ม Oxygen
+    public void ResetHealthAfterRespawn()
+    {
+        currentHealth = maxHealth;
+        isInvulnerable = false;
+        onHealthChanged?.Invoke(currentHealth, maxHealth);
+        // อย่าเรียก UpdateSafeZoneState เพื่อป้องกันการเพิ่ม Oxygen ทันที
+        Debug.Log($"[ResetHealthAfterRespawn] เกิดใหม่แล้ว รีเซ็ตเลือดเต็มเป็น {currentHealth}/{maxHealth} (ไม่เพิ่ม Oxygen)");
     }
 
     private void PlaySound(AudioClip clip)

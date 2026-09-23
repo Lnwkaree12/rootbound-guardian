@@ -9,10 +9,10 @@ public class CheckpointManager : MonoBehaviour
     private PlayerDataSave currentSaveData;
     private bool hasCheckpoint = false;
 
-    // รายชื่อไอเทมที่เก็บไปในปัจจุบัน
+    // ๏ฟฝ๏ฟฝยช๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝในปัจ๏ฟฝุบัน
     private HashSet<string> currentPickedItemIDs = new HashSet<string>();
 
-    // รายชื่อไอเทมที่ถูกบันทึกไว้ ณ จุดเซฟล่าสุด
+    // ๏ฟฝ๏ฟฝยช๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝูก๏ฟฝัน๏ฟฝึก๏ฟฝ๏ฟฝ๏ฟฝ ๏ฟฝ ๏ฟฝุดเซฟ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝุด
     private HashSet<string> savedPickedItemIDs = new HashSet<string>();
 
     private void Awake()
@@ -28,7 +28,7 @@ public class CheckpointManager : MonoBehaviour
         }
     }
 
-    // เรียกเมื่อผู้เล่นเก็บไอเทม
+    // ๏ฟฝ๏ฟฝ๏ฟฝยก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝอผ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ
     public void MarkItemAsPicked(string itemID)
     {
         if (!currentPickedItemIDs.Contains(itemID))
@@ -37,45 +37,45 @@ public class CheckpointManager : MonoBehaviour
         }
     }
 
-    // เรียกเมื่อผู้เล่นกดเซฟที่ต้นไม้
+    // ๏ฟฝ๏ฟฝ๏ฟฝยก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝอผ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ่นก๏ฟฝเซฟ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ
     public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp = null, Inventory inventoryComp = null)
     {
         lastCheckpointPosition = checkpointPos;
         hasCheckpoint = true;
 
-        // 1. บันทึกข้อมูลผู้เล่น (ถ้าส่ง Component มา)
+        // 1. ๏ฟฝัน๏ฟฝึก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝลผ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ (๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ Component ๏ฟฝ๏ฟฝ)
         if (healthComp != null || inventoryComp != null)
         {
             currentSaveData = new PlayerDataSave
             {
-                // เซฟค่าเลือดปัจจุบันแทน MaxHealth
+                // เซฟ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝอด๏ฟฝัจ๏ฟฝุบันแทน MaxHealth
                 savedHealth = healthComp != null ? healthComp.CurrentHealth : 100,
                 savedItems = inventoryComp != null ? new List<ItemData>(inventoryComp.GetItems()) : new List<ItemData>()
             };
         }
 
-        // 2. ล็อกรายชื่อไอเทมที่ถูกเก็บ ณ วินาทีที่เซฟ
+        // 2. ๏ฟฝ๏ฟฝอก๏ฟฝ๏ฟฝยช๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝูก๏ฟฝ๏ฟฝ ๏ฟฝ ๏ฟฝินาทีท๏ฟฝ๏ฟฝเซฟ
         savedPickedItemIDs = new HashSet<string>(currentPickedItemIDs);
 
-        Debug.Log($"[CheckpointManager] บันทึกจุดเซฟสำเร็จที่ตำแหน่ง: {checkpointPos}");
+        Debug.Log($"[CheckpointManager] ๏ฟฝัน๏ฟฝึก๏ฟฝุดเซฟ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ็จท๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝหน๏ฟฝ: {checkpointPos}");
     }
 
-    // เรียกเมื่อผู้เล่นตาย (Respawn)
+    // ๏ฟฝ๏ฟฝ๏ฟฝยก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝอผ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ่นต๏ฟฝ๏ฟฝ (Respawn)
     public void RespawnPlayer(GameObject player)
     {
         if (!hasCheckpoint) return;
 
-        // 1. วาร์ปตัวละครกลับจุดเซฟ
+        // 1. ๏ฟฝ๏ฟฝ๏ฟฝ์ปต๏ฟฝ๏ฟฝ๏ฟฝะครก๏ฟฝับ๏ฟฝุดเซฟ
         CharacterController cc = player.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
         player.transform.position = lastCheckpointPosition;
         if (cc != null) cc.enabled = true;
 
-        // 2. คืนค่าเลือดและกระเป๋าเดินทาง
+        // 2. ๏ฟฝืน๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝอด๏ฟฝ๏ฟฝะก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝิน๏ฟฝาง
         PlayerHealth health = player.GetComponent<PlayerHealth>();
         if (health != null)
         {
-            health.ResetHealth(); // จะตั้งค่าเลือดตาม respawnHealth ที่ตั้งไว้ใน PlayerHealth
+            health.ResetHealth(); // ๏ฟฝะต๏ฟฝ้งค๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝอด๏ฟฝ๏ฟฝ๏ฟฝ respawnHealth ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ PlayerHealth
         }
 
         Inventory inventory = player.GetComponent<Inventory>();
@@ -84,10 +84,10 @@ public class CheckpointManager : MonoBehaviour
             inventory.LoadSavedItems(currentSaveData.savedItems);
         }
 
-        // 3. Rollback รายชื่อไอเทมที่ถูกเก็บกลับไปเท่ากับตอนเซฟล่าสุด
+        // 3. Rollback ๏ฟฝ๏ฟฝยช๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝูก๏ฟฝ็บก๏ฟฝับ๏ฟฝ๏ฟฝ๏ฟฝากับ๏ฟฝอนเซฟ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝุด
         currentPickedItemIDs = new HashSet<string>(savedPickedItemIDs);
 
-        // 4. อัปเดตไอเทมในฉากทั้งหมด
+        // 4. ๏ฟฝัปเดต๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝในฉาก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ
         ItemObject[] allItems = FindObjectsByType<ItemObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (ItemObject item in allItems)
         {
