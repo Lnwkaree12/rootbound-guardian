@@ -1,85 +1,87 @@
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 7f;
-    [SerializeField] private float gravity = -20f;
 
     [Header("Dash Settings")]
-    [SerializeField] private float dashSpeed = 20f;
+    [SerializeField] private float dashSpeed = 25f; // 🌟 ปรับเพิ่มตรงนี้ ยิ่งเยอะ ยิ่งพุ่งไปได้ไกลขึ้นในเวลาเท่าเดิม!
 
-    private CharacterController controller;
-    private Vector3 verticalVelocity;
-    private float originalStepOffset;
+    [Header("Gravity Settings")]
+    [SerializeField] private float customGravity = -30f; // ช่วยดึงแรงโน้มถ่วงให้ตกไว ไม่ลอย
 
-    public bool IsGrounded => controller != null && controller.isGrounded;
+    private Rigidbody rb;
+    private Vector2 currentInput;
+    private bool isDashing;
+    private Vector3 dashDirection;
+
+    public bool IsGrounded { get; private set; }
 
     private void Awake()
     {
-        controller = GetComponent<CharacterController>();
-        if (controller != null)
+        rb = GetComponent<Rigidbody>();
+    }
+
+    private void FixedUpdate()
+    {
+        // 1. เพิ่ม Custom Gravity เพื่อไม่ให้ตัวละครลอยตอนตก
+        if (!IsGrounded)
         {
-            originalStepOffset = controller.stepOffset;
+            rb.AddForce(Vector3.up * customGravity, ForceMode.Acceleration);
+        }
+
+        // 2. ระบบพุ่ง Dash
+        if (isDashing)
+        {
+            // 🌟 ตั้งความเร็วพุ่งแกน X/Z ทันที (ตัดความเร็วร่วงแกน Y ชั่วคราวเพื่อให้แดชเป็นแนวตรง)
+            rb.linearVelocity = new Vector3(dashDirection.x * dashSpeed, 0f, dashDirection.z * dashSpeed);
+        }
+        else
+        {
+            // ระบบเดินปกติ
+            if (currentInput.sqrMagnitude > 0.01f)
+            {
+                Vector3 targetVelocity = new Vector3(currentInput.x * moveSpeed, rb.linearVelocity.y, currentInput.y * moveSpeed);
+                rb.linearVelocity = targetVelocity;
+            }
+            else
+            {
+                // หยุดแกน X/Z ทันทีเมื่อไม่ได้กดเดิน (ป้องกันการสไลด์)
+                rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            }
         }
     }
 
-    private void LateUpdate()
-    {
-        // ล็อกไม่ให้หมุนเบี้ยวสำหรับมุมมอง 2D / Top-Down
-        transform.rotation = Quaternion.identity;
-    }
-
-    // สั่งเดินปกติ
-    public void Move(Vector2 inputDirection)
-    {
-        if (controller == null || !controller.enabled) return;
-
-        controller.stepOffset = originalStepOffset;
-        ApplyGravity();
-
-        Vector3 move = new Vector3(inputDirection.x, 0, inputDirection.y);
-        Vector3 finalVelocity = (move * moveSpeed) + verticalVelocity;
-
-        controller.Move(finalVelocity * Time.deltaTime);
-    }
-
-    // สั่งพุ่งแดช
+    // สั่งพุ่ง Dash
     public void Dash(Vector3 direction)
     {
-        if (controller == null || !controller.enabled) return;
-
-        verticalVelocity.y = 0f;
-        controller.stepOffset = 0.8f;
-
-        Vector3 finalVelocity = direction * dashSpeed;
-        controller.Move(finalVelocity * Time.deltaTime);
+        dashDirection = direction.normalized;
+        isDashing = true;
     }
 
-    // คำนวณแรงโน้มถ่วง
-    private void ApplyGravity()
+    // 🛑 เมื่อหมดเวลา Dash สั่งหยุดความเร็วพุ่งทันที (ตัดอาการไถล)
+    public void StopDash()
     {
-        if (controller.isGrounded && verticalVelocity.y < 0)
-        {
-            verticalVelocity.y = -2f;
-        }
-        verticalVelocity.y += gravity * Time.deltaTime;
+        isDashing = false;
+        // ล้างความเร็วแกน X/Z ให้กลับมาเท่ากับ 0 ทันที เพื่อไม่ให้ไถลต่อ
+        rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
     }
 
-    // หยุดแรงเคลื่อนที่ทั้งหมดทันที (ใช้ตอนเปิด Win UI หรือ Pause)
-    public void StopVelocity()
+    public void Move(Vector2 inputDirection)
     {
-        verticalVelocity = Vector3.zero;
+        currentInput = inputDirection;
     }
 
-    // ระบบวาร์ปตำแหน่งปลอดภัย
-    public void Teleport(Vector3 newPosition)
+    private void OnCollisionStay(Collision collision)
     {
-        if (controller == null) return;
+        // เช็กพื้นแบบง่าย
+        IsGrounded = true;
+    }
 
-        controller.enabled = false;
-        transform.position = newPosition;
-        controller.enabled = true;
+    private void OnCollisionExit(Collision collision)
+    {
+        IsGrounded = false;
     }
 }

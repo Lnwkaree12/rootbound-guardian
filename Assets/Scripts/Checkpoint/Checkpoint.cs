@@ -19,7 +19,7 @@ public class Checkpoint : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (PlayerTriggerUtility.IsPlayer(other))
         {
             isPlayerInside = true;
             playerObject = other.gameObject;
@@ -56,7 +56,7 @@ public class Checkpoint : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (PlayerTriggerUtility.IsPlayer(other))
         {
             // ออกจากเขตจุดเซฟ กลับสู่โซนก๊าซพิษ
             if (healsOxygen)

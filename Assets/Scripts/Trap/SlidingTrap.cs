@@ -1,45 +1,66 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody))]
 public class SlidingTrap : MonoBehaviour
 {
-    [Header("การตั้งค่าระยะทางและการเคลื่อนที่")]
-    [SerializeField] private Vector3 moveDirection = Vector3.right; // ทิศทางการเลื่อน (default: แกน X ซ้าย-ขวา)
-    [SerializeField] private float distance = 5f;                   // ระยะทางที่จะเลื่อนไป-กลับ
-    [SerializeField] private float speed = 3f;                      // ความเร็วในการเลื่อน
+    [Header("เธเธฒเธฃเธ•เธฑเนเธเธเนเธฒเธฃเธฐเธขเธฐเธ—เธฒเธเนเธฅเธฐเธเธฒเธฃเน€เธเธฅเธทเนเธญเธเธ—เธตเน")]
+    [SerializeField] private Vector3 moveDirection = Vector3.right;
+    [SerializeField] private float distance = 5f;
+    [SerializeField] private float speed = 3f;
 
     private Vector3 startPosition;
+    private Vector3 lastPosition;
     private Rigidbody rb;
+
+    // เน€เธเนเธเธฃเธฒเธขเธเธทเนเธญ Rigidbody เธเธญเธเธ•เธฑเธงเธฅเธฐเธเธฃเธ—เธตเนเธเธณเธฅเธฑเธเธขเธทเธเธญเธขเธนเนเธเธเนเธ—เนเธ
+    private HashSet<Rigidbody> passengers = new HashSet<Rigidbody>();
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true; // บังคับเป็น Kinematic เพื่อให้ควบคุมผ่านโค้ดได้อย่างเสถียร
+        rb.isKinematic = true;
     }
 
     private void Start()
     {
         startPosition = transform.position;
+        lastPosition = startPosition;
     }
 
     private void FixedUpdate()
     {
-        // คำนวณระยะทางไป-กลับ ด้วย Mathf.PingPong
+        // 1. เธเธณเธเธงเธ“เธ•เธณเนเธซเธเนเธเน€เธเนเธฒเธซเธกเธฒเธขเนเธซเธกเนเธเธญเธเนเธ—เนเธ
         float pingPongValue = Mathf.PingPong(Time.time * speed, distance);
-
-        // คำนวณตำแหน่งใหม่
         Vector3 targetPosition = startPosition + (moveDirection.normalized * pingPongValue);
 
-        // เคลื่อนที่ด้วย Rigidbody เพื่อให้ระบบ Physics ทำงานถูกต้อง (ผู้เล่นยืนบนแผ่นแล้วไม่ไถลตก)
+        // 2. เธเธณเธเธงเธ“เธฃเธฐเธขเธฐเธ—เธตเนเนเธ—เนเธเน€เธเธฅเธทเนเธญเธเธ—เธตเนเนเธเนเธเน€เธเธฃเธกเธเธตเน (Delta)
+        Vector3 platformDelta = targetPosition - transform.position;
+
+        // 3. เธเธขเธฑเธ Rigidbody เธเธญเธเธ•เธฑเธงเธฅเธฐเธเธฃเธ•เธฒเธกเธฃเธฐเธขเธฐ platformDelta เธ—เธฑเธเธ—เธต!
+        foreach (Rigidbody passengerRb in passengers)
+        {
+            if (passengerRb != null)
+            {
+                passengerRb.MovePosition(passengerRb.position + platformDelta);
+            }
+        }
+
+        // 4. เธเธขเธฑเธเธ•เธฑเธงเนเธ—เนเธเน€เธฅเธทเนเธญเธ
         rb.MovePosition(targetPosition);
+        lastPosition = targetPosition;
     }
 
-    // ระบบส่งตัวละครให้เคลื่อนที่ไปพร้อมกับแผ่นเลื่อนเมื่อขึ้นมายืน
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            collision.transform.SetParent(transform);
+            Rigidbody playerRb = collision.gameObject.GetComponent<Rigidbody>();
+            if (playerRb != null && !passengers.Contains(playerRb))
+            {
+                passengers.Add(playerRb);
+            }
         }
     }
 
@@ -47,15 +68,11 @@ public class SlidingTrap : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            collision.transform.SetParent(null);
+            Rigidbody playerRb = collision.gameObject.GetComponent<Rigidbody>();
+            if (playerRb != null && passengers.Contains(playerRb))
+            {
+                passengers.Remove(playerRb);
+            }
         }
-    }
-
-    // วาดเส้นไกด์ไลน์ในหน้า Scene View เพื่อให้ปรับระยะง่ายขึ้น
-    private void OnDrawGizmosSelected()
-    {
-        Vector3 origin = Application.isPlaying ? startPosition : transform.position;
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(origin, origin + (moveDirection.normalized * distance));
     }
 }

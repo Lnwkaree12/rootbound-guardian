@@ -392,17 +392,7 @@ public class DoorController : MonoBehaviour
 
     public bool IsPlayer(Collider other)
     {
-        if (other == null) return false;
-        if (other.CompareTag("Player")) return true;
-        if (other.GetComponent<PlayerMovement>() != null) return true;
-        if (other.GetComponentInParent<PlayerMovement>() != null) return true;
-        if (other.GetComponentInChildren<PlayerMovement>() != null) return true;
-
-        string objName = other.gameObject.name.ToLower();
-        if (objName.Contains("player") || objName.Contains("capsule") || objName.Contains("finalmc")) return true;
-        if (other.transform.root != null && other.transform.root.name.ToLower().Contains("player")) return true;
-
-        return false;
+        return PlayerTriggerUtility.IsPlayer(other);
     }
 
     public void HandlePlayerContact(Collider other)

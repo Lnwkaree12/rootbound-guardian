@@ -137,7 +137,7 @@ MonoBehaviour:
   riseSpeed: 2
   waitTimeAtBottom: 1
   waitTimeAtTop: 2
-  audioSource: {fileID: 0}
+  audioSource: {fileID: 4500363387625111993}
   smashSound: {fileID: 8300000, guid: aea6aa0ea7d227b499e2f19e5889ad6f, type: 3}
 --- !u!65 &6656022286622306614
 BoxCollider:
@@ -172,9 +172,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a71659466554f3488dd2de894059404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
-  damage: 100
-  destroyOnImpact: 0
-  lifetime: 3
+  damageAmount: 10
+  onHitPlayer:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!82 &4500363387625111993
 AudioSource:
   m_ObjectHideFlags: 0

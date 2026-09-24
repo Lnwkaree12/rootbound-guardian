@@ -27,7 +27,7 @@ public class KeyPickup : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // Check if player collected the key (collides with Player tags or scripts)
-        if (other.CompareTag("Player") || other.GetComponent<PlayerMovement>() != null)
+        if (PlayerTriggerUtility.IsPlayer(other))
         {
             if (QuestManager.Instance != null)
             {

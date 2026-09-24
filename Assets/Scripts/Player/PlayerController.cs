@@ -2,10 +2,12 @@
 
 [RequireComponent(typeof(PlayerInputHandler))]
 [RequireComponent(typeof(PlayerMovement))]
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Dash Settings")]
     [SerializeField] private float dashDuration = 0.2f;
+    [SerializeField] private float dashCooldown = 0.8f;
     [SerializeField] private int dashHealthCost = 10;
     [SerializeField] private int dashOxygenCost = 15;
 
@@ -19,9 +21,10 @@ public class PlayerController : MonoBehaviour
 
     [Header("Fall Detection")]
     [SerializeField] private float fallThresholdSpeed = -2f;
-    private CharacterController characterController;
+    [SerializeField] private float fallSoundDelay = 0.25f;
     private Rigidbody rb;
     private bool isFallingSoundPlayed = false;
+    private float fallTimer;
 
     private PlayerInputHandler inputHandler;
     private PlayerMovement movement;
@@ -31,6 +34,7 @@ public class PlayerController : MonoBehaviour
 
     private bool isDashing;
     private float dashTimer;
+    private float dashCooldownTimer;
     private Vector3 dashDirection;
 
     private void Awake()
@@ -41,7 +45,6 @@ public class PlayerController : MonoBehaviour
         playerHealth = GetComponent<PlayerHealth>();
         playerOxygen = GetComponent<PlayerOxygen>();
 
-        characterController = GetComponent<CharacterController>();
         rb = GetComponent<Rigidbody>();
 
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
@@ -82,7 +85,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleFootstepSounds()
     {
-        bool isGrounded = (characterController != null) ? characterController.isGrounded : true;
+        bool isGrounded = movement != null && movement.IsGrounded;
         bool isMoving = inputHandler.MoveInput.sqrMagnitude > 0.01f;
 
         if (isGrounded && isMoving)
@@ -112,37 +115,35 @@ public class PlayerController : MonoBehaviour
 
     private void CheckFallingState()
     {
-        float verticalVelocity = 0f;
-
-        if (characterController != null)
-        {
-            verticalVelocity = characterController.velocity.y;
-        }
-        else if (rb != null)
-        {
-            verticalVelocity = rb.linearVelocity.y;
-        }
-
-        bool isGrounded = (characterController != null) ? characterController.isGrounded : true;
+        float verticalVelocity = rb != null ? rb.linearVelocity.y : 0f;
+        bool isGrounded = movement != null && movement.IsGrounded;
 
         if (!isGrounded && verticalVelocity < fallThresholdSpeed)
         {
-            if (!isFallingSoundPlayed)
+            fallTimer += Time.deltaTime;
+
+            if (!isFallingSoundPlayed && fallTimer >= fallSoundDelay)
             {
                 StopFootstepSound();
                 PlaySound(fallSound);
                 isFallingSoundPlayed = true;
             }
         }
-        else if (isGrounded)
+        else
         {
+            fallTimer = 0f;
             isFallingSoundPlayed = false;
         }
     }
 
     private void HandleDashState()
     {
-        if (inputHandler.DashPressed && !isDashing)
+        if (dashCooldownTimer > 0f)
+        {
+            dashCooldownTimer -= Time.deltaTime;
+        }
+
+        if (inputHandler.DashPressed && !isDashing && dashCooldownTimer <= 0f)
         {
             StartDash();
         }
@@ -153,6 +154,7 @@ public class PlayerController : MonoBehaviour
             if (dashTimer <= 0)
             {
                 isDashing = false;
+                movement.StopDash();
             }
         }
     }
@@ -196,6 +198,7 @@ public class PlayerController : MonoBehaviour
 
         isDashing = true;
         dashTimer = dashDuration;
+        dashCooldownTimer = dashCooldown;
 
         inputHandler.ResetDashFlag();
     }

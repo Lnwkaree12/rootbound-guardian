@@ -77,7 +77,7 @@ public class TreeSavePoint : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (PlayerTriggerUtility.IsPlayer(other))
         {
             isPlayerInRange = true;
             playerTransform = other.transform;
@@ -108,7 +108,7 @@ public class TreeSavePoint : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (PlayerTriggerUtility.IsPlayer(other))
         {
             isPlayerInRange = false;
             playerTransform = null;

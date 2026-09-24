@@ -180,12 +180,13 @@ GameObject:
   - component: {fileID: 8883299822360985090}
   - component: {fileID: 7049007052264201770}
   - component: {fileID: 4721852447051477663}
-  - component: {fileID: 8204653507344247518}
   - component: {fileID: 7532572160159764220}
   - component: {fileID: 8023078674573080028}
   - component: {fileID: 1830090229681436556}
   - component: {fileID: 7649121720225849218}
   - component: {fileID: 4418683475671264755}
+  - component: {fileID: 6715797333656333174}
+  - component: {fileID: 6391933892677904430}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -374,8 +375,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 7
-  gravity: -20
-  dashSpeed: 45
+  dashSpeed: 20
+  customGravity: -30
 --- !u!114 &6512294905877617563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -389,6 +390,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   dashDuration: 0.2
+  dashCooldown: 0.8
   dashHealthCost: 10
   dashOxygenCost: 15
   audioSource: {fileID: 8544269323940799470}
@@ -398,6 +400,7 @@ MonoBehaviour:
   footstepSound: {fileID: 8300000, guid: 65f4ba56817d4544e982290c95f015f7, type: 3}
   fallSound: {fileID: 8300000, guid: 172988548d0d5034cab5a6e66bee34ac, type: 3}
   fallThresholdSpeed: -2
+  fallSoundDelay: 0.25
 --- !u!114 &8883299822360985090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -437,31 +440,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputHandler
   inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
---- !u!143 &8204653507344247518
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4389765043622299808}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 0.9
-  m_Radius: 0.26
-  m_SlopeLimit: 44.21
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7532572160159764220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -475,8 +453,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 20
-  gravity: -20
-  dashSpeed: 45
+  dashSpeed: 20
+  customGravity: -30
 --- !u!114 &8023078674573080028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -549,6 +527,56 @@ MonoBehaviour:
   onOxygenDepleted:
     m_PersistentCalls:
       m_Calls: []
+--- !u!54 &6715797333656333174
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4389765043622299808}
+  serializedVersion: 5
+  m_Mass: 20
+  m_LinearDamping: 2
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!136 &6391933892677904430
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4389765043622299808}
+  m_Material: {fileID: 13400000, guid: 0b30567a7428148c4b79796e0f46c11b, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.21
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: -0.004999924, z: -0.099999905}
 --- !u!1 &5551271543905125926
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ public class DamageDealer : MonoBehaviour
 {
     [SerializeField] private int damageAmount = 10;
 
-    // Êè§ Event ÍÍ¡ä»àÁ×èÍª¹â´¹ Player
+    // ï¿½ï¿½ Event ï¿½Í¡ï¿½ï¿½ï¿½ï¿½ï¿½Íªï¿½â´¹ Player
     public UnityEvent onHitPlayer;
 
     private void OnTriggerEnter(Collider other)
@@ -20,12 +20,23 @@ public class DamageDealer : MonoBehaviour
 
     private void HandleDamage(GameObject target)
     {
+        Rigidbody targetRigidbody = target.GetComponent<Rigidbody>();
+        if (targetRigidbody == null)
+        {
+            targetRigidbody = target.GetComponentInParent<Rigidbody>();
+        }
+
         PlayerHealth playerHealth = target.GetComponentInParent<PlayerHealth>();
 
-        if (playerHealth != null)
+        if (playerHealth != null && targetRigidbody != null)
         {
             playerHealth.TakeDamage(damageAmount);
-            onHitPlayer?.Invoke(); // á¨é§ÇèÒª¹â´¹ Player áÅéÇ¹Ğ
+            onHitPlayer?.Invoke(); // ï¿½ï¿½ï¿½ï¿½Òªï¿½â´¹ Player ï¿½ï¿½ï¿½Ç¹ï¿½
+        }
+
+        if (target.CompareTag("Wall"))
+        {
+            onHitPlayer?.Invoke(); // à¸Šà¸™à¸à¸³à¹à¸à¸‡ -> à¸ªà¹ˆà¸‡à¸à¸¥à¸±à¸šà¹€à¸‚à¹‰à¸² Pool à¸—à¸±à¸™à¸—à¸µ
         }
     }
 }

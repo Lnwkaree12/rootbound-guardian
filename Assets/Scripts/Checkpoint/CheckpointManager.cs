@@ -66,10 +66,18 @@ public class CheckpointManager : MonoBehaviour
         if (!hasCheckpoint) return;
 
         // 1. ���컵���Фá�Ѻ�ش૿
-        CharacterController cc = player.GetComponent<CharacterController>();
-        if (cc != null) cc.enabled = false;
-        player.transform.position = lastCheckpointPosition;
-        if (cc != null) cc.enabled = true;
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.position = lastCheckpointPosition;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+        else
+        {
+            player.transform.position = lastCheckpointPosition;
+        }
+        Physics.SyncTransforms();
 
         // 2. �׹������ʹ��С������Թ�ҧ
         PlayerHealth health = player.GetComponent<PlayerHealth>();

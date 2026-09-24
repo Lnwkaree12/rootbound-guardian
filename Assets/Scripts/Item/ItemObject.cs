@@ -69,7 +69,7 @@ public class ItemObject : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (PlayerTriggerUtility.IsPlayer(other))
         {
             isPlayerInRange = true;
             playerInventory = other.GetComponentInParent<Inventory>();
@@ -85,7 +85,7 @@ public class ItemObject : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (PlayerTriggerUtility.IsPlayer(other))
         {
             isPlayerInRange = false;
             playerInventory = null;
