@@ -34,9 +34,10 @@ public class DamageDealer : MonoBehaviour
             onHitPlayer?.Invoke(); // ����Ҫ�ⴹ Player ���ǹ�
         }
 
-        if (target.CompareTag("Wall"))
+        /*if (target.CompareTag("Wall"))
         {
             onHitPlayer?.Invoke(); // ชนกำแพง -> ส่งกลับเข้า Pool ทันที
         }
+        */
     }
 }

@@ -158,9 +158,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a71659466554f3488dd2de894059404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
-  damage: 100
-  destroyOnImpact: 0
-  lifetime: 3
+  damageAmount: 50
+  onHitPlayer:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &5184383420333145883
 PrefabInstance:
   m_ObjectHideFlags: 0

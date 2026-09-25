@@ -172,7 +172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a71659466554f3488dd2de894059404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
-  damageAmount: 10
+  damageAmount: 50
   onHitPlayer:
     m_PersistentCalls:
       m_Calls: []
