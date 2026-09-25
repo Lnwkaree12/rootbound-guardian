@@ -14,17 +14,13 @@ public class PlayerOxygen : MonoBehaviour
     [SerializeField] private int regenPerTick = 10;
     [SerializeField] private float regenTickInterval = 0.5f;
 
-    [Header("When Oxygen Depleted")]
-    [SerializeField] private int healthDamagePerTickWhenDepleted = 5;
-    [SerializeField] private float damageTickIntervalWhenDepleted = 1f;
-
     [Header("Events")]
     public UnityEvent<int, int> onOxygenChanged; // current, max
     public UnityEvent onOxygenDepleted;
 
     private Coroutine oxygenRoutine;
-    private PlayerHealth playerHealth;
     private bool isInSafeZone = true;
+    private bool gameOverTriggered;
 
     public int CurrentOxygen => currentOxygen;
     public int MaxOxygen => maxOxygen;
@@ -33,7 +29,6 @@ public class PlayerOxygen : MonoBehaviour
     private void Awake()
     {
         currentOxygen = maxOxygen;
-        playerHealth = GetComponent<PlayerHealth>();
     }
 
     private void Start()
@@ -73,21 +68,8 @@ public class PlayerOxygen : MonoBehaviour
 
             if (currentOxygen <= 0)
             {
-                onOxygenDepleted?.Invoke();
-
-                // เมื่อออกซิเจนหมด ให้เริ่มหักเลือดตาม interval จนกว่าออกซิเจนจะขึ้นหรือตาย
-                while (currentOxygen <= 0 && !isInSafeZone)
-                {
-                    yield return new WaitForSeconds(damageTickIntervalWhenDepleted);
-
-                    if (playerHealth != null)
-                    {
-                        playerHealth.TakeDamage(healthDamagePerTickWhenDepleted);
-                        if (playerHealth.CurrentHealth <= 0) yield break;
-                    }
-                }
-
-                // ถ้าออกซิเจนยังคง 0 แต่เราอยู่ใน safe zone หรือ player ตาย, 루프จะออก
+                TriggerGameOver();
+                yield break;
             }
         }
     }
@@ -123,7 +105,31 @@ public class PlayerOxygen : MonoBehaviour
 
         if (currentOxygen <= 0)
         {
-            onOxygenDepleted?.Invoke();
+            TriggerGameOver();
+        }
+    }
+
+    private void TriggerGameOver()
+    {
+        if (gameOverTriggered) return;
+        gameOverTriggered = true;
+
+        if (oxygenRoutine != null)
+        {
+            StopCoroutine(oxygenRoutine);
+            oxygenRoutine = null;
+        }
+
+        onOxygenDepleted?.Invoke();
+
+        GameOverUIManager gameOverUI = FindObjectOfType<GameOverUIManager>();
+        if (gameOverUI != null)
+        {
+            gameOverUI.TriggerGameOver();
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerOxygen] GameOverUIManager ไม่พบในฉาก");
         }
     }
 }
