@@ -178,12 +178,8 @@ GameObject:
   - component: {fileID: 6986236195885634361}
   - component: {fileID: 3168087101343134898}
   - component: {fileID: 6512294905877617563}
-  - component: {fileID: 8883299822360985090}
   - component: {fileID: 7049007052264201770}
-  - component: {fileID: 4721852447051477663}
-  - component: {fileID: 7532572160159764220}
-  - component: {fileID: 8023078674573080028}
-  - component: {fileID: 1830090229681436556}
+  - component: {fileID: 8883299822360985090}
   - component: {fileID: 7649121720225849218}
   - component: {fileID: 6715797333656333174}
   - component: {fileID: 6391933892677904430}
@@ -437,20 +433,6 @@ MonoBehaviour:
   fallSound: {fileID: 8300000, guid: 172988548d0d5034cab5a6e66bee34ac, type: 3}
   fallThresholdSpeed: -2
   fallSoundDelay: 0.25
---- !u!114 &8883299822360985090
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4389765043622299808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 621e594d3f4a9014bb0c0fb6084c14bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Inventory
-  maxSlots: 10
-  items: []
 --- !u!114 &7049007052264201770
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -463,47 +445,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa1dc1a5c1c6b94f8cf1cf82e5ad876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
---- !u!114 &4721852447051477663
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4389765043622299808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b049c99f2c2380247882995ae1a13ff5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerInputHandler
-  inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
---- !u!114 &7532572160159764220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4389765043622299808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3ec267322ded604f9f8a8b847ca14b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  moveSpeed: 20
-  dashSpeed: 20
-  customGravity: -30
---- !u!114 &8023078674573080028
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4389765043622299808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fa1dc1a5c1c6b94f8cf1cf82e5ad876, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
---- !u!114 &1830090229681436556
+--- !u!114 &8883299822360985090
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

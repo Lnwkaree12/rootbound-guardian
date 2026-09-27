@@ -249,7 +249,8 @@ PrefabInstance:
       propertyPath: invulnerabilityDuration
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1830090229681436556, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
     m_RemovedGameObjects:
     - {fileID: 5551271543905125926, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
     m_AddedGameObjects:
