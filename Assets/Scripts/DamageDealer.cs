@@ -4,9 +4,16 @@ using UnityEngine.Events;
 public class DamageDealer : MonoBehaviour
 {
     [SerializeField] private int damageAmount = 10;
+    [SerializeField] private float wallHitDelay = 0.05f; // หน่วงเวลาเช็คกำแพง 0.05 วินาทีหลังเกิด
 
-    // �� Event �͡�����ͪ�ⴹ Player
     public UnityEvent onHitPlayer;
+
+    private float spawnTime;
+
+    private void OnEnable()
+    {
+        spawnTime = Time.time; // บันทึกเวลาที่ถูกดึงออกจาก Pool
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -20,24 +27,22 @@ public class DamageDealer : MonoBehaviour
 
     private void HandleDamage(GameObject target)
     {
-        Rigidbody targetRigidbody = target.GetComponent<Rigidbody>();
-        if (targetRigidbody == null)
-        {
-            targetRigidbody = target.GetComponentInParent<Rigidbody>();
-        }
-
+        // 1. เช็คว่าเป็น Player หรือไม่ (ความเสียหายโดนได้ทันที)
         PlayerHealth playerHealth = target.GetComponentInParent<PlayerHealth>();
 
-        if (playerHealth != null && targetRigidbody != null)
+        if (playerHealth != null)
         {
             playerHealth.TakeDamage(damageAmount);
-            onHitPlayer?.Invoke(); // ����Ҫ�ⴹ Player ���ǹ�
+            onHitPlayer?.Invoke();
+            return;
         }
 
-        /*if (target.CompareTag("Wall"))
+        // 2. ถ้าเป็น Wall ให้เช็คก่อนว่าเกิดมานานพอหรือยัง (กันกรณีSpawnมาซ้อนกำแพง)
+        if (Time.time - spawnTime < wallHitDelay) return;
+
+        if (target.CompareTag("Wall") || target.transform.root.CompareTag("Wall"))
         {
-            onHitPlayer?.Invoke(); // ชนกำแพง -> ส่งกลับเข้า Pool ทันที
+            onHitPlayer?.Invoke();
         }
-        */
     }
 }

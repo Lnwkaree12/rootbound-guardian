@@ -445,6 +445,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa1dc1a5c1c6b94f8cf1cf82e5ad876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
+  is3DModel: 0
 --- !u!114 &8883299822360985090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -513,8 +514,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.21
-  m_Height: 1
+  m_Radius: 0.44
+  m_Height: 1.57
   m_Direction: 1
   m_Center: {x: 0, y: -0.004999924, z: -0.099999905}
 --- !u!1 &5551271543905125926
@@ -971,7 +972,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ee35c802f90520e43b4ff7e12aa9b8fc, type: 2}
+  - {fileID: 2100000, guid: bb724a1ae03e6284fbc4606924351b59, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -994,7 +995,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 39e1c038d5016ab46a7f5a9ef95e6657, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 580a05e9b379a5644825d4462999dcaa, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
