@@ -222,6 +222,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49ee7ce43f369644685cc6b42591647e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArrowProjectile
-  speed: 30
-  maxLifetime: 5
+  speed: 2
+  maxLifetime: 3
   damageDealer: {fileID: 505238617117226819}
