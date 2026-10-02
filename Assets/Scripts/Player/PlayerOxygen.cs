@@ -6,7 +6,7 @@ public class PlayerOxygen : MonoBehaviour
 {
     [Header("Oxygen Settings")]
     [SerializeField] private int maxOxygen = 100;
-    [SerializeField] private int currentOxygen;
+    [SerializeField] private int currentOxygen = 100;
 
     [Header("Drain / Regen")]
     [SerializeField] private int drainPerTick = 5;
@@ -28,7 +28,14 @@ public class PlayerOxygen : MonoBehaviour
 
     private void Awake()
     {
-        currentOxygen = maxOxygen;
+        if (currentOxygen <= 0 || currentOxygen > maxOxygen)
+            currentOxygen = maxOxygen;
+    }
+
+    private void OnValidate()
+    {
+        if (currentOxygen <= 0)
+            currentOxygen = maxOxygen;
     }
 
     private void Start()
@@ -125,7 +132,11 @@ public class PlayerOxygen : MonoBehaviour
         GameOverUIManager gameOverUI = FindObjectOfType<GameOverUIManager>();
         if (gameOverUI != null)
         {
-            gameOverUI.TriggerGameOver();
+            gameOverUI.TriggerGameOver("ออกซิเจนหมด! คุณขาดอากาศหายใจ");
+        }
+        else if (GameOverUIManager.Instance != null)
+        {
+            GameOverUIManager.Instance.TriggerGameOver("ออกซิเจนหมด! คุณขาดอากาศหายใจ");
         }
         else
         {

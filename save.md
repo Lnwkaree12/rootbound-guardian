@@ -1,85 +1,135 @@
-# 📑 Project Status & Save Report (บันทึกสถานะโปรเจกต์ล่าสุด)
-**Date:** September 2, 2026  
-**Project:** rootbound-guardian (Unity URP)  
-**Status:** All Core Features & Victory Door Quest Completed Successfully
+# ⚔️ ROOTBOUND GUARDIAN — PROJECT DEV LOG (SAVE.MD)
+> **บันทึกสถานะการพัฒนา ฟีเจอร์ และระบบทั้งหมดในโปรเจกต์**  
+> อัปเดตล่าสุด: 2 ตุลาคม 2026 (รวมสถานะช่วงก่อนหลุดและหลังแก้ไขเรียบร้อย)
 
 ---
 
-## 🌟 ภาพรวมสิ่งที่พัฒนาและปรับปรุงล่าสุด (Latest Completed Work)
-
-### 16. ระบบหน้าจอฉลองชัยชนะ UI Win & ระบบไขประตูดันเจี้ยน (Victory Win UI & Door Unlock System)
-* **[WinUIManager.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Player/WinUIManager.cs)**:
-  * จัดการแสดงผลหน้าต่าง UI ชนะ (Victory Modal Panel) เมื่อผู้เล่นไขประตูดันเจี้ยนสำเร็จ
-  * **แสดงผลสถิติการเล่นแบบเรียลไทม์:**
-    * 🔑 **สถานะภารกิจ:** ใช้กุญแจไขประตูสำเร็จ! (1/1)
-    * ⏱️ **เวลาที่ใช้ (Clear Time):** คำนวณเวลาที่ใช้ในการผ่านด่าน (นาที:วินาที)
-    * ❤️ **พลังชีวิตคงเหลือ (HP Remaining):** ดึงค่าจาก `PlayerStats` แสดงเลือดคงเหลือปัจจุบัน
-  * **ระบบอนิเมชั่น Pop-up:** ค่อยๆ เฟดพื้นหลังสีดำมืด (Dim Overlay) พร้อมย่อ-ขยายหน้าต่างแบบนุ่มนวลด้วยสมการ Ease-Out Cubic
-  * **เสียงฉลองชัยชนะ (Procedural Victory Fanfare):** สังเคราะห์เสียงดนตรีคอร์ด Arpeggio ฉลองชัยชนะ (C5 ➡️ E5 ➡️ G5 ➡️ C6) ผ่านโค้ดในตัว ไม่ต้องพึ่งพาไฟล์เสียงภายนอก
-  * **การควบคุมและปุ่มกด:**
-    * ปลดล็อคและแสดงเคอร์เซอร์เมาส์ พร้อมหยุดเวลาในเกม (`Time.timeScale = 0f`)
-    * **ปุ่ม 🔄 เล่นใหม่อีกครั้ง (Restart):** รีโหลดซีนปัจจุบันเพื่อเล่นซ้ำ (หรือกดคีย์บอร์ด `R`)
-    * **ปุ่ม 🏠 กลับหน้าหลัก (Main Menu):** กลับไปยังซีนเมนูหลัก `MainScreen` (หรือกดคีย์บอร์ด `M` หรือ `Esc`)
-  * **ระบบสำรองอัตโนมัติ (Runtime Auto-Creation):** หากในฉากยังไม่มี Prefab วางอยู่ สคริปต์จะสร้าง Canvas และหน้าต่าง UI Win ขึ้นมาแบบอัตโนมัติในหน่วยความจำทันที ป้องกันข้อผิดพลาด NullReference ได้ 100%
-
-* **[DoorController.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Player/DoorController.cs)**:
-  * **แก้ไขบั๊กตรวจจับผู้เล่นไม่ติด (Child vs Parent Collider Fix):** ปรับฟังก์ชัน `IsPlayer()` ให้ตรวจสอบทั้ง Root, Parent, วัตถุลูก `Capsule`, Tag `"Player"` และชื่อ Object
-  * **รองรับทั้ง Trigger & Solid Collision:** มีการติดตั้งคอมโพเนนต์ผู้ช่วย `DoorPanelCollisionForwarder` บนบานประตูทึบ ทำให้ไม่ว่าจะเดินชนบานประตูหรือเข้าสู่เขต Trigger ระบบจะรับรู้ทันที
-  * **ระบบตรวจจับระยะห่างสำรอง (Proximity Distance Fallback):** คำนวณระยะห่างระหว่างตัวละครกับประตูตามสเกลจริง (รองรับประตูสเกลใหญ่ 5.4 เท่า)
-  * **ป้ายข้อความลอย 3D (Billboard Prompt):** แสดงข้อความบอกสถานะเหนือประตูที่จะหันหน้ามองตามมุมกล้องตลอดเวลา:
-    * ยังไม่มีกุญแจ: `"🔒 ประตูล็อคอยู่! (ต้องหากุญแจก่อน)"`
-    * เก็บกุญแจแล้ว: `"🗝️ กด [F] เพื่อไขประตู (มีกุญแจแล้ว)"`
-  * **กลไกการเปิดประตู:** เมื่อมีกุญแจแล้วกดปุ่ม `F` หรือเดินชนประตู บานประตูจะหมุนเปิดออก 90 องศา คอลไลเดอร์จะเปลี่ยนเป็น Trigger ให้เดินผ่านได้ พร้อมเล่นเสียงกลไกปลดล็อค และเรียกหน้าต่าง UI Win ขึ้นมาฉลองหลังจากประตูเริ่มเปิด 0.65 วินาที
-
-* **[PlayerMovement.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Player/PlayerMovement.cs)**:
-  * ปรับปรุงฟังก์ชัน `TryInteract()` ให้ตรวจหาและสั่งเปิด `DoorController` ได้โดยตรงเมื่อกดปุ่ม `F`
-  * ขยายรัศมีการค้นหากุญแจและวัตถุปฏิสัมพันธ์จากเดิม 1.5 หน่วย เป็น 5.5 - 7.5 หน่วย เพื่อให้สมดุลกับตัวละครสเกลขนาดใหญ่ (~9 เท่า)
-
-* **[QuestManager.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Player/QuestManager.cs)**:
-  * เพิ่มเมธอด `UseKeyOnDoor()` อัปเดตข้อความภารกิจบนหน้าจอเป็น `"🚪 ไขประตูดันเจี้ยนสำเร็จ! (1/1)"` ด้วยตัวอักษรสีทองอร่าม
-
-* **[CreateWinUI.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Editor/CreateWinUI.cs)**:
-  * สคริปต์ Editor ช่วยสร้างและบันทึก Prefab หน้าต่างชัยชนะ [Win_Canvas.prefab](file:///C:/Users/Artemis/rootbound-guardian/Assets/Prefabs/Win_Canvas.prefab) และผสานรวมเข้ากับ [HUD_Canvas.prefab](file:///C:/Users/Artemis/rootbound-guardian/Assets/Prefabs/HUD_Canvas.prefab)
-  * ออกแบบในธีมแฟนตาซีอบอุ่น (พื้นหลังไม้สีเข้ม กรอบทอง ลวดลายใบไม้ และฟอนต์ภาษาไทย Itim-Regular)
-  * เมนูอำนวยความสะดวก:
-    * **`Tools ➡️ SproutScout ➡️ Create Win UI`**
-    * **`Tools ➡️ SproutScout ➡️ Setup Complete Win & Door Quest in Scene`**
-
-* **[Player Variant.prefab](file:///C:/Users/Artemis/rootbound-guardian/Assets/Character/Player%20Variant.prefab)**:
-  * กำหนด Tag `Player` ให้กับวัตถุ `Capsule` เรียบร้อยแล้ว
+## 📌 ข้อมูลโปรเจกต์ (Project Info)
+- **ชื่อโปรเจกต์:** Rootbound Guardian
+- **ที่ตั้งโฟลเดอร์:** `C:\Users\Artemis\rootbound-guardian`
+- **Unity Version:** Unity 6000.3.9f1 (Unity 6)
+- **ประเภทเกม:** 3D Action RPG / Dungeon Crawler
+- **สถานะปัจจุบัน:** พร้อมเปิดเล่นและทดสอบใน Unity Editor (`errorCount: 0`, `scriptCompilationFailed: False`)
 
 ---
 
-## 📋 สรุปรายการงานทั้งหมดในโปรเจกต์ (Complete Project Summary)
+## 🌟 ฟีเจอร์และระบบที่พัฒนาเสร็จสมบูรณ์ (Completed Systems)
 
-1. **การบ้านโปรแกรม Python:** [program.py](file:///C:/Users/Artemis/Downloads/program.py) และ [screenshot.png](file:///C:/Users/Artemis/Downloads/screenshot.png)
-2. **ตัวละครและการเคลื่อนไหว:** [Player.prefab](file:///C:/Users/Artemis/rootbound-guardian/Assets/Prefabs/Player.prefab) และ [PlayerMovement.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Player/PlayerMovement.cs)
-3. **คบเพลิง 3D และไฟกะพริบ:** [Torch.prefab](file:///C:/Users/Artemis/rootbound-guardian/Assets/Prefabs/Torch.prefab) และ [LightFlicker.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/LightFlicker.cs)
-4. **การจัดแสงดันเจี้ยน:** โทนสี Teal & Orange, Vignette, Bloom
-5. **หน้าจอ HP & Stamina HUD:** [HUD_Canvas.prefab](file:///C:/Users/Artemis/rootbound-guardian/Assets/Prefabs/HUD_Canvas.prefab) พร้อมพอร์ตเทรตสาวเอลฟ์สมส่วน 1:1
-6. **คัตซีนเปิดเกม:** [Intro_Cinematic_Canvas.prefab](file:///C:/Users/Artemis/rootbound-guardian/Assets/Prefabs/Intro_Cinematic_Canvas.prefab) และ [IntroCinematicManager.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Intro/IntroCinematicManager.cs)
-7. **ฝุ่นละอองในซีนอินโทร:** ละอองทอง `Dustmotes` ส่องกล้อง Z = 4
-8. **การบีบอัดวิดีโอ:** [Movie_001.mp4](file:///C:/Users/Artemis/Downloads/Movie_001.mp4) (ลดขนาด 91%)
-9. **หน้าโหลดเกมหน่วงเวลา:** [Loading Screen.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Loading%20Screen.cs) ขั้นต่ำ 5.5 วินาที
-10. **มอนสเตอร์สไลม์ NPC:** [SlimeV2NPC.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/SlimeV2NPC.cs) กระโดดยืดหดพร้อม Billboard Dialogue
-11. **มอนสเตอร์ผักผลไม้สายโจมตี:** 5 ตัวใน [Attack](file:///C:/Users/Artemis/rootbound-guardian/Assets/Character/Attack/) พร้อมบทพูดเฉพาะสายพันธุ์
-12. **แก้บั๊ก Editor เมนูสีเทา:** แก้ไข `CreateInventoryHUD.cs`
-13. **แสงและเงาสำหรับ 2D Sprites ใน 3D:** URP Lit Shader + Alpha Clipping + Two-Sided Shadows
-14. **จัดแสงดันเจี้ยนในซีนปัจจุบัน:** [DungeonSceneConfigurator.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Editor/DungeonSceneConfigurator.cs)
-15. **โมเดลโขดหินสามมิติ:** [Rock.prefab](file:///C:/Users/Artemis/rootbound-guardian/Assets/Prefabs/Rock.prefab) พร้อมเท็กซ์เจอร์และนูนชน
-16. **ระบบหน้าต่างชัยชนะ UI Win & ไขประตู:** [WinUIManager.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Player/WinUIManager.cs) และ [DoorController.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Player/DoorController.cs)
+### 1. 🗝️ Chest & Key Cinematic System (ระบบหีบสมบัติและคัตซีนกุญแจ)
+- **ไฟล์สคริปต์:** `Assets/Scripts/Item/ChestController.cs`
+- **ลำดับการทำงานของคัตซีนเมื่อผู้เล่นกดเปิด:**
+  1. เมื่อผู้เล่นอยู่ในระยะ `3.5m` จะมี UI แจ้งเตือนขึ้น
+  2. เมื่อกดเปิด (`E` หรือปุ่ม Interaction) ฝาหีบจะค่อยๆ เปิดออกทำมุม `-85°`
+  3. อนุภาคแสงและออร่าศักดิ์สิทธิ์ (`radiantBurstVFX` + `keyAuraVFX` + `radiantLight`) สว่างวาบขึ้น พร้อมเสียง Fanfare ชนะเลิศ
+  4. กุญแจ (`keyTransform`) ลอยขึ้นมาเหนือหีบอย่างนุ่มนวล พร้อมหมุนรอบตัวเองอย่างสวยงาม
+  5. กล้องหลักตัดเข้าสู่ **Cinematic Close-Up Zoom** โฟกัสไปที่กุญแจโดยตรงจากมุมเฉียงด้านหน้า
+- **ค่าพารามิเตอร์ที่ปรับแต่งล่าสุด (Balanced Values):**
+  - `keyRiseHeight`: **`0.42f`** (ปรับแก้จากเดิมที่ลอยสูงเกินไป ให้ลอยสง่าพอดีเหนือขอบหีบ)
+  - `keyTargetScale`: `Vector3(0.24f, 0.24f, 0.24f)` (ปรับสเกลกุญแจให้สวยงามสมส่วน)
+  - `camCloseUpWorldPos`: ตำแหน่งเยื้อง `Vector3(0.45f, 0.35f, -1.9f)` พร้อมองศากล้องเฉียงขึ้นเล็กน้อย ทำให้มองเห็นกุญแจชัดเจน **ไม่ถูกแผ่นหลังของผู้เล่นบัง**
+  - บันทึกลงใน Scene จริงบน GameObject `Chest` เรียบร้อย
+- **🎀 Cute Kawaii Chest Open UI (UI เปิดกล่องสไตล์น่ารักเข้าชุดกัน):**
+  - **Speech Bubble Capsule (`Cute_Tree_Bubble_Bg.png`)**: แคปซูลฟองคำพูดมาร์ชแมลโลว์โค้งมน นุ่มฟู พร้อมเงาละมุน
+  - **Candy 3D [E] Keycap (`Cute_Key_E_Candy.png`)**: ปุ่ม 'E' ทรงลูกกวาด 3D กระโดดดึ๋งเรียกความสนใจทุก 1.4s
+  - **Cute Golden Chest Badge (`Cute_Chest_Badge.png`)**: ไอคอนกล่องสมบัติทองคำจิ๋วสไตล์จิบิพร้อมประกายดาววิ้งวับ
+  - **Typography**: ข้อความ `"OPEN CHEST"` ด้วยฟอนต์น่ารักแฟนตาซี **`OneLittleFont-Full SDF`**
+  - **Animation**: Elastic Pop-In เมื่อเข้าใกล้, ลอยแกว่ง Wobble & Breathing นุ่มนวล เชื่อมต่อกับ `ChestController.interactPromptUI` เรียบร้อย
 
 ---
 
-## 🎮 วิธีการทดสอบเกมใน Unity Editor
+### 2. 🌲 Tree Save Point & Cute Kawaii UI System (ระบบจุดเซฟต้นไม้สไตล์น่ารัก)
+- **ไฟล์สคริปต์:** `Assets/Scripts/Checkpoint/TreeSavePoint.cs`, `TreeInteractUI.cs`
+- **ดีไซน์ภาพใหม่ (Super Cute Visual Style):**
+  - **Speech Bubble Capsule (`Cute_Tree_Bubble_Bg.png`)**: กล่องแคปซูลฟองคำพูดทรงมนสไตล์มาร์ชแมลโลว์ สีครีมละมุน ขอบเขียวพาสเทล พร้อมเงาตกกระทบและหางชี้ลงหาต้นไม้
+  - **Candy 3D [E] Key Button (`Cute_Key_E_Candy.png`)**: ปุ่มคีย์บอร์ด 3D สไตล์ลูกกวาด/เยลลี่ สีครีมทองเนย พร้อมตัวอักษร 'E' เส้นหนากลมมน และเงาแสงสะท้อนมันวาว
+  - **Cute Sprout Badge (`Cute_Sprout_Badge.png`)**: ไอคอนต้นกล้าใบไม้จิ๋ว 🌱 สองใบพร้อมประกายดาวสีทองวิบวับที่มุมขวา
+  - **Typography**: ข้อความ `"REST & SAVE"` ใช้ฟอนต์น่ารักลายมือแฟนตาซี **`OneLittleFont-Full SDF`** สีเขียวมอสส์เข้ม สบายตาและเข้ากับโทนเกม
+- **แอนิเมชันน่ารักเป็นธรรมชาติ (Playful & Bouncy Feel):**
+  - **Floating & Gentle Wobble**: ลอยขึ้น-ลงอย่างนุ่มนวล พร้อมเอียงโยกเบาๆ (`±2.4°`) ตามจังหวะลอยตัว
+  - **Squash & Stretch Breathing**: มีจังหวะยุบพองแบบหายใจ ให้ความรู้สึกมีชีวิตชีวา
+  - **Kawaii Key Hop ("Press me!")**: ปุ่ม `[E]` จะกระโดดดึ๋งเบาๆ ทุก 1.4 วินาทีเพื่อเรียกร้องความสนใจจากผู้เล่น
+  - **Sprout Waggle**: ใบไม้จิ๋วโยกไหวเบาๆ เพิ่มความน่ารัก
+  - **Elastic Overshoot Pop-In**: ตอนเดินเข้าใกล้ กล่อง UI จะเด้งตัวขยายออกมาแบบยางยืด (Bouncy Elastic Pop) อย่างร่าเริง
+- **VFX เมื่อกดเซฟ:**
+  - ละอองใบไม้สีเขียวทอง (`RisingLeaves`) พุ่งกระจาย
+  - ประกายดาวเวทมนตร์ (`Sparkles`) และวงแหวน Shockwave สีเทอร์ควอยซ์
+  - หิ่งห้อยเรืองแสง (`AmbientFireflies`) บินวนรอบพุ่มไม้หลังฟื้นฟูเสร็จ
 
-1. สลับหน้าต่างไปที่ **Unity Editor**
-2. เปิดซีน **`Assets/Scenes/map.unity`** (หรือซีนที่กำลังพัฒนา)
-3. กดปุ่ม **Play** ใน Unity Editor:
-   * เดินไปเก็บกุญแจ 🗝️ ในแผนที่ (เควสท์จะเปลี่ยนเป็นสีเขียว 1/1)
-   * เดินไปที่ประตู 🚪 (จะมีป้ายลอย 3D บอกสถานะ)
-   * **กดปุ่ม `F` หรือเดินชนประตู:**
-     * บานประตูจะหมุนเปิดออกอย่างนุ่มนวล
-     * ข้อความเควสท์เปลี่ยนเป็นสีทอง 1/1
-     * เสียงดนตรีชัยชนะจะดังขึ้น พร้อมหน้าต่าง **UI Win** สีทองอร่ามเด้งขึ้นมาสรุปเวลาและเลือด
-     * สามารถกดปุ่ม **"🔄 เล่นใหม่อีกครั้ง"** หรือ **"🏠 กลับหน้าหลัก"** ได้ทันที
+
+---
+
+### 3. 🖥️ Unified HUD & Modern UI (ระบบอินเทอร์เฟซผู้เล่น)
+- **หลอดพลังชีวิตและออกซิเจน (Player Health & Oxygen Bar):**
+  - แสดงผลคงที่ ชัดเจน มีการอัปเดตค่าแบบ Real-time ตามความเสียหายและการหายใจ
+- **Dash Cooldown Indicator (มุมขวาล่าง):**
+  - เพิ่ม UI แสดงสถานะคูลดาวน์ของการพุ่งตัว (Dash) ที่มุมขวาล่าง พร้อมเรเดียลฟิลล์หมุนจับเวลา
+- **Quest Tracker UI:**
+  - ปรับปรุงกรอบภารกิจและเป้าหมายใหม่ให้สวยงาม สะอาดตา และเข้ากับธีมแฟนตาซี
+
+---
+
+### 4. 💀 Game Over UI System (ระบบจบเกม)
+- **ไฟล์สคริปต์:** `Assets/Scripts/UI/GameOverUI.cs`, `GameOverManager.cs`
+- **เงื่อนไข:** ทำงานอัตโนมัติทันทีเมื่อ **HP = 0** หรือ **Oxygen = 0**
+- **การทำงาน:**
+  - ล็อกการควบคุมของผู้เล่น
+  - แสดงหน้าต่าง Game Over แบบนุ่มนวล พร้อมปุ่ม **Retry / Restart** สำหรับโหลดจุดเซฟหรือเริ่มใหม่
+
+---
+
+### 5. 🌅 Cozy Golden Hour & Fairytale Lighting (ระบบจัดแสงแมพสไตล์อบอุ่นตาม Reference)
+- **อ้างอิงภาพสไตล์:** `C:\Users\Artemis\Downloads\2026-10-02_222704.png`
+- **การจัดแสง Directional Sunlight:**
+  - สีแสงแดด: Warm Sunny Honey Gold (`#FFF0CC`, `Color(1.0f, 0.94f, 0.80f)`)
+  - ความสว่าง (Intensity): `1.45f`
+  - องศามุมตกกระทบ: `Quaternion.Euler(34f, -145f, 0f)` ให้แสงแดดยามเย็นส่องทอดยาว พาดผ่านทางเดินและเสาหินอย่างมีมิติ
+  - เงา (Shadows): Soft Shadows นุ่มนวล ความเข้ม `0.60f` (เงาโปร่งสบายตา ไม่มืดทึบ)
+- **แสงบรรยากาศแวดล้อม Trilight Ambient:**
+  - ท้องฟ้า (Sky): Warm Peach (`Color(1.0f, 0.88f, 0.72f)`)
+  - เส้นขอบฟ้า (Equator): Golden Sage (`Color(0.88f, 0.84f, 0.72f)`)
+  - ผืนดิน (Ground): Warm Sand/Moss (`Color(0.62f, 0.58f, 0.48f)`)
+- **หมอกและท้องฟ้าเทพนิยาย (Warm Peach Sky & Fog):**
+  - ท้องฟ้าแบบ Procedural: สร้าง `WarmGoldenSkybox.mat` ให้สีไล่เฉดพีช-ทอง-ฟ้าพาสเทล
+  - หมอกละมุน (Linear Fog): สี Warm Peach Mist (`#F6D6A6`) เริ่มที่ระยะ `18m` ถึง `75m` สร้างมิติความลึกเหมือนภาพวาด
+- **จุดกำเนิดแสงย่อย (Cozy Lanterns & Torches):**
+  - คบเพลิงและโคมไฟให้แสงสีส้มอำพันอบอุ่น (`Color(1.0f, 0.74f, 0.35f)`) ส่องสว่างเป็นหย่อมๆ
+- **Post-Processing (Color Grading & Bloom):**
+  - White Balance: Temperature `+14` (โทนอุ่นสบายตา)
+  - Color Adjustments: Saturation `+18` (สีสดใสมีชีวิตชีวา), Contrast `+8`
+  - Bloom: แสงฟุ้งนุ่มนวลสีทอง (`Intensity 0.85`, `Threshold 0.82`)
+  - Vignette: ขอบมืดโทนน้ำผึ้งจางๆ (`0.15`) เสริมโฟกัสตรงกลางจอ
+
+---
+
+## 🔧 สรุปการแก้ไขปัญหาด้านเทคนิค (Technical & Stability Fixes)
+
+### ปัญหาที่เกิดขึ้นจาก RAM เต็ม:
+1. จังหวะที่ RAM เต็มระหว่างการบันทึกฉาก Unity ทำให้ Process ของ Unity Build Daemon (`AssetImportWorker42`, `AssetImportWorker43`) เกิดอาการค้างและแครชกลายเป็น Zombie Process
+2. Unity Editor แจ้งเตือนข้อผิดพลาด:
+   ```text
+   Internal build system error. Read the full binlog without getting a BuildFinishedMessage.
+   The backend process appears to still be running.
+   ```
+3. ค่าแฟล็กระบบ `EditorUtility.scriptCompilationFailed` ค้างอยู่ที่ `True` ส่งผลให้ไม่สามารถกดเข้า Play Mode ได้
+
+### วิธีการแก้ไขที่สำเร็จสมบูรณ์:
+1. ทำการปิด (Kill/Terminate) ตัว `AssetImportWorker` และ `UnityCrashHandler64` ที่ค้างอยู่ทั้งหมด
+2. คืนพื้นที่ RAM ให้ระบบได้ประมาณ **~1.8 GB**
+3. สั่งรัน Clean Recompilation ใน Unity Editor:
+   ```csharp
+   CompilationPipeline.RequestScriptCompilation(RequestScriptCompilationOptions.CleanBuildCache);
+   ```
+4. ผลการตรวจสอบสถานะล่าสุด:
+   - `errorCount: 0`
+   - `scriptCompilationFailed: False`
+   - Editor กลับมาตอบสนองปกติ 100% พร้อมทดสอบ
+
+---
+
+## 🎮 วิธีการทดสอบใน Unity Editor
+1. เปิดโปรเจกต์ที่ฉากหลัก (`C:\Users\Artemis\rootbound-guardian`)
+2. กดปุ่ม **Play** ที่แถบด้านบนของ Unity Editor
+3. ทดสอบการควบคุม:
+   - เดินไปที่ **ต้นไม้**: สังเกตปุ่ม **E** ลอยน่ารัก และกดเพื่อดู Particle ละอองใบไม้
+   - เดินไปที่ **หีบสมบัติ (Chest)**: กดเปิดเพื่อดูฉากคัตซีน ฝาหีบเปิด แสงประกายวาบ กุญแจลอยขึ้นในระดับความสูงที่พอเหมาะ (`0.42f`) และกล้องซูมเข้าหากุญแจโดยไม่โดนตัวผู้เล่นบัง
+   - สังเกต HUD: หลอด HP, หลอด Oxygen, คูลดาวน์ Dash ขวาล่าง และ Quest Tracker

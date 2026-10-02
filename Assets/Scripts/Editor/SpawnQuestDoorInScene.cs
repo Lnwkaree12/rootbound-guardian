@@ -3,13 +3,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-[InitializeOnLoad]
 public class SpawnQuestDoorInScene
 {
-    static SpawnQuestDoorInScene()
-    {
-        EditorApplication.delayCall += EnsureDoorSpawnedInScene;
-    }
+    
 
     [MenuItem("Tools/SproutScout/Spawn Door in Scene")]
     public static void ForceSpawnDoor()

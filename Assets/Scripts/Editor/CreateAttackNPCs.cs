@@ -3,13 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using TMPro;
 
-[InitializeOnLoad]
 public class CreateAttackNPCs
 {
-    static CreateAttackNPCs()
-    {
-        EditorApplication.delayCall += EnsureAttackNPCsExist;
-    }
+    
 
     [MenuItem("Tools/SproutScout/Create Attack NPC Prefabs")]
     public static void ForceCreateAttackNPCs()

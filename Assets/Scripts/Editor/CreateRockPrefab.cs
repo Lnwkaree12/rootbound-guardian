@@ -4,13 +4,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 
-[InitializeOnLoad]
 public class CreateRockPrefab
 {
-    static CreateRockPrefab()
-    {
-        EditorApplication.delayCall += EnsureRockPrefabExists;
-    }
+    
 
     [MenuItem("Tools/SproutScout/Create Rock Prefab")]
     public static void ForceCreateRock()

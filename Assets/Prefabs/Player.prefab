@@ -358,7 +358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerOxygen
   maxOxygen: 100
-  currentOxygen: 0
+  currentOxygen: 100
   drainPerTick: 5
   drainTickInterval: 1
   regenPerTick: 10

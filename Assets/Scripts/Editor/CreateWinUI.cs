@@ -4,13 +4,9 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
-[InitializeOnLoad]
 public class CreateWinUI
 {
-    static CreateWinUI()
-    {
-        EditorApplication.delayCall += EnsureWinUIReady;
-    }
+
 
     [MenuItem("Tools/SproutScout/Create Win UI")]
     public static void ForceCreateWinUI()
