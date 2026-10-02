@@ -229,8 +229,10 @@ public class TreeSavePoint : MonoBehaviour
     {
         if (CheckpointManager.Instance != null)
         {
-            // ใช้ Reference ที่ Cache ไว้ตั้งแต่ OnTriggerEnter
-            CheckpointManager.Instance.SaveCheckpoint(transform.position, playerHealth, playerInventory);
+            Vector3 checkpointPosition = playerObject != null
+                ? playerObject.transform.root.position
+                : transform.position;
+            CheckpointManager.Instance.SaveCheckpoint(checkpointPosition, playerHealth, playerInventory);
             Debug.Log("[Tree Save Point] บันทึกจุด Checkpoint เรียบร้อย!");
         }
         else

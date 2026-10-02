@@ -42,11 +42,11 @@ public class WinUIManager : MonoBehaviour
 
     void Awake()
     {
-        if (instance == null) instance = this;
-        else if (instance != this) { Destroy(gameObject); return; }
+        FindUIReferences();
+
+        if (instance == null || (instance.winPanel == null && winPanel != null)) instance = this;
 
         levelStartTime = Time.timeSinceLevelLoad;
-        FindUIReferences();
 
         if (winPanel != null) winPanel.SetActive(false);
 
@@ -132,6 +132,12 @@ public class WinUIManager : MonoBehaviour
 
         EnsureEventSystem();
         FindUIReferences();
+
+        if (winPanel == null)
+        {
+            Debug.LogError("[WinUIManager] WinPanel was not found. Add a WinPanel reference to the active WinUIManager.");
+            yield break;
+        }
 
         if (winPanel != null)
         {
