@@ -436,7 +436,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 489328178299401009}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1780,7 +1780,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1600031355545929323}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1892,7 +1892,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1601059081363931144}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -2720,7 +2720,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2058360857633460096}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -2832,7 +2832,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2199629690536368824}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -3217,7 +3217,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2529681961937646571}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -4673,7 +4673,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3455620722685502072}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -5575,7 +5575,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4390276091704320622}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -5799,7 +5799,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4515170080912737585}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -6394,7 +6394,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5049071274857998172}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -7065,7 +7065,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5643928216433566268}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -7177,7 +7177,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5855341828580201379}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -7625,7 +7625,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6166797027083535361}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -8532,7 +8532,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7020146895493494587}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -8980,7 +8980,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7730108360642847860}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -9204,7 +9204,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7817775593443563550}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -10212,7 +10212,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8780802353784648529}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -10324,7 +10324,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8820246133201645884}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -12476,7 +12476,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4451879499853659348, guid: 1ee48ba913c410841b95e0375f3b274a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -21.221828
+      value: -22.08
       objectReference: {fileID: 0}
     - target: {fileID: 4451879499853659348, guid: 1ee48ba913c410841b95e0375f3b274a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -12665,6 +12665,10 @@ PrefabInstance:
     - target: {fileID: 928978061935668556, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_Name
       value: crushed stone (9)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: waitTimeAtTop
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -14458,7 +14462,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4451879499853659348, guid: 1ee48ba913c410841b95e0375f3b274a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -21.221828
+      value: -22.08
       objectReference: {fileID: 0}
     - target: {fileID: 4451879499853659348, guid: 1ee48ba913c410841b95e0375f3b274a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -14972,7 +14976,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4451879499853659348, guid: 1ee48ba913c410841b95e0375f3b274a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -21.221828
+      value: -22.08
       objectReference: {fileID: 0}
     - target: {fileID: 4451879499853659348, guid: 1ee48ba913c410841b95e0375f3b274a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -15268,7 +15272,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4451879499853659348, guid: 1ee48ba913c410841b95e0375f3b274a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -21.221828
+      value: -22.08
       objectReference: {fileID: 0}
     - target: {fileID: 4451879499853659348, guid: 1ee48ba913c410841b95e0375f3b274a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -16099,6 +16103,10 @@ PrefabInstance:
     - target: {fileID: 928978061935668556, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_Name
       value: crushed stone (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: waitTimeAtBottom
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
