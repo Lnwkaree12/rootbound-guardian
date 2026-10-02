@@ -1,0 +1,23 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.3/staging' branch; Version is '6000.3.9f1 (7a9955a4f2fa) revision 8034645'; Using compiler version '194234433'; Build Type 'Release'
+OS: 'Windows 11  (10.0.22631) Professional' Language: 'en' Physical Memory: 32688 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-Artemis" at "2026-09-17T12:21:45.9570992Z"
+Process architecture: x64
+Date: 2026-09-17T12:21:45Z
+
+COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\6000.3.9f1\Editor\Unity.exe
+-batchmode
+-nographics
+-projectPath
+C:\Users\Artemis\rootbound-guardian
+-executeMethod
+CreateMainMenuUI.BuildFromCommandLine
+-quit
+-logFile
+C:\Users\Artemis\rootbound-guardian\batch_build.log
+Successfully changed project path to: C:\Users\Artemis\rootbound-guardian
+C:/Users/Artemis/rootbound-guardian
+Exiting without the bug reporter. Application will terminate with return code 1
