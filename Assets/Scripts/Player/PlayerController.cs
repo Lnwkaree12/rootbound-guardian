@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 [RequireComponent(typeof(PlayerInputHandler))]
 [RequireComponent(typeof(PlayerMovement))]
@@ -36,6 +36,12 @@ public class PlayerController : MonoBehaviour
     private float dashTimer;
     private float dashCooldownTimer;
     private Vector3 dashDirection;
+
+    public float DashCooldown => dashCooldown;
+    public float DashCooldownTimer => dashCooldownTimer;
+    public float DashCooldownNormalized => dashCooldown > 0f ? Mathf.Clamp01(dashCooldownTimer / dashCooldown) : 0f;
+    public bool CanDash => dashCooldownTimer <= 0f && !isDashing;
+    public bool IsDashing => isDashing;
 
     private void Awake()
     {

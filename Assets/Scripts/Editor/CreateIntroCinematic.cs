@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-[InitializeOnLoad]
 public class CreateIntroCinematic
 {
     static CreateIntroCinematic()

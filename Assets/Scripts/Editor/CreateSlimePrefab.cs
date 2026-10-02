@@ -3,13 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using TMPro;
 
-[InitializeOnLoad]
 public class CreateSlimePrefab
 {
-    static CreateSlimePrefab()
-    {
-        EditorApplication.delayCall += EnsureSlimePrefabsExist;
-    }
+    
 
     [MenuItem("Tools/SproutScout/Create Slime Prefabs")]
     public static void ForceCreateSlimes()

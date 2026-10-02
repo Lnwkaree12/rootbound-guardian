@@ -2,13 +2,9 @@
 using UnityEditor;
 using UnityEngine;
 
-[InitializeOnLoad]
 public class CleanPlayerPrefab
 {
-    static CleanPlayerPrefab()
-    {
-        EditorApplication.delayCall += CleanPlayer;
-    }
+    
 
     public static void CleanPlayer()
     {

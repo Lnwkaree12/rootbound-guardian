@@ -2,13 +2,9 @@
 using UnityEditor;
 using UnityEngine;
 
-[InitializeOnLoad]
 public class CreatePlantWithLantern
 {
-    static CreatePlantWithLantern()
-    {
-        EditorApplication.delayCall += EnsurePlantPrefabExists;
-    }
+    
 
     [MenuItem("Tools/SproutScout/Create Plant with Lantern")]
     public static void ForceCreatePlantPrefab()

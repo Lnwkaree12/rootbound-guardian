@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-[InitializeOnLoad]
 public class CreateTorchFirePrefab
 {
     static CreateTorchFirePrefab()

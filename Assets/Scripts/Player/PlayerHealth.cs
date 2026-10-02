@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -162,7 +162,30 @@ public class PlayerHealth : MonoBehaviour
         onDeath?.Invoke();
         Debug.Log("Player Died!");
 
-        StartCoroutine(RespawnRoutine());
+        StartCoroutine(GameOverRoutine());
+    }
+
+    private IEnumerator GameOverRoutine()
+    {
+        // 1. ดึงระยะเวลาของ Animation ตายจาก PlayerAnimation
+        float animLength = playerAnim != null ? playerAnim.GetDeadAnimationLength() : 0f;
+
+        // 2. รอจนกว่า Animation ตายจะเล่นเสร็จ + Delay ที่ตั้งค่าไว้
+        yield return new WaitForSeconds(animLength + respawnDelay);
+
+        GameOverUIManager gameOverUI = FindObjectOfType<GameOverUIManager>();
+        if (gameOverUI != null)
+        {
+            gameOverUI.TriggerGameOver("พลังชีวิตหมดลงแล้ว!");
+        }
+        else if (GameOverUIManager.Instance != null)
+        {
+            GameOverUIManager.Instance.TriggerGameOver("พลังชีวิตหมดลงแล้ว!");
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerHealth] GameOverUIManager ไม่พบในฉาก");
+        }
     }
 
     private IEnumerator RespawnRoutine()

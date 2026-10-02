@@ -7,12 +7,14 @@ public class GameOverUIManager : MonoBehaviour
     public static GameOverUIManager Instance { get; private set; }
 
     [Header("UI References")]
-    [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private CanvasGroup gameOverCanvasGroup;
+    [SerializeField] public GameObject gameOverPanel;
+    [SerializeField] public CanvasGroup gameOverCanvasGroup;
+    [SerializeField] public Text titleText;
+    [SerializeField] public Text reasonText;
 
     [Header("Action Buttons")]
-    [SerializeField] private Button restartButton;
-    [SerializeField] private Button mainMenuButton;
+    [SerializeField] public Button restartButton;
+    [SerializeField] public Button mainMenuButton;
 
     private bool isGameOver;
 
@@ -24,7 +26,7 @@ public class GameOverUIManager : MonoBehaviour
         }
         else if (Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
 
@@ -37,13 +39,18 @@ public class GameOverUIManager : MonoBehaviour
         }
     }
 
-    public void TriggerGameOver()
+    public void TriggerGameOver(string reason = "")
     {
         if (isGameOver) return;
         isGameOver = true;
 
         FindUIReferences();
         BindButtonEvents();
+
+        if (reasonText != null && !string.IsNullOrEmpty(reason))
+        {
+            reasonText.text = reason;
+        }
 
         if (gameOverPanel != null)
         {
@@ -53,6 +60,7 @@ public class GameOverUIManager : MonoBehaviour
 
         if (gameOverCanvasGroup != null)
         {
+            gameOverCanvasGroup.alpha = 1f;
             gameOverCanvasGroup.interactable = true;
             gameOverCanvasGroup.blocksRaycasts = true;
         }
@@ -60,6 +68,21 @@ public class GameOverUIManager : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         Time.timeScale = 0f;
+    }
+
+    public void ResetGameOverState()
+    {
+        isGameOver = false;
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
+        if (gameOverCanvasGroup != null)
+        {
+            gameOverCanvasGroup.alpha = 0f;
+            gameOverCanvasGroup.interactable = false;
+            gameOverCanvasGroup.blocksRaycasts = false;
+        }
     }
 
     private void FindUIReferences()
@@ -79,6 +102,20 @@ public class GameOverUIManager : MonoBehaviour
             {
                 gameOverCanvasGroup = gameOverPanel.AddComponent<CanvasGroup>();
             }
+        }
+
+        if (titleText == null)
+        {
+            Transform t = gameOverPanel.transform.Find("ModalContainer/InnerCard/TitleText");
+            if (t == null) t = gameOverPanel.transform.Find("ModalContainer/TitleText");
+            if (t != null) titleText = t.GetComponent<Text>();
+        }
+
+        if (reasonText == null)
+        {
+            Transform r = gameOverPanel.transform.Find("ModalContainer/InnerCard/ReasonText");
+            if (r == null) r = gameOverPanel.transform.Find("ModalContainer/ReasonText");
+            if (r != null) reasonText = r.GetComponent<Text>();
         }
 
         if (restartButton == null)

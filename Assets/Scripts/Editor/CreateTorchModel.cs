@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 
-[InitializeOnLoad]
 public class CreateTorchModel
 {
     static CreateTorchModel()

@@ -4,13 +4,9 @@ using UnityEngine;
 using UnityEditor.Animations;
 using System.IO;
 
-[InitializeOnLoad]
 public class CreateAttackAnimation
 {
-    static CreateAttackAnimation()
-    {
-        EditorApplication.delayCall += AutoCreateAllAnimations;
-    }
+    
 
     private static void AutoCreateAllAnimations()
     {

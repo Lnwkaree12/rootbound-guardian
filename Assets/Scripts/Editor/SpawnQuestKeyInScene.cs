@@ -3,13 +3,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-[InitializeOnLoad]
 public class SpawnQuestKeyInScene
 {
-    static SpawnQuestKeyInScene()
-    {
-        EditorApplication.delayCall += EnsureKeySpawnedInScene;
-    }
+    
 
     [MenuItem("Tools/SproutScout/Spawn Key in Scene")]
     public static void ForceSpawnKey()

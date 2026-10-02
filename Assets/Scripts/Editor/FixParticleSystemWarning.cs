@@ -3,13 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 
-[InitializeOnLoad]
 public class FixParticleSystemWarning
 {
-    static FixParticleSystemWarning()
-    {
-        EditorApplication.delayCall += AutoFix;
-    }
+    
 
     private static void AutoFix()
     {
