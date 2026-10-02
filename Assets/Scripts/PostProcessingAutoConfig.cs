@@ -21,11 +21,15 @@ public static class PostProcessingAutoConfig
         #endif
     }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     public static void ConfigureActiveScene()
     {
         ConfigureCamera();
-        ConfigureVolume();
+        // Do NOT create or override Volumes at runtime in play mode
+        if (!Application.isPlaying)
+        {
+            ConfigureVolume();
+        }
     }
 
     public static void ConfigureCamera()
@@ -64,9 +68,12 @@ public static class PostProcessingAutoConfig
 
     public static void ConfigureVolume()
     {
+        // Never create or override volume during play mode
+        if (Application.isPlaying) return;
+
         // 3. Check if there is already a Volume component in the scene
         Volume existingVolume = GameObject.FindObjectOfType<Volume>();
-        if (existingVolume == null)
+        if (existingVolume != null) return;
         {
             // Create a new Global Volume GameObject
             GameObject volumeGO = new GameObject("Global Post Processing Volume");
