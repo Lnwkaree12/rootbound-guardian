@@ -28,6 +28,12 @@
   - `keyTargetScale`: `Vector3(0.24f, 0.24f, 0.24f)` (ปรับสเกลกุญแจให้สวยงามสมส่วน)
   - `camCloseUpWorldPos`: ตำแหน่งเยื้อง `Vector3(0.45f, 0.35f, -1.9f)` พร้อมองศากล้องเฉียงขึ้นเล็กน้อย ทำให้มองเห็นกุญแจชัดเจน **ไม่ถูกแผ่นหลังของผู้เล่นบัง**
   - บันทึกลงใน Scene จริงบน GameObject `Chest` เรียบร้อย
+- **🎀 Cute Kawaii Chest Open UI (UI เปิดกล่องสไตล์น่ารักเข้าชุดกัน):**
+  - **Speech Bubble Capsule (`Cute_Tree_Bubble_Bg.png`)**: แคปซูลฟองคำพูดมาร์ชแมลโลว์โค้งมน นุ่มฟู พร้อมเงาละมุน
+  - **Candy 3D [E] Keycap (`Cute_Key_E_Candy.png`)**: ปุ่ม 'E' ทรงลูกกวาด 3D กระโดดดึ๋งเรียกความสนใจทุก 1.4s
+  - **Cute Golden Chest Badge (`Cute_Chest_Badge.png`)**: ไอคอนกล่องสมบัติทองคำจิ๋วสไตล์จิบิพร้อมประกายดาววิ้งวับ
+  - **Typography**: ข้อความ `"OPEN CHEST"` ด้วยฟอนต์น่ารักแฟนตาซี **`OneLittleFont-Full SDF`**
+  - **Animation**: Elastic Pop-In เมื่อเข้าใกล้, ลอยแกว่ง Wobble & Breathing นุ่มนวล เชื่อมต่อกับ `ChestController.interactPromptUI` เรียบร้อย
 
 ---
 
