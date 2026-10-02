@@ -3,13 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 
-[InitializeOnLoad]
 public class CreateDoorModel
 {
-    static CreateDoorModel()
-    {
-        EditorApplication.delayCall += EnsureDoorPrefabExists;
-    }
+    
 
     [MenuItem("Tools/SproutScout/Create Door Model Prefab")]
     public static void ForceCreateDoor()

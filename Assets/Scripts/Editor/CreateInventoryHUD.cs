@@ -3,14 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-[InitializeOnLoad]
 public class CreateInventoryHUD
 {
-    static CreateInventoryHUD()
-    {
-        // Run once when Unity compiles or launches to ensure the Inventory HUD is integrated
-        EditorApplication.delayCall += EnsureInventoryHUDReady;
-    }
+
 
     [MenuItem("Tools/SproutScout/Create Inventory and Potion UI")]
     public static void ForceCreateInventoryHUD()

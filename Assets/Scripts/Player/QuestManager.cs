@@ -5,8 +5,10 @@ public class QuestManager : MonoBehaviour
 {
     [Header("Quest UI References")]
     public GameObject questPanel;
+    public Text questCategoryText;
     public Text questTitleText;
     public Text questDescText;
+    public Text questDetailText;
 
     [Header("Quest Progress")]
     public bool hasKey = false;
@@ -39,19 +41,35 @@ public class QuestManager : MonoBehaviour
     {
         if (questPanel == null)
         {
-            questPanel = GameObject.Find("QuestPanel");
+            Transform qp = transform.Find("QuestPanel");
+            questPanel = qp != null ? qp.gameObject : GameObject.Find("QuestPanel");
+        }
+
+        if (questPanel == null) return;
+
+        if (questCategoryText == null)
+        {
+            Transform t = questPanel.transform.Find("CategoryText");
+            if (t != null) questCategoryText = t.GetComponent<Text>();
         }
 
         if (questTitleText == null)
         {
-            GameObject titleObj = GameObject.Find("QuestPanel/TitleText");
-            if (titleObj != null) questTitleText = titleObj.GetComponent<Text>();
+            Transform t = questPanel.transform.Find("TitleText");
+            if (t != null) questTitleText = t.GetComponent<Text>();
         }
 
         if (questDescText == null)
         {
-            GameObject descObj = GameObject.Find("QuestPanel/DescText");
-            if (descObj != null) questDescText = descObj.GetComponent<Text>();
+            Transform t = questPanel.transform.Find("DescText");
+            if (t == null) t = questPanel.transform.Find("ObjectiveRow/DescText");
+            if (t != null) questDescText = t.GetComponent<Text>();
+        }
+
+        if (questDetailText == null)
+        {
+            Transform t = questPanel.transform.Find("DetailText");
+            if (t != null) questDetailText = t.GetComponent<Text>();
         }
     }
 

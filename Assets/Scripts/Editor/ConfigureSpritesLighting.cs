@@ -3,13 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 
-[InitializeOnLoad]
 public class ConfigureSpritesLighting
 {
-    static ConfigureSpritesLighting()
-    {
-        EditorApplication.delayCall += EnsureAllSpritesAreLit;
-    }
+    
 
     [MenuItem("Tools/SproutScout/Configure Sprites Lighting and Shadows")]
     public static void ForceConfigureSpritesLighting()

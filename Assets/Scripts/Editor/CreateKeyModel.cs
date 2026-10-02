@@ -3,13 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 
-[InitializeOnLoad]
 public class CreateKeyModel
 {
-    static CreateKeyModel()
-    {
-        EditorApplication.delayCall += EnsureKeyPrefabExists;
-    }
+    
 
     [MenuItem("Tools/SproutScout/Create Key Model Prefab")]
     public static void ForceCreateKey()

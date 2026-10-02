@@ -3,13 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 
-[InitializeOnLoad]
 public class CreateMapPrefab
 {
-    static CreateMapPrefab()
-    {
-        EditorApplication.delayCall += EnsureMapPrefabExists;
-    }
+    
 
     [MenuItem("Tools/SproutScout/Create Stylized Map Prefab")]
     public static void ForceCreateMap()

@@ -3,13 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-[InitializeOnLoad]
 public class CreateQuestUI
 {
-    static CreateQuestUI()
-    {
-        EditorApplication.delayCall += EnsureQuestUIReady;
-    }
+
 
     [MenuItem("Tools/SproutScout/Create Quest UI")]
     public static void ForceCreateQuestUI()
