@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5572359220139809753}
   m_Layer: 3
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -251,6 +251,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1830090229681436556, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
+    - {fileID: 7649121720225849218, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
     m_RemovedGameObjects:
     - {fileID: 5551271543905125926, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
     m_AddedGameObjects:

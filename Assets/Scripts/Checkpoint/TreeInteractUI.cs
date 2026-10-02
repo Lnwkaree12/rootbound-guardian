@@ -18,7 +18,7 @@ public class TreeInteractUI : MonoBehaviour
     [SerializeField] private float floatHeight = 0.12f;
     [SerializeField] private float pulseSpeed = 3.6f;
     [SerializeField] private float pulseScale = 0.05f;
-    [SerializeField] private float wobbleAngle = 2.4f;
+    [SerializeField] private float wobbleAngle = 0f; // 0 = perfectly straight & level (no tilt)
 
     private Camera targetCamera;
     private Vector3 initialLocalPos;
@@ -52,7 +52,7 @@ public class TreeInteractUI : MonoBehaviour
 
     private void Start()
     {
-        targetCamera = Camera.main;
+        targetCamera = GetBestCamera();
     }
 
     public void ConfigureElements(Image bg, Image key, Image sprout, TextMeshProUGUI text)
@@ -67,16 +67,23 @@ public class TreeInteractUI : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (targetCamera == null)
+        if (targetCamera == null || !targetCamera.isActiveAndEnabled)
         {
-            targetCamera = Camera.main;
+            targetCamera = GetBestCamera();
             if (targetCamera == null) return;
         }
 
-        // 1. Billboard facing active camera with cute gentle sway
-        float tilt = Mathf.Sin(Time.time * (floatSpeed * 0.8f)) * wobbleAngle;
+        // 1. Billboard facing active camera perfectly level with the screen (zero tilt)
         Quaternion camRot = targetCamera.transform.rotation;
-        transform.rotation = camRot * Quaternion.Euler(0f, 0f, tilt);
+        if (wobbleAngle > 0.001f)
+        {
+            float tilt = Mathf.Sin(Time.time * (floatSpeed * 0.8f)) * wobbleAngle;
+            transform.rotation = camRot * Quaternion.Euler(0f, 0f, tilt);
+        }
+        else
+        {
+            transform.rotation = camRot;
+        }
 
         // 2. Gentle cute floating hover animation
         if (isVisible)
@@ -114,6 +121,43 @@ public class TreeInteractUI : MonoBehaviour
                 sproutIcon.transform.localRotation = Quaternion.Euler(0f, 0f, sproutTilt);
             }
         }
+    }
+
+    private Camera GetBestCamera()
+    {
+        // 1. Check Player's attached camera first (gameplay camera)
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) player = GameObject.Find("Player");
+        if (player == null) player = GameObject.Find("Player Variant");
+        if (player != null)
+        {
+            Camera playerCam = player.GetComponentInChildren<Camera>(false);
+            if (playerCam != null && playerCam.isActiveAndEnabled)
+            {
+                return playerCam;
+            }
+        }
+
+        // 2. Check Camera.main
+        Camera mainCam = Camera.main;
+        if (mainCam != null && mainCam.isActiveAndEnabled)
+        {
+            return mainCam;
+        }
+
+        // 3. Fallback to highest depth camera
+        Camera[] cams = Camera.allCameras;
+        Camera bestCam = null;
+        float maxDepth = float.MinValue;
+        for (int i = 0; i < cams.Length; i++)
+        {
+            if (cams[i] != null && cams[i].isActiveAndEnabled && cams[i].depth >= maxDepth)
+            {
+                maxDepth = cams[i].depth;
+                bestCam = cams[i];
+            }
+        }
+        return bestCam;
     }
 
     public void Show()

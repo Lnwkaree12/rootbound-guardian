@@ -158,14 +158,41 @@ flowchart TD
 5. **Automatic Smash Trap (`AutomaticSmashTrap.cs`)**: เสาหินทุบกระแทกจากเพดาน
 6. **Rotating Obstacle (`RotateObject.cs`)**: ท่อนซุง/ใบมีดหมุนเหวี่ยงรอบแกน
 
-### 5.5 การจัดแสง Cozy Golden Hour & Post-Processing (Fairytale Reference)
-- **Directional Sunlight:** สี Warm Sunny Honey Gold (`#FFF0CC`), Intensity `1.45f`, องศา `(34f, -145f, 0f)`, Soft Shadows `0.60f` โปร่งสบายตา
-- **Trilight Ambient:** Sky = Warm Peach, Equator = Golden Sage, Ground = Warm Sand/Moss
-- **Fog & Skybox:** `WarmGoldenSkybox.mat` สีพีชทอง, Linear Fog สี Warm Peach Mist (`#F6D6A6`) ระยะ 18m - 75m
-- **Lanterns & Torches:** แสงสีส้มอำพัน (`Color(1.0f, 0.74f, 0.35f)`) ส่องเป็นจุดๆ
-- **URP Post-Processing:** White Balance Temp `+14`, Saturation `+18`, Bloom ฟุ้งนวลตา (`Intensity 0.85`), Vignette จางๆ `0.15`
+### 5.5 การจัดแสง Cozy Fairytale Golden Hour & Post-Processing (ตาม Reference 2026-10-02_222704.png)
+- **เครื่องมือติดตั้งอัตโนมัติ:** เมนู **`Tools ➡️ SproutScout ➡️ Apply Cozy Fairytale Lighting (Reference Style)`** ผ่าน [SetupFairytaleLighting.cs](file:///C:/Users/Artemis/rootbound-guardian/Assets/Scripts/Editor/SetupFairytaleLighting.cs)
+- **Directional Sunlight:**
+  - สีแสงแดด: Warm Honey Gold (`Color(1.0f, 0.95f, 0.86f)`), Intensity `1.25f` นวลตา ส่องเฉียงจากมุมหลัง-ขวา `(42f, 138f, 0f)`
+  - เงา (Soft Shadows): Strength `0.46f` เงาโปร่งแสง ไม่ดำทึบตา มองเห็นดีเทลพื้นและสิ่งของในร่มเงาอย่างชัดเจน
+- **Trilight Ambient Lighting:**
+  - ท้องฟ้า (Sky): Soft Skylight Slate-Teal (`Color(0.72f, 0.80f, 0.86f)`) ยกเงาให้สว่างนวลตาในโทนสีคราม-เขียวตามภาพต้นแบบ
+  - ขอบฟ้า (Equator): Muted Sage / Moss Fill (`Color(0.65f, 0.72f, 0.68f)`)
+  - ผืนดิน (Ground): Warm Earth Ambient Bounce (`Color(0.52f, 0.48f, 0.42f)`)
+- **Skybox & หมอกละมุน (Procedural Sky & Golden Twilight Mist):**
+  - Skybox: [CozyFairytaleSkybox.mat](file:///C:/Users/Artemis/rootbound-guardian/Assets/Materials/CozyFairytaleSkybox.mat) ไล่เฉดสีพีชทองละมุน
+  - Linear Fog: สีหมอกพีชทองนุ่มตา (`Color(0.92f, 0.84f, 0.74f)`) ระยะ `22m` ถึง `110m`
+- **ระบบคบเพลิงและโคมไฟ (Torches & Lanterns Warm Glow):**
+  - ติดตั้ง Point Light สีส้มอำพัน (`Color(1.0f, 0.74f, 0.38f)`) พร้อมระบบกะพริบไหว `LightFlicker` ให้กับคบเพลิงทั้ง 33 จุดในแผนที่
+  - เพิ่มไฟเรืองแสงเวทมนตร์สีเขียวทองที่ต้นไม้เซฟพอยต์ Tree Save Point
+- **URP Post-Processing Volume ([CozyFairytaleVolumeProfile.asset](file:///C:/Users/Artemis/rootbound-guardian/Assets/Settings/CozyFairytaleVolumeProfile.asset)):**
+  - **Tonemapping:** โหมด `Neutral` รักษาสีพาสเทลให้นุ่มนวล ไม่ดึงคอนทราสต์จนดำจม
+  - **Color Adjustments:** Post Exposure `+0.20`, Contrast `+6`, Saturation `+10`
+  - **White Balance:** Temp `+12`, Tint `+1.5` ให้ความอบอุ่นแบบนิทานเทพนิยาย
+  - **Bloom:** แสงฟุ้งสีทองนวล (`Intensity 0.95`, `Threshold 0.80`, `Scatter 0.70`, Tint `#FFF0D1`)
+  - **Shadows Midtones Highlights:** ยกเงาขึ้นเป็นโทน Slate-Teal อ่อนๆ (`0.38, 0.44, 0.50`), Midtones สีน้ำผึ้ง, และ Highlights สีนมสดครีม
+  - **Vignette:** ขอบมืดโทนน้ำตาลอุ่นจางๆ (`0.14`) เสริมมิติภาพตรงกลางจอ
 
-### 5.6 การแก้ไขปัญหาเสถียรภาพและหน่วยความจำ (RAM & Build Cache Fix)
+### 5.6 แก้ไขปัญหา UI เอียงทั้ง Chest และ Tree Save Point (UI Tilt & Camera Alignment Fix)
+- **สาเหตุของปัญหา:**
+  1. ในฉากมีกล้อง 2 ตัว: กล้องเก่า `Main Camera` (มุมเอียง 35°, 45°) ที่ไม่ได้ใช้งานแต่ถูกใส่ Tag `MainCamera` ไว้ ในขณะที่กล้องตัวจริงที่ตามผู้เล่น `Player Variant/Camera` (มุม 19.49°, 0°) มี Tag เป็น `Untagged`
+  2. ทำให้สคริปต์ `TreeInteractUI` ดึงกล้องผ่าน `Camera.main` ได้กล้องตัวเก่าไป บานป้าย UI จึงหันหน้าไปทางมุม 45° ส่งผลให้เมื่อมองผ่านกล้องผู้เล่นจริง ป้ายจะถูกมองเฉียงจนเอียงเทลงข้างขวาประมาณ ~9°
+  3. นอกจากนี้ ค่า `wobbleAngle = 2.4f` ยังทำให้ตัวป้ายโยกแกว่งเอียงซ้ายขวาตามแกน Z ตลอดเวลา
+- **การแก้ไขสำเร็จ:**
+  1. กำหนด Tag `MainCamera` ให้กล้องของ `Player Variant` ทั้งใน Scene และใน Prefab
+  2. ปิดใช้งาน (Disable) กล้องเก่าที่ไม่ได้ใช้ พร้อมเคลียร์ `AudioListener` ที่ซ้ำซ้อน
+  3. ปรับปรุงฟังก์ชัน `GetBestCamera()` ใน `TreeInteractUI.cs` ให้ตรวจจับกล้องของผู้เล่นและกล้องที่กำลัง Render หน้าจอโดยตรง
+  4. ตั้งค่า `wobbleAngle = 0f` (ตรงขนานกับหน้าจอ 100% `dot = 1.0000`) ป้ายระนาบตรงสวยงาม ไม่เอียงกระดกอีกต่อไป
+
+### 5.7 การแก้ไขปัญหาเสถียรภาพและหน่วยความจำ (RAM & Build Cache Fix)
 - **ปัญหา:** RAM เครื่องเต็ม ทำให้ Process `AssetImportWorker42`, `AssetImportWorker43` ค้างกลายเป็น Zombie Process ส่งผลให้ `scriptCompilationFailed = True` ค้างในระบบ
 - **การแก้ไข:** ปิด Worker ค้าง คืน RAM ~1.8GB และสั่ง `CompilationPipeline.RequestScriptCompilation(RequestScriptCompilationOptions.CleanBuildCache)`
 - **ผลลัพธ์:** ปัจจุบันโปรเจกต์คอมไพล์ผ่านสมบูรณ์ `errorCount: 0`, `scriptCompilationFailed: False` 100%
