@@ -159,6 +159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
   damageAmount: 50
+  wallHitDelay: 0.05
   onHitPlayer:
     m_PersistentCalls:
       m_Calls: []
@@ -275,6 +276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpikeTrapBase
   spikeTransform: {fileID: 2745459079285546698}
+  spikeCollider: {fileID: 7888539863426989635}
   spikeUpDistance: 0.5
   popUpSpeed: 15
   retractSpeed: 2

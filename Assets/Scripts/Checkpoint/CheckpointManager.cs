@@ -8,6 +8,7 @@ public class CheckpointManager : MonoBehaviour
     private Vector3 lastCheckpointPosition;
     private PlayerDataSave currentSaveData;
     private bool hasCheckpoint = false;
+    private bool lastCheckpointHealsOxygen = true;
 
     // ��ª�������������㹻Ѩ�غѹ
     private HashSet<string> currentPickedItemIDs = new HashSet<string>();
@@ -40,8 +41,14 @@ public class CheckpointManager : MonoBehaviour
     // ���¡����ͼ����蹡�૿�������
     public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp = null, Inventory inventoryComp = null)
     {
+        SaveCheckpoint(checkpointPos, healthComp, inventoryComp, true);
+    }
+
+    public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp, Inventory inventoryComp, bool healsOxygen)
+    {
         lastCheckpointPosition = checkpointPos;
         hasCheckpoint = true;
+        lastCheckpointHealsOxygen = healsOxygen;
 
         // 1. �ѹ�֡�����ż����� (����� Component ��)
         if (healthComp != null || inventoryComp != null)
@@ -83,7 +90,7 @@ public class CheckpointManager : MonoBehaviour
         PlayerHealth health = player.GetComponent<PlayerHealth>();
         if (health != null)
         {
-            health.ResetHealth(); // �е�駤�����ʹ��� respawnHealth ��������� PlayerHealth
+            health.ResetHealth(lastCheckpointHealsOxygen);
         }
 
         Inventory inventory = player.GetComponent<Inventory>();

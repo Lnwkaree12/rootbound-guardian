@@ -317,16 +317,33 @@ public class DoorController : MonoBehaviour
 
     private void TriggerWinUI()
     {
-        WinUIManager wum = WinUIManager.Instance;
-        if (wum == null) wum = FindObjectOfType<WinUIManager>();
+        WinUIManager[] managers = FindObjectsByType<WinUIManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        WinUIManager winManager = null;
+        int highestSortingOrder = int.MinValue;
 
-        if (wum == null)
+        foreach (WinUIManager manager in managers)
         {
-            GameObject wumGO = new GameObject("WinUIManager_Auto");
-            wum = wumGO.AddComponent<WinUIManager>();
+            if (manager == null || manager.winPanel == null || manager.gameObject.scene != gameObject.scene)
+            {
+                continue;
+            }
+
+            Canvas canvas = manager.winPanel.GetComponentInParent<Canvas>();
+            int sortingOrder = canvas != null ? canvas.sortingOrder : 0;
+            if (winManager == null || sortingOrder > highestSortingOrder)
+            {
+                winManager = manager;
+                highestSortingOrder = sortingOrder;
+            }
         }
 
-        wum.TriggerWin(0.65f);
+        if (winManager == null)
+        {
+            Debug.LogError("[DoorController] No WinUIManager with a WinPanel was found in the active scene.");
+            return;
+        }
+
+        winManager.TriggerWin(0.65f);
     }
 
     private IEnumerator FlashLockedPrompt()

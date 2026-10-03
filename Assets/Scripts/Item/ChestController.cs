@@ -6,6 +6,7 @@ public class ChestController : MonoBehaviour
     [Header("Chest Components")]
     [SerializeField] private Transform lidTransform;
     [SerializeField] private Transform keyTransform;
+    [SerializeField] private ItemData rewardItem;
     [SerializeField] private GameObject interactPromptUI;
     [SerializeField] private ParticleSystem radiantBurstVFX;
     [SerializeField] private ParticleSystem keyAuraVFX;
@@ -32,6 +33,7 @@ public class ChestController : MonoBehaviour
     private PlayerInputHandler inputHandler;
     private PlayerController playerController;
     private PlayerMovement playerMovement;
+    private Inventory playerInventory;
     private TreeInteractUI promptUI;
 
     private Quaternion lidInitialRot;
@@ -127,6 +129,7 @@ public class ChestController : MonoBehaviour
             inputHandler = pGO.GetComponentInParent<PlayerInputHandler>() ?? pGO.GetComponentInChildren<PlayerInputHandler>();
             playerController = pGO.GetComponentInParent<PlayerController>() ?? pGO.GetComponentInChildren<PlayerController>();
             playerMovement = pGO.GetComponentInParent<PlayerMovement>() ?? pGO.GetComponentInChildren<PlayerMovement>();
+            playerInventory = pGO.GetComponentInParent<Inventory>() ?? pGO.GetComponentInChildren<Inventory>();
 
             SetPromptActive(true);
         }
@@ -135,6 +138,7 @@ public class ChestController : MonoBehaviour
             inputHandler = null;
             playerController = null;
             playerMovement = null;
+            playerInventory = null;
 
             SetPromptActive(false);
         }
@@ -170,6 +174,7 @@ public class ChestController : MonoBehaviour
         if (playerObject == null) playerObject = GameObject.FindGameObjectWithTag("Player") ?? GameObject.Find("Player");
         if (playerController == null && playerObject != null) playerController = playerObject.GetComponentInParent<PlayerController>() ?? playerObject.GetComponentInChildren<PlayerController>();
         if (playerMovement == null && playerObject != null) playerMovement = playerObject.GetComponentInParent<PlayerMovement>() ?? playerObject.GetComponentInChildren<PlayerMovement>();
+        if (playerInventory == null && playerObject != null) playerInventory = playerObject.GetComponentInParent<Inventory>() ?? playerObject.GetComponentInChildren<Inventory>();
 
         if (playerController != null) playerController.enabled = false;
         if (playerMovement != null) playerMovement.Move(Vector2.zero);
@@ -329,10 +334,21 @@ public class ChestController : MonoBehaviour
             yield return null;
         }
 
-        // 9. Award Key to Quest and Inventory
-        if (QuestManager.Instance != null)
+        // 9. Award the configured item; fall back to the legacy quest key when unset.
+        if (rewardItem != null && playerInventory != null)
+        {
+            if (!playerInventory.AddItem(rewardItem))
+            {
+                Debug.LogWarning("[ChestController] Inventory is full; chest reward was not added.");
+            }
+        }
+        else if (rewardItem == null && QuestManager.Instance != null)
         {
             QuestManager.Instance.CollectKey();
+        }
+        else if (rewardItem != null)
+        {
+            Debug.LogWarning("[ChestController] Player Inventory was not found; chest reward was not added.");
         }
 
         // 10. Camera Return & Key Disperse

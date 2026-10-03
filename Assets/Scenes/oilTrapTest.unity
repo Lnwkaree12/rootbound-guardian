@@ -1405,6 +1405,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46d27102bbff52b4f81ccaf1775799b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Checkpoint
+  isActivated: 0
+  healsOxygen: 1
+  activatedVisual: {fileID: 0}
 --- !u!65 &78551790
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8751,9 +8754,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a71659466554f3488dd2de894059404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
-  damage: 100
-  destroyOnImpact: 0
-  lifetime: 3
+  damageAmount: 10
+  wallHitDelay: 0.05
+  onHitPlayer:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &713187503
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -12526,9 +12531,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a71659466554f3488dd2de894059404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
-  damage: 100
-  destroyOnImpact: 0
-  lifetime: 3
+  damageAmount: 10
+  wallHitDelay: 0.05
+  onHitPlayer:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1006052559
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -16120,6 +16127,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46d27102bbff52b4f81ccaf1775799b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Checkpoint
+  isActivated: 0
+  healsOxygen: 1
+  activatedVisual: {fileID: 0}
 --- !u!65 &1237528958
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -18896,9 +18906,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a71659466554f3488dd2de894059404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
-  damage: 100
-  destroyOnImpact: 0
-  lifetime: 3
+  damageAmount: 10
+  wallHitDelay: 0.05
+  onHitPlayer:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1513025748
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -25097,7 +25109,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 14835071610585012, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 93.43
+      value: 348.9
       objectReference: {fileID: 0}
     - target: {fileID: 14835071610585012, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
       propertyPath: m_LocalPosition.y
@@ -25159,6 +25171,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 8883299822360985090, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
+      propertyPath: items.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8883299822360985090, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
+      propertyPath: 'items.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 5e70f2f338d6c194bb6e797cd8bb6845, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

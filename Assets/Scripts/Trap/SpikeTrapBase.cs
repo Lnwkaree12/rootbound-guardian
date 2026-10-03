@@ -1,25 +1,28 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using System.Collections;
 
 public class SpikeTrapBase : MonoBehaviour
 {
-    [Header(" Object Àπ“¡∑’ËµÈÕß°“√„ÀÈ¢¬—∫")]
-    [SerializeField] private Transform spikeTransform; // ≈“° Object Àπ“¡¡“„ Ë™ËÕßπ’È
+    [Header(" Object ‡∏´‡∏ô‡∏≤‡∏°‡∏ó‡∏µ‡πà‡∏ï‡πâ‡∏≠‡∏á‡∏Å‡∏≤‡∏£‡πÉ‡∏´‡πâ‡∏Ç‡∏¢‡∏±‡∏ö")]
+    [SerializeField] private Transform spikeTransform;
 
-    [Header("µ”·ÀπËß°“√¬◊Ëπ¢ÕßÀπ“¡")]
+    [Header("‡∏ï‡∏±‡∏ß‡∏ó‡∏≥‡∏î‡∏≤‡πÄ‡∏°‡∏à / Collider ‡∏´‡∏ô‡∏≤‡∏°")]
+    [SerializeField] private Collider spikeCollider; // ‡∏•‡∏≤‡∏Å Box Collider ‡∏Ç‡∏≠‡∏á‡∏ï‡∏±‡∏ß‡∏´‡∏ô‡∏≤‡∏°‡∏°‡∏≤‡πÉ‡∏™‡πà ‡∏´‡∏£‡∏∑‡∏≠‡πÉ‡∏ä‡πâ DamageDealer
+
+    [Header("‡∏ï‡∏≥‡πÅ‡∏´‡∏ô‡πà‡∏á‡∏Å‡∏≤‡∏£‡∏¢‡∏∑‡πà‡∏ô‡∏Ç‡∏≠‡∏á‡∏´‡∏ô‡∏≤‡∏°")]
     [SerializeField] private float spikeUpDistance = 1.5f;
 
-    [Header("§«“¡‡√Á«„π°“√‡§≈◊ËÕπ∑’Ë")]
+    [Header("‡∏Ñ‡∏ß‡∏≤‡∏°‡πÄ‡∏£‡πá‡∏ß‡πÉ‡∏ô‡∏Å‡∏≤‡∏£‡πÄ‡∏Ñ‡∏•‡∏∑‡πà‡∏≠‡∏ô‡∏ó‡∏µ‡πà")]
     [SerializeField] private float popUpSpeed = 15f;
     [SerializeField] private float retractSpeed = 2f;
 
-    [Header("√–¬–‡«≈“°“√√Õ («‘π“∑’)")]
+    [Header("‡∏£‡∏∞‡∏¢‡∏∞‡πÄ‡∏ß‡∏•‡∏≤‡∏Å‡∏≤‡∏£‡∏£‡∏≠ (‡∏ß‡∏¥‡∏ô‡∏≤‡∏ó‡∏µ)")]
     [SerializeField] private float activeTime = 1f;
     [SerializeField] private float cooldownTime = 2f;
 
-    [Header("√–∫∫‡ ’¬ß (Audio)")]
-    [SerializeField] private AudioSource audioSource; // µ—«‡≈Ëπ‡ ’¬ß
-    [SerializeField] private AudioClip popUpSound;   // ‡ ’¬ßµÕπÀπ“¡æÿËß¢÷Èπ¡“
+    [Header("‡∏£‡∏∞‡∏ö‡∏ö‡πÄ‡∏™‡∏µ‡∏¢‡∏á (Audio)")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip popUpSound;
 
     private Vector3 hiddenPosition;
     private Vector3 targetPosition;
@@ -28,16 +31,25 @@ public class SpikeTrapBase : MonoBehaviour
     {
         if (spikeTransform == null)
         {
-            Debug.LogError("°√ÿ≥“≈“° Object Àπ“¡¡“„ Ë„π™ËÕß Spike Transform ¥È«¬§√—∫!");
+            Debug.LogError("‡∏Å‡∏£‡∏∏‡∏ì‡∏≤‡∏•‡∏≤‡∏Å Object ‡∏´‡∏ô‡∏≤‡∏°‡∏°‡∏≤‡πÉ‡∏™‡πà‡πÉ‡∏ô‡∏ä‡πà‡∏≠‡∏á Spike Transform ‡∏î‡πâ‡∏ß‡∏¢‡∏Ñ‡∏£‡∏±‡∏ö!");
             return;
         }
 
-        // ∫—π∑÷°µ”·ÀπËß‡√‘Ë¡µÈπ¢ÕßÀπ“¡
+        // ‡∏´‡∏≤‡∏Å‡πÑ‡∏°‡πà‡πÑ‡∏î‡πâ‡∏•‡∏≤‡∏Å Collider ‡∏°‡∏≤‡πÉ‡∏™‡πà ‡πÉ‡∏´‡πâ‡∏•‡∏≠‡∏á‡∏î‡∏∂‡∏á‡∏à‡∏≤‡∏Å spikeTransform ‡∏≠‡∏±‡∏ï‡πÇ‡∏ô‡∏°‡∏±‡∏ï‡∏¥
+        if (spikeCollider == null)
+        {
+            spikeCollider = spikeTransform.GetComponent<Collider>();
+        }
+
+        // ‡∏õ‡∏¥‡∏î Collider ‡πÑ‡∏ß‡πâ‡∏ï‡∏±‡πâ‡∏á‡πÅ‡∏ï‡πà‡πÄ‡∏£‡∏¥‡πà‡∏°‡πÄ‡∏Å‡∏°
+        if (spikeCollider != null)
+        {
+            spikeCollider.enabled = false;
+        }
+
         hiddenPosition = spikeTransform.position;
-        // §”π«≥µ”·ÀπËß∑’ËÀπ“¡®–æÿËß¢÷Èπ¡“
         targetPosition = hiddenPosition + spikeTransform.up * spikeUpDistance;
 
-        // ∂È“‰¡Ë‰¥È„ Ë AudioSource „ÀÈÀ“„π Object µ—«π’ÈÕ—µ‚π¡—µ‘
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
@@ -52,10 +64,12 @@ public class SpikeTrapBase : MonoBehaviour
         {
             yield return new WaitForSeconds(cooldownTime);
 
-            // ‡≈Ëπ‡ ’¬ßµÕπ‡√‘Ë¡æÿËß¢÷Èπ¡“
             PlayPopUpSound();
 
-            // æÿËß¢÷Èπ
+            // üü¢ ‡πÄ‡∏õ‡∏¥‡∏î Collider ‡∏ó‡∏≥‡∏î‡∏≤‡πÄ‡∏°‡∏à ‡πÄ‡∏°‡∏∑‡πà‡∏≠‡∏´‡∏ô‡∏≤‡∏°‡πÄ‡∏£‡∏¥‡πà‡∏°‡∏û‡∏∏‡πà‡∏á‡∏Ç‡∏∂‡πâ‡∏ô
+            if (spikeCollider != null) spikeCollider.enabled = true;
+
+            // ‡∏û‡∏∏‡πà‡∏á‡∏Ç‡∏∂‡πâ‡∏ô
             while (Vector3.Distance(spikeTransform.position, targetPosition) > 0.01f)
             {
                 spikeTransform.position = Vector3.MoveTowards(spikeTransform.position, targetPosition, popUpSpeed * Time.deltaTime);
@@ -65,13 +79,16 @@ public class SpikeTrapBase : MonoBehaviour
 
             yield return new WaitForSeconds(activeTime);
 
-            // À¥≈ß
+            // ‡∏´‡∏î‡∏•‡∏á
             while (Vector3.Distance(spikeTransform.position, hiddenPosition) > 0.01f)
             {
                 spikeTransform.position = Vector3.MoveTowards(spikeTransform.position, hiddenPosition, retractSpeed * Time.deltaTime);
                 yield return null;
             }
             spikeTransform.position = hiddenPosition;
+
+            // üî¥ ‡∏õ‡∏¥‡∏î Collider ‡πÄ‡∏°‡∏∑‡πà‡∏≠‡∏´‡∏ô‡∏≤‡∏°‡∏´‡∏î‡∏Å‡∏•‡∏±‡∏ö‡∏™‡∏∏‡∏î‡πÅ‡∏•‡πâ‡∏ß
+            if (spikeCollider != null) spikeCollider.enabled = false;
         }
     }
 
@@ -85,7 +102,6 @@ public class SpikeTrapBase : MonoBehaviour
         }
         else
         {
-            // À“°‰¡Ë¡’ AudioSource ‡≈Ëπ‡ ’¬ß 3D ≥ ®ÿ¥Àπ“¡
             AudioSource.PlayClipAtPoint(popUpSound, transform.position);
         }
     }

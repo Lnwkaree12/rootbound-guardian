@@ -9,7 +9,7 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private int currentHealth;
 
     [Header("Safe Zone Settings")]
-    [SerializeField] private bool isInSafeZone = true;
+    [SerializeField] private bool isInSafeZone;
 
     [Header("i-Frame Settings")]
     [SerializeField] private float invulnerabilityDuration = 1f;
@@ -162,30 +162,7 @@ public class PlayerHealth : MonoBehaviour
         onDeath?.Invoke();
         Debug.Log("Player Died!");
 
-        StartCoroutine(GameOverRoutine());
-    }
-
-    private IEnumerator GameOverRoutine()
-    {
-        // 1. ดึงระยะเวลาของ Animation ตายจาก PlayerAnimation
-        float animLength = playerAnim != null ? playerAnim.GetDeadAnimationLength() : 0f;
-
-        // 2. รอจนกว่า Animation ตายจะเล่นเสร็จ + Delay ที่ตั้งค่าไว้
-        yield return new WaitForSeconds(animLength + respawnDelay);
-
-        GameOverUIManager gameOverUI = FindObjectOfType<GameOverUIManager>();
-        if (gameOverUI != null)
-        {
-            gameOverUI.TriggerGameOver("พลังชีวิตหมดลงแล้ว!");
-        }
-        else if (GameOverUIManager.Instance != null)
-        {
-            GameOverUIManager.Instance.TriggerGameOver("พลังชีวิตหมดลงแล้ว!");
-        }
-        else
-        {
-            Debug.LogWarning("[PlayerHealth] GameOverUIManager ไม่พบในฉาก");
-        }
+        StartCoroutine(RespawnRoutine());
     }
 
     private IEnumerator RespawnRoutine()
@@ -206,11 +183,16 @@ public class PlayerHealth : MonoBehaviour
 
     public void ResetHealth()
     {
+        ResetHealth(true);
+    }
+
+    public void ResetHealth(bool safeZone)
+    {
         currentHealth = Mathf.Clamp(respawnHealth, 1, maxHealth);
         isInvulnerable = false;
 
         onHealthChanged?.Invoke(currentHealth, maxHealth);
-        UpdateSafeZoneState(true);
+        UpdateSafeZoneState(safeZone);
         Debug.Log($"[ResetHealth] เกิดใหม่แล้ว! รีเซ็ตเลือดเป็น {currentHealth}/{maxHealth}");
     }
 
