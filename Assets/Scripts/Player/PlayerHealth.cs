@@ -9,7 +9,7 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private int currentHealth;
 
     [Header("Safe Zone Settings")]
-    [SerializeField] private bool isInSafeZone = true;
+    [SerializeField] private bool isInSafeZone;
 
     [Header("i-Frame Settings")]
     [SerializeField] private float invulnerabilityDuration = 1f;
@@ -183,11 +183,16 @@ public class PlayerHealth : MonoBehaviour
 
     public void ResetHealth()
     {
+        ResetHealth(true);
+    }
+
+    public void ResetHealth(bool safeZone)
+    {
         currentHealth = Mathf.Clamp(respawnHealth, 1, maxHealth);
         isInvulnerable = false;
 
         onHealthChanged?.Invoke(currentHealth, maxHealth);
-        UpdateSafeZoneState(true);
+        UpdateSafeZoneState(safeZone);
         Debug.Log($"[ResetHealth] เกิดใหม่แล้ว! รีเซ็ตเลือดเป็น {currentHealth}/{maxHealth}");
     }
 

@@ -232,7 +232,7 @@ public class TreeSavePoint : MonoBehaviour
             Vector3 checkpointPosition = playerObject != null
                 ? playerObject.transform.root.position
                 : transform.position;
-            CheckpointManager.Instance.SaveCheckpoint(checkpointPosition, playerHealth, playerInventory);
+            CheckpointManager.Instance.SaveCheckpoint(checkpointPosition, playerHealth, playerInventory, healsOxygen);
             Debug.Log("[Tree Save Point] บันทึกจุด Checkpoint เรียบร้อย!");
         }
         else

@@ -320,7 +320,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHealth: 100
   currentHealth: 0
-  isInSafeZone: 1
+  isInSafeZone: 0
   invulnerabilityDuration: 1
   respawnDelay: 1.5
   respawnHealth: 15

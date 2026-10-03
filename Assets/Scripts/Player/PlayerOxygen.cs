@@ -19,7 +19,7 @@ public class PlayerOxygen : MonoBehaviour
     public UnityEvent onOxygenDepleted;
 
     private Coroutine oxygenRoutine;
-    private bool isInSafeZone = true;
+    private bool isInSafeZone;
     private bool gameOverTriggered;
 
     public int CurrentOxygen => currentOxygen;

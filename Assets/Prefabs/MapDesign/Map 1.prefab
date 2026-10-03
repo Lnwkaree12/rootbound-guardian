@@ -8237,7 +8237,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -19.240002
+      value: -9.6
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8274,6 +8274,14 @@ PrefabInstance:
     - target: {fileID: 928978061935668556, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_Name
       value: crushed stone (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: smashSpeed
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: smashDistance
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: waitTimeAtTop
@@ -9853,7 +9861,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -19.240002
+      value: -9.6
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9890,6 +9898,14 @@ PrefabInstance:
     - target: {fileID: 928978061935668556, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_Name
       value: crushed stone (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: smashSpeed
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: smashDistance
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: waitTimeAtTop
@@ -15297,7 +15313,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -19.240002
+      value: -9.6
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -15334,6 +15350,14 @@ PrefabInstance:
     - target: {fileID: 928978061935668556, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_Name
       value: crushed stone (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: smashSpeed
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: smashDistance
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: waitTimeAtTop

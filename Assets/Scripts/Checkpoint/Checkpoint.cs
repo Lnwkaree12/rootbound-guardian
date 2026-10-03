@@ -127,7 +127,7 @@ public class Checkpoint : MonoBehaviour
         Inventory inventory = playerObject.GetComponentInParent<Inventory>();
         if (CheckpointManager.Instance != null)
         {
-            CheckpointManager.Instance.SaveCheckpoint(transform.position, playerHealth, inventory);
+            CheckpointManager.Instance.SaveCheckpoint(transform.position, playerHealth, inventory, healsOxygen);
             Debug.Log("กด Interact: บันทึกจุดเซฟเรียบร้อย!");
         }
         else
