@@ -11046,7 +11046,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -9.6
+      value: -0.7
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -11091,6 +11091,10 @@ PrefabInstance:
     - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: smashDistance
       value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: waitTimeAtBottom
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11284,7 +11288,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -9.6
+      value: -0.7
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -11329,6 +11333,14 @@ PrefabInstance:
     - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: smashDistance
       value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: waitTimeAtTop
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: waitTimeAtBottom
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11900,7 +11912,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -9.6
+      value: -0.7
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -13220,7 +13232,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -9.6
+      value: -0.7
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -14844,7 +14856,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -9.6
+      value: -0.7
       objectReference: {fileID: 0}
     - target: {fileID: 553859245028554742, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -14889,6 +14901,14 @@ PrefabInstance:
     - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
       propertyPath: smashDistance
       value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: waitTimeAtTop
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704493310873843246, guid: 016730623ff527845a741840df59aecc, type: 3}
+      propertyPath: waitTimeAtBottom
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
