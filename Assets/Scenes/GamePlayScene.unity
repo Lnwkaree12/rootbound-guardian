@@ -15048,6 +15048,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5043417774484866980, guid: 1088187ee40cff241bea5ac2f4ffae32, type: 3}
+      propertyPath: VelocityModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5739943334603411258, guid: 1088187ee40cff241bea5ac2f4ffae32, type: 3}
       propertyPath: m_Name
       value: TorchFire (1)
@@ -21706,7 +21710,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5139282899822417975, guid: 4e610dd4925310b4b8262a9f8d0e9ef4, type: 3}
       propertyPath: ShapeModule.radiusThickness
-      value: 1.0000
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26840,9 +26844,45 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2102418876438833712, guid: 571f3ae21f8492f4d8f622262ab9bf61, type: 3}
+      propertyPath: VelocityModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2102418876438833712, guid: 571f3ae21f8492f4d8f622262ab9bf61, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2102418876438833712, guid: 571f3ae21f8492f4d8f622262ab9bf61, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3297524497711417251, guid: 571f3ae21f8492f4d8f622262ab9bf61, type: 3}
       propertyPath: m_Name
       value: Void_BlackHole_Prominence_VFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 3974901607519448706, guid: 571f3ae21f8492f4d8f622262ab9bf61, type: 3}
+      propertyPath: VelocityModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238674424365518229, guid: 571f3ae21f8492f4d8f622262ab9bf61, type: 3}
+      propertyPath: VelocityModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238674424365518229, guid: 571f3ae21f8492f4d8f622262ab9bf61, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238674424365518229, guid: 571f3ae21f8492f4d8f622262ab9bf61, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238674424365518229, guid: 571f3ae21f8492f4d8f622262ab9bf61, type: 3}
+      propertyPath: InitialModule.startRotationX.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4238674424365518229, guid: 571f3ae21f8492f4d8f622262ab9bf61, type: 3}
+      propertyPath: InitialModule.startRotationY.minMaxState
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -28762,6 +28802,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 39357427977123968, guid: 1088187ee40cff241bea5ac2f4ffae32, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5043417774484866980, guid: 1088187ee40cff241bea5ac2f4ffae32, type: 3}
+      propertyPath: VelocityModule.enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5739943334603411258, guid: 1088187ee40cff241bea5ac2f4ffae32, type: 3}
@@ -31338,12 +31382,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 7c3323697e5099c4cb3e906a47a5230f, type: 2}
+    - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 4316811578490882673, guid: 7c3323697e5099c4cb3e906a47a5230f, type: 2}
+    - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4279903283
       objectReference: {fileID: 0}
     - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2224958704386141680, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_LocalScale.x
@@ -32312,6 +32368,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 39357427977123968, guid: 1088187ee40cff241bea5ac2f4ffae32, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5043417774484866980, guid: 1088187ee40cff241bea5ac2f4ffae32, type: 3}
+      propertyPath: VelocityModule.enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5739943334603411258, guid: 1088187ee40cff241bea5ac2f4ffae32, type: 3}
