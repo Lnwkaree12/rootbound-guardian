@@ -100,6 +100,25 @@ public class MainMenuUIController : MonoBehaviour
     [Header("Scene Transition")]
     public string targetSceneName = "Loading Screen";
 
+    [Header("Door & Camera Interaction")]
+    public Transform doorLeafRight;
+    public Transform doorLeafLeft;
+    public Camera mainCamera;
+    public Vector3 defaultCameraPos = new Vector3(0f, 0.95f, -5.20f);
+    public Vector3 exitCameraPos = new Vector3(0f, 1.15f, -6.60f);
+    public Vector3 zoomCameraPos = new Vector3(-0.15f, 1.25f, 0.20f);
+    public float doorOpenAngleY = 95f; // Opens right leaf inward matching Screenshot 2026-10-10 021652.png
+    public float doorSmoothSpeed = 5.5f;
+    public float cameraSmoothSpeed = 4.5f;
+    public float startZoomDuration = 1.35f;
+    public AudioClip startZoomSound;
+
+    // Door & Camera internal animation state
+    private float targetDoorAngleY = 0f;
+    private float currentDoorAngleY = 0f;
+    private Vector3 targetCameraPos = new Vector3(0f, 0.95f, -5.20f);
+    private bool isZoomingToDoor = false;
+
     [Header("Audio Feedback")]
     public bool enableProceduralSfx = true;
 
@@ -193,6 +212,7 @@ public class MainMenuUIController : MonoBehaviour
         InitCanvasGroups();
         InitAnimatedOptions();
         InitSettingsRows();
+        InitDoorAndCamera();
     }
 
     private void Start()
@@ -374,6 +394,81 @@ public class MainMenuUIController : MonoBehaviour
         }
     }
 
+    private void InitDoorAndCamera()
+    {
+        if (doorLeafRight == null || doorLeafLeft == null)
+        {
+            var castleDoor = GameObject.Find("castle_door");
+            if (castleDoor != null)
+            {
+                if (doorLeafRight == null) doorLeafRight = castleDoor.transform.Find("Door_Leaf_Right");
+                if (doorLeafLeft == null) doorLeafLeft = castleDoor.transform.Find("Door_Leaf_Left");
+            }
+        }
+
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                var camGO = GameObject.Find("Main Camera");
+                if (camGO != null) mainCamera = camGO.GetComponent<Camera>();
+            }
+        }
+
+        if (mainCamera != null)
+        {
+            defaultCameraPos = mainCamera.transform.position;
+            targetCameraPos = defaultCameraPos;
+        }
+
+        if (startZoomSound == null)
+        {
+#if UNITY_EDITOR
+            startZoomSound = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/whoosh-effect.mp3");
+#endif
+        }
+
+        targetDoorAngleY = 0f;
+        currentDoorAngleY = 0f;
+        if (doorLeafRight != null) doorLeafRight.localRotation = Quaternion.Euler(270f, 0f, 0f);
+        if (doorLeafLeft != null) doorLeafLeft.localRotation = Quaternion.Euler(270f, 0f, 0f);
+    }
+
+    private void UpdateDoorAndCameraTargets()
+    {
+        if (isZoomingToDoor) return;
+
+        if (currentState == MenuState.MainMenu)
+        {
+            if (mainMenuIndex == 0) // Start
+            {
+                targetDoorAngleY = doorOpenAngleY;
+                targetCameraPos = defaultCameraPos;
+            }
+            else if (mainMenuIndex == 2) // Exit
+            {
+                targetDoorAngleY = 0f;
+                targetCameraPos = exitCameraPos;
+            }
+            else // Settings
+            {
+                targetDoorAngleY = 0f;
+                targetCameraPos = defaultCameraPos;
+            }
+        }
+        else if (currentState == MenuState.ExitConfirm)
+        {
+            targetDoorAngleY = 0f;
+            targetCameraPos = exitCameraPos;
+        }
+        else
+        {
+            targetDoorAngleY = 0f;
+            targetCameraPos = defaultCameraPos;
+        }
+    }
+
     #endregion
 
     #region State Management & Smooth Transitions
@@ -406,15 +501,28 @@ public class MainMenuUIController : MonoBehaviour
         {
             settingsIndex = 0;
             UpdateSettingsVisuals(true);
+            UpdateDoorAndCameraTargets();
         }
         else if (newState == MenuState.ExitConfirm)
         {
             exitModalIndex = 0;
             UpdateExitModalVisuals(true);
+            UpdateDoorAndCameraTargets();
             if (exitModalCardRect != null)
             {
                 exitModalCardRect.localScale = Vector3.one * 0.82f; // pop-in scale
             }
+        }
+        else if (newState == MenuState.PressAnyKey)
+        {
+            UpdateDoorAndCameraTargets();
+        }
+
+        if (instant)
+        {
+            currentDoorAngleY = targetDoorAngleY;
+            if (doorLeafRight != null) doorLeafRight.localRotation = Quaternion.Euler(270f, currentDoorAngleY, 0f);
+            if (mainCamera != null) mainCamera.transform.position = targetCameraPos;
         }
 
         if (playSfx)
@@ -575,6 +683,21 @@ public class MainMenuUIController : MonoBehaviour
 
         if (confirmBadgeRect != null) confirmBadgeRect.localScale = Vector3.one * confirmBadgeScale;
         if (backBadgeRect != null) backBadgeRect.localScale = Vector3.one * backBadgeScale;
+
+        // 5. Smooth Door Leaf & Camera Navigation Interpolation
+        if (!isZoomingToDoor)
+        {
+            currentDoorAngleY = Mathf.Lerp(currentDoorAngleY, targetDoorAngleY, dt * doorSmoothSpeed);
+            if (doorLeafRight != null)
+            {
+                doorLeafRight.localRotation = Quaternion.Euler(270f, currentDoorAngleY, 0f);
+            }
+
+            if (mainCamera != null)
+            {
+                mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, targetCameraPos, dt * cameraSmoothSpeed);
+            }
+        }
     }
 
     private void UpdateAnimatedOption(AnimatedOption opt, float dt)
@@ -753,6 +876,7 @@ public class MainMenuUIController : MonoBehaviour
         SetOptionVisualState(startOption, mainMenuIndex == 0, snap);
         SetOptionVisualState(settingsOption, mainMenuIndex == 1, snap);
         SetOptionVisualState(exitOption, mainMenuIndex == 2, snap);
+        UpdateDoorAndCameraTargets();
     }
 
     private void SetOptionVisualState(AnimatedOption opt, bool isSelected, bool snap = false)
@@ -790,8 +914,9 @@ public class MainMenuUIController : MonoBehaviour
 
     public void OnStartClicked()
     {
-        if (isTransitioning) return;
+        if (isTransitioning || isZoomingToDoor) return;
         isTransitioning = true;
+        isZoomingToDoor = true;
         PlaySound(confirmSound);
         PunchConfirmBadge();
         StartCoroutine(StartGameRoutine());
@@ -811,7 +936,60 @@ public class MainMenuUIController : MonoBehaviour
 
     private IEnumerator StartGameRoutine()
     {
-        yield return new WaitForSecondsRealtime(0.25f);
+        // Ensure door target is fully open
+        targetDoorAngleY = doorOpenAngleY;
+
+        // Play whoosh/zoom sound if available
+        if (startZoomSound != null)
+        {
+            PlaySound(startZoomSound);
+        }
+
+        float zoomDuration = Mathf.Max(0.6f, startZoomDuration);
+        float elapsed = 0f;
+        Vector3 startCamPos = mainCamera != null ? mainCamera.transform.position : defaultCameraPos;
+        Quaternion startCamRot = mainCamera != null ? mainCamera.transform.rotation : Quaternion.identity;
+        Quaternion targetCamRot = Quaternion.Euler(-3.5f, 0f, 0f);
+
+        while (elapsed < zoomDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / zoomDuration);
+            float ease = t * t * (3f - 2f * t); // Smoothstep ease
+
+            // Fast snap/finish opening door
+            currentDoorAngleY = Mathf.Lerp(currentDoorAngleY, doorOpenAngleY, Time.unscaledDeltaTime * 12f);
+            if (doorLeafRight != null)
+            {
+                doorLeafRight.localRotation = Quaternion.Euler(270f, currentDoorAngleY, 0f);
+            }
+
+            // Smooth camera glide into opened door
+            if (mainCamera != null)
+            {
+                mainCamera.transform.position = Vector3.Lerp(startCamPos, zoomCameraPos, ease);
+                mainCamera.transform.rotation = Quaternion.Slerp(startCamRot, targetCamRot, ease);
+            }
+
+            // Fade out UI smoothly during first part of zoom
+            if (mainMenuCG != null)
+            {
+                mainMenuCG.alpha = Mathf.Lerp(1f, 0f, t * 2.2f);
+            }
+            if (keyHintsCG != null)
+            {
+                keyHintsCG.alpha = Mathf.Lerp(1f, 0f, t * 2.2f);
+            }
+
+            yield return null;
+        }
+
+        if (mainCamera != null)
+        {
+            mainCamera.transform.position = zoomCameraPos;
+        }
+
+        yield return new WaitForSecondsRealtime(0.1f);
 
         if (!string.IsNullOrEmpty(targetSceneName) && Application.CanStreamedLevelBeLoaded(targetSceneName))
         {
@@ -825,6 +1003,7 @@ public class MainMenuUIController : MonoBehaviour
         {
             Debug.LogWarning($"[MainMenuUIController] Target scene '{targetSceneName}' not found in Build Settings.");
             isTransitioning = false;
+            isZoomingToDoor = false;
         }
     }
 
