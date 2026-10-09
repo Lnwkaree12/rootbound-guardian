@@ -19773,7 +19773,7 @@ PrefabInstance:
     - target: {fileID: 3722935143760919988, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: onHealthChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1966376712}
     - target: {fileID: 3722935143760919988, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: onHealthChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: UpdateHealthBar
@@ -19873,7 +19873,7 @@ PrefabInstance:
     - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: onOxygenChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1966376711}
     - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: onOxygenChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: UpdateHealthBar
@@ -75382,6 +75382,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+--- !u!114 &1966376711 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8737835370384556503, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+  m_PrefabInstance: {fileID: 1966376710}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 662b532d5bc4d5e4aae5362a101736b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthBarUI
+--- !u!114 &1966376712 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1375217368577326380, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+  m_PrefabInstance: {fileID: 1966376710}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 662b532d5bc4d5e4aae5362a101736b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthBarUI
 --- !u!1001 &1970013150
 PrefabInstance:
   m_ObjectHideFlags: 0

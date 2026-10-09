@@ -138,14 +138,16 @@ public class IntroCinematicManager : MonoBehaviour
         }
         fadeGroup.alpha = 0f;
 
-        if (currentSlideIndex >= slides.Length)
+        int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+
+        if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
         {
-            // End of cinematic, load the gameplay scene!
-            Debug.Log("[IntroCinematicManager] Intro completed. Loading scene: " + nextSceneName);
-            SceneManager.LoadScene(nextSceneName);
+            SceneManager.LoadScene(nextSceneIndex);
         }
         else
         {
+            Debug.LogWarning("ไม่มีซีนถัดไปใน Build Settings");
+    
             // Setup next slide
             slideImage.sprite = slides[currentSlideIndex].sprite;
             dialogueText.text = "";
