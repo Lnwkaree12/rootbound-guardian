@@ -159,6 +159,5 @@ x86/
 
 # Built Visual Studio Code Extensions
 *.vsix
-Assets/Texture
 Assets/Prefabs/Player.prefab
 save.md
