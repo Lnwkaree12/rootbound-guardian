@@ -198,7 +198,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Parallax
   sizeOfSprite: 0
-  backgroundMoveSpeed: 1.5
+  backgroundMoveSpeed: 0.5
 --- !u!1 &3890555345112129301
 GameObject:
   m_ObjectHideFlags: 0
@@ -488,7 +488,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Parallax
   sizeOfSprite: 0
-  backgroundMoveSpeed: 5
+  backgroundMoveSpeed: 1.5
 --- !u!1 &4438424970511598445
 GameObject:
   m_ObjectHideFlags: 0
@@ -869,7 +869,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Parallax
   sizeOfSprite: 0
-  backgroundMoveSpeed: 3
+  backgroundMoveSpeed: 1
 --- !u!1 &8265296879714491343
 GameObject:
   m_ObjectHideFlags: 0
