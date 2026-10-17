@@ -23186,11 +23186,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: drainPerTick
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: globalVolume
+      value: 
+      objectReference: {fileID: 832575518}
+    - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: drainTickInterval
-      value: 1
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: maxVignetteIntensity
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: minVignetteIntensity
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: onOxygenChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Mode

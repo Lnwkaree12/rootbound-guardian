@@ -3,22 +3,34 @@ using UnityEngine;
 public class TreeSavePoint : MonoBehaviour
 {
     [Header("Tree Status")]
-    [SerializeField] private bool isRestored = false;
-    [SerializeField] private bool healsOxygen = true;
+    [SerializeField]
+    private bool isRestored = false;
+    [SerializeField]
+    private bool healsOxygen = true;
 
     [Header("UI Prompts (Optional)")]
-    [SerializeField] private GameObject interactPromptUI;
+    [SerializeField]
+    private GameObject interactPromptUI;
 
     [Header("Visual Effects (Optional)")]
-    [SerializeField] private GameObject deadTreeVisual;
-    [SerializeField] private GameObject restoredTreeVisual;
+    [SerializeField]
+    private GameObject deadTreeVisual;
+    [SerializeField]
+    private GameObject restoredTreeVisual;
 
     [Header("Restoration VFX & Audio")]
-    [SerializeField] private ParticleSystem restoreVfxPrefab;
-    [SerializeField] private ParticleSystem restoreVfxInstance;
-    [SerializeField] private ParticleSystem ambientFireflies;
-    [SerializeField] private AudioClip restoreSound;
-    [SerializeField] private AudioSource audioSource;
+    [SerializeField]
+    private ParticleSystem restoreVfxPrefab;
+    [SerializeField]
+    private ParticleSystem restoreVfxInstance;
+    [SerializeField]
+    private ParticleSystem ambientFireflies;
+    [SerializeField]
+    private AudioClip restoreSound;
+    [SerializeField]
+    private AudioSource audioSource;
+
+    public bool IsRestored => isRestored;
 
     private bool isPlayerInRange = false;
     private GameObject playerObject;
@@ -52,7 +64,7 @@ public class TreeSavePoint : MonoBehaviour
     {
         if (IsPlayerCollider(other))
         {
-            SetPlayerInRange(false, null);
+            SetPlayerInRange(false, other.gameObject);
         }
     }
 
@@ -67,10 +79,10 @@ public class TreeSavePoint : MonoBehaviour
     private void SetPlayerInRange(bool inRange, GameObject go)
     {
         isPlayerInRange = inRange;
-        playerObject = inRange ? go : null;
 
         if (inRange && go != null)
         {
+            playerObject = go;
             inputHandler = go.GetComponentInParent<PlayerInputHandler>();
             playerHealth = go.GetComponentInParent<PlayerHealth>();
             playerOxygen = go.GetComponentInParent<PlayerOxygen>();
@@ -84,6 +96,7 @@ public class TreeSavePoint : MonoBehaviour
             {
                 if (healsOxygen && playerOxygen != null)
                 {
+                    playerOxygen.SetOxygenSlowDrain(false);
                     playerOxygen.UpdateSafeZoneState(true);
                 }
                 SaveGame();
@@ -91,11 +104,28 @@ public class TreeSavePoint : MonoBehaviour
         }
         else
         {
-            if (isRestored && healsOxygen && playerOxygen != null)
+            // ดึง PlayerOxygen จาก go ที่หลุดจาก trigger เพื่อความชัวร์ (กรณี Reference เดิมโดนล้าง)
+            PlayerOxygen targetOxygen = playerOxygen;
+            if (targetOxygen == null && go != null)
             {
-                playerOxygen.UpdateSafeZoneState(false);
+                targetOxygen = go.GetComponentInParent<PlayerOxygen>();
             }
 
+            if (isRestored && healsOxygen && targetOxygen != null)
+            {
+                // ยกเลิก Safe Zone
+                targetOxygen.UpdateSafeZoneState(false);
+
+                // เช็กว่าผู้เล่นยังอยู่ใน Slow Zone ชั้นนอกหรือไม่
+                OxygenSlowZone slowZone = GetComponentInChildren<OxygenSlowZone>();
+                if (slowZone != null && slowZone.IsPlayerInsideSlowZone)
+                {
+                    targetOxygen.SetOxygenSlowDrain(true);
+                }
+            }
+
+            // ล้างค่า Reference หลังจากประมวลผล Safe Zone เสร็จสิ้น
+            playerObject = null;
             inputHandler = null;
             playerHealth = null;
             playerOxygen = null;
@@ -121,35 +151,10 @@ public class TreeSavePoint : MonoBehaviour
         }
     }
 
-    private float GetHorizontalDistance(Vector3 a, Vector3 b)
-    {
-        float dx = a.x - b.x;
-        float dz = a.z - b.z;
-        return Mathf.Sqrt(dx * dx + dz * dz);
-    }
-
     private void Update()
     {
-        // Proximity detection fallback (คำนวณเฉพาะแกน XZ ในแนวราบ ป้องกันปัญหาความสูงแกน Y ทำให้ระยะคลาดเคลื่อน)
-        if (!isRestored)
-        {
-            if (!isPlayerInRange)
-            {
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null && GetHorizontalDistance(transform.position, player.transform.position) <= 3.8f)
-                {
-                    SetPlayerInRange(true, player);
-                }
-            }
-            else if (playerObject != null && GetHorizontalDistance(transform.position, playerObject.transform.position) > 5.5f)
-            {
-                SetPlayerInRange(false, null);
-            }
-        }
-
         if (!isPlayerInRange) return;
 
-        // กด Interact (E) เพื่อฟื้นฟูต้นไม้และบันทึกจุดเซฟ (รองรับทั้ง InputHandler และปุ่ม E ตรงๆ)
         bool interactPressed = (inputHandler != null && inputHandler.InteractPressed) || Input.GetKeyDown(KeyCode.E);
         if (!isRestored && interactPressed)
         {
@@ -166,8 +171,14 @@ public class TreeSavePoint : MonoBehaviour
         UpdateTreeVisual();
         PlayRestoreVFX();
 
+        if (playerObject != null && playerOxygen == null)
+        {
+            playerOxygen = playerObject.GetComponentInParent<PlayerOxygen>();
+        }
+
         if (healsOxygen && playerOxygen != null)
         {
+            playerOxygen.SetOxygenSlowDrain(false);
             playerOxygen.UpdateSafeZoneState(true);
         }
 
@@ -178,7 +189,6 @@ public class TreeSavePoint : MonoBehaviour
     {
         FindVFXReferences();
 
-        // 1. Instantiate fresh world-space VFX burst (clean, guaranteed visible, unaffected by parent state)
         if (restoreVfxPrefab != null)
         {
             GameObject burstObj = Instantiate(restoreVfxPrefab.gameObject, transform.position + Vector3.up * 1.2f, Quaternion.identity);
@@ -197,24 +207,20 @@ public class TreeSavePoint : MonoBehaviour
             {
                 DestroyImmediate(burstObj);
             }
-            Debug.Log($"[TreeSavePoint] Instantiated world-space TreeRestoreVFX for: {gameObject.name}");
         }
 
-        // 2. Play attached instance burst VFX if present
         if (restoreVfxInstance != null)
         {
             restoreVfxInstance.gameObject.SetActive(true);
             restoreVfxInstance.Play(true);
         }
 
-        // 3. Play ambient fireflies around canopy
         if (ambientFireflies != null)
         {
             ambientFireflies.gameObject.SetActive(true);
             ambientFireflies.Play(true);
         }
 
-        // 4. Audio Feedback
         if (restoreSound != null)
         {
             if (audioSource == null) audioSource = GetComponent<AudioSource>();
@@ -277,13 +283,6 @@ public class TreeSavePoint : MonoBehaviour
         }
     }
 
-    public void ConfigureVisuals(GameObject deadVisual, GameObject restoredVisual, GameObject promptUI)
-    {
-        deadTreeVisual = deadVisual;
-        restoredTreeVisual = restoredVisual;
-        interactPromptUI = promptUI;
-    }
-
     private void FindVFXReferences()
     {
         if (restoreVfxInstance == null)
@@ -310,7 +309,7 @@ public class TreeSavePoint : MonoBehaviour
         }
     }
 
-    // Public setter for editor configuration
+    // Helper functions สำหรับ Editor Script (เช่น CreateHUDAdditions.cs)
     public void ConfigureVFX(ParticleSystem burstInstance, ParticleSystem fireflies, AudioClip sound, ParticleSystem prefab = null)
     {
         restoreVfxInstance = burstInstance;
@@ -318,6 +317,13 @@ public class TreeSavePoint : MonoBehaviour
         restoreSound = sound;
         if (prefab != null) restoreVfxPrefab = prefab;
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
+    }
+
+    public void ConfigureVisuals(GameObject deadVisual, GameObject restoredVisual, GameObject promptUI)
+    {
+        deadTreeVisual = deadVisual;
+        restoredTreeVisual = restoredVisual;
+        interactPromptUI = promptUI;
     }
 
     public void ResetTreeState()
