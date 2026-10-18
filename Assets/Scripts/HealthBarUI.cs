@@ -11,6 +11,28 @@ public class HealthBarUI : MonoBehaviour
     [SerializeField] private Text valueText;
     [SerializeField] private string prefix = "";
 
+    [Header("Juicy Polish")]
+    [SerializeField] private Slider ghostSlider;
+    [SerializeField] private bool smoothTransition = true;
+    [SerializeField] private float smoothSpeed = 10f;
+    [SerializeField] private float ghostSpeed = 3f;
+
+    private float targetValue = -1f;
+    private float targetMaxValue = 100f;
+    private bool initialized = false;
+
+    public Slider GhostSlider
+    {
+        get => ghostSlider;
+        set => ghostSlider = value;
+    }
+
+    public bool SmoothTransition
+    {
+        get => smoothTransition;
+        set => smoothTransition = value;
+    }
+
     public BarType Type
     {
         get => barType;
@@ -48,6 +70,37 @@ public class HealthBarUI : MonoBehaviour
     {
         // Fallback auto-binding: ensures the bar is updated even if Inspector event was missed
         AutoBindToPlayer();
+    }
+
+    private void Update()
+    {
+        if (!smoothTransition || healthSlider == null || targetValue < 0f) return;
+
+        // Smoothly interpolate primary health slider
+        if (Mathf.Abs(healthSlider.value - targetValue) > 0.05f)
+        {
+            healthSlider.value = Mathf.MoveTowards(healthSlider.value, targetValue, smoothSpeed * Time.deltaTime * targetMaxValue * 0.5f);
+        }
+        else
+        {
+            healthSlider.value = targetValue;
+        }
+
+        // Smoothly interpolate ghost slider behind
+        if (ghostSlider != null)
+        {
+            if (ghostSlider.maxValue != targetMaxValue)
+                ghostSlider.maxValue = targetMaxValue;
+
+            if (ghostSlider.value > healthSlider.value)
+            {
+                ghostSlider.value = Mathf.MoveTowards(ghostSlider.value, healthSlider.value, ghostSpeed * Time.deltaTime * targetMaxValue * 0.25f);
+            }
+            else
+            {
+                ghostSlider.value = healthSlider.value;
+            }
+        }
     }
 
     public void AutoBindToPlayer()
@@ -89,11 +142,22 @@ public class HealthBarUI : MonoBehaviour
         if (healthSlider == null)
             healthSlider = GetComponent<Slider>();
 
+        targetMaxValue = maxHealth;
+        targetValue = currentHealth;
+
         if (healthSlider != null)
         {
-            // ตั้ง Max Value ก่อนตั้ง Value เสมอ
             healthSlider.maxValue = maxHealth;
-            healthSlider.value = currentHealth;
+            if (!initialized || !smoothTransition || !Application.isPlaying)
+            {
+                healthSlider.value = currentHealth;
+                if (ghostSlider != null)
+                {
+                    ghostSlider.maxValue = maxHealth;
+                    ghostSlider.value = currentHealth;
+                }
+                initialized = true;
+            }
         }
 
         if (valueText != null)
@@ -103,7 +167,6 @@ public class HealthBarUI : MonoBehaviour
                 : $"{prefix}{currentHealth} / {maxHealth}";
         }
 
-        // พิมพ์ดูค่าใน Console ว่า currentHealth มันลดลงจริงไหม
         Debug.Log($"[UI Debug] {gameObject.name} Current: {currentHealth} | Max: {maxHealth}");
     }
 }

@@ -20,29 +20,12 @@ using UnityEngine.Rendering.Universal;
 /// - Glowing dust motes and lantern embers particles
 /// - Cinematic URP lighting & post-processing (Bloom, Vignette, Color Grading)
 /// </summary>
-[InitializeOnLoad]
 public static class SetupMainScreenEnvironment
 {
     private const string SCENE_PATH = "Assets/Scenes/MainScreen.unity";
     private const string MODELS_DIR = "Assets/Models/MainScreen";
     private const string MATERIALS_DIR = "Assets/Materials/MainScreen";
     private const string SETTINGS_DIR = "Assets/Settings";
-
-    static SetupMainScreenEnvironment()
-    {
-        EditorApplication.delayCall += AutoRunIfApplicable;
-    }
-
-    private static void AutoRunIfApplicable()
-    {
-        if (EditorApplication.isPlaying || Application.isPlaying) return;
-
-        if (!SessionState.GetBool("SetupMainScreen_RanOnce_v2", false))
-        {
-            SessionState.SetBool("SetupMainScreen_RanOnce_v2", true);
-            ExecuteSetup();
-        }
-    }
 
     [MenuItem("Tools/SproutScout/Setup Main Screen 3D Environment")]
     public static void ExecuteSetup()
@@ -780,16 +763,11 @@ public static class SetupMainScreenEnvironment
             Object.DestroyImmediate(existing);
         }
 
-        // Also clean up loose WalkUp02 or empty Terrain if present
+        // Also clean up loose WalkUp02 if present
         GameObject walkUp = GameObject.Find("WalkUp02");
         if (walkUp != null)
         {
             Object.DestroyImmediate(walkUp);
-        }
-        GameObject terrain = GameObject.Find("Terrain");
-        if (terrain != null)
-        {
-            Object.DestroyImmediate(terrain);
         }
 
         // Clean up duplicate volumes if multiple exist

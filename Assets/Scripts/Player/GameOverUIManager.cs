@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class GameOverUIManager : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class GameOverUIManager : MonoBehaviour
     [SerializeField] public CanvasGroup gameOverCanvasGroup;
     [SerializeField] public Text titleText;
     [SerializeField] public Text reasonText;
+
+    [Header("Text Displays (TMP Supported)")]
+    [SerializeField] public TextMeshProUGUI titleTextTMP;
+    [SerializeField] public TextMeshProUGUI reasonTextTMP;
 
     [Header("Action Buttons")]
     [SerializeField] public Button restartButton;
@@ -50,6 +55,10 @@ public class GameOverUIManager : MonoBehaviour
         if (reasonText != null && !string.IsNullOrEmpty(reason))
         {
             reasonText.text = reason;
+        }
+        if (reasonTextTMP != null && !string.IsNullOrEmpty(reason))
+        {
+            reasonTextTMP.text = reason;
         }
 
         if (gameOverPanel != null)
@@ -104,18 +113,26 @@ public class GameOverUIManager : MonoBehaviour
             }
         }
 
-        if (titleText == null)
+        if (titleText == null && titleTextTMP == null)
         {
             Transform t = gameOverPanel.transform.Find("ModalContainer/InnerCard/TitleText");
             if (t == null) t = gameOverPanel.transform.Find("ModalContainer/TitleText");
-            if (t != null) titleText = t.GetComponent<Text>();
+            if (t != null)
+            {
+                titleText = t.GetComponent<Text>();
+                titleTextTMP = t.GetComponent<TextMeshProUGUI>();
+            }
         }
 
-        if (reasonText == null)
+        if (reasonText == null && reasonTextTMP == null)
         {
             Transform r = gameOverPanel.transform.Find("ModalContainer/InnerCard/ReasonText");
             if (r == null) r = gameOverPanel.transform.Find("ModalContainer/ReasonText");
-            if (r != null) reasonText = r.GetComponent<Text>();
+            if (r != null)
+            {
+                reasonText = r.GetComponent<Text>();
+                reasonTextTMP = r.GetComponent<TextMeshProUGUI>();
+            }
         }
 
         if (restartButton == null)

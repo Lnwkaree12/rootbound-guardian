@@ -102,6 +102,61 @@ public class WinUIManager : MonoBehaviour
                 if (m != null) modalContainer = m.GetComponent<RectTransform>();
             }
 
+            if (titleTextTMP == null && titleText == null)
+            {
+                Transform t = winPanel.transform.Find("ModalContainer/InnerCard/TitleText");
+                if (t == null) t = winPanel.transform.Find("ModalContainer/TitleText");
+                if (t != null)
+                {
+                    titleTextTMP = t.GetComponent<TextMeshProUGUI>();
+                    titleText = t.GetComponent<Text>();
+                }
+            }
+
+            if (subtitleTextTMP == null && subtitleText == null)
+            {
+                Transform s = winPanel.transform.Find("ModalContainer/InnerCard/SubtitleText");
+                if (s == null) s = winPanel.transform.Find("ModalContainer/SubtitleText");
+                if (s != null)
+                {
+                    subtitleTextTMP = s.GetComponent<TextMeshProUGUI>();
+                    subtitleText = s.GetComponent<Text>();
+                }
+            }
+
+            if (questStatusTextTMP == null && questStatusText == null)
+            {
+                Transform q = winPanel.transform.Find("ModalContainer/InnerCard/StatsPanel/QuestStatusText");
+                if (q == null) q = winPanel.transform.Find("ModalContainer/StatsPanel/QuestStatusText");
+                if (q != null)
+                {
+                    questStatusTextTMP = q.GetComponent<TextMeshProUGUI>();
+                    questStatusText = q.GetComponent<Text>();
+                }
+            }
+
+            if (clearTimeTextTMP == null && clearTimeText == null)
+            {
+                Transform c = winPanel.transform.Find("ModalContainer/InnerCard/StatsPanel/TimeText");
+                if (c == null) c = winPanel.transform.Find("ModalContainer/StatsPanel/TimeText");
+                if (c != null)
+                {
+                    clearTimeTextTMP = c.GetComponent<TextMeshProUGUI>();
+                    clearTimeText = c.GetComponent<Text>();
+                }
+            }
+
+            if (hpRemainingTextTMP == null && hpRemainingText == null)
+            {
+                Transform h = winPanel.transform.Find("ModalContainer/InnerCard/StatsPanel/HPText");
+                if (h == null) h = winPanel.transform.Find("ModalContainer/StatsPanel/HPText");
+                if (h != null)
+                {
+                    hpRemainingTextTMP = h.GetComponent<TextMeshProUGUI>();
+                    hpRemainingText = h.GetComponent<Text>();
+                }
+            }
+
             if (restartButton == null)
             {
                 Transform t = winPanel.transform.Find("ModalContainer/InnerCard/ButtonRow/RestartButton");
@@ -137,6 +192,28 @@ public class WinUIManager : MonoBehaviour
         {
             Debug.LogError("[WinUIManager] WinPanel was not found. Add a WinPanel reference to the active WinUIManager.");
             yield break;
+        }
+
+        // Calculate and display statistics
+        float elapsed = Mathf.Max(0f, Time.timeSinceLevelLoad - levelStartTime);
+        int minutes = Mathf.FloorToInt(elapsed / 60f);
+        int seconds = Mathf.FloorToInt(elapsed % 60f);
+        string timeStr = string.Format("เวลาที่ใช้: {0:00}:{1:00}", minutes, seconds);
+
+        if (clearTimeTextTMP != null) clearTimeTextTMP.text = timeStr;
+        if (clearTimeText != null) clearTimeText.text = timeStr;
+
+        PlayerHealth ph = Object.FindFirstObjectByType<PlayerHealth>();
+        if (ph != null)
+        {
+            string hpStr = $"พลังชีวิตคงเหลือ: {ph.CurrentHealth} / {ph.MaxHealth} HP";
+            if (hpRemainingTextTMP != null) hpRemainingTextTMP.text = hpStr;
+            if (hpRemainingText != null) hpRemainingText.text = hpStr;
+        }
+
+        if (audioSource != null && victorySound != null)
+        {
+            audioSource.PlayOneShot(victorySound);
         }
 
         if (winPanel != null)
