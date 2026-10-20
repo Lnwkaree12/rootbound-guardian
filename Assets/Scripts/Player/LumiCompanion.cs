@@ -57,16 +57,16 @@ public class LumiCompanion : MonoBehaviour
     [Header("Playful Banter Lines")]
     [SerializeField] private List<string> banterLines = new List<string>()
     {
-        "เดินระวังหน่อยสิเจ้ามนุษย์! เดี๋ยวก็สะดุดหินหรอก ฮิๆ~",
-        "ว้าว ลาวาตรงนั้นสีสวยจัง... แต่อย่ากระโดดลงไปเล่นนะ!",
-        "ปีกข้าสวยมั้ยล่ะ? บินทั้งวันยังไม่เหนื่อยเลยนะจะบอกให้~",
-        "นี่ๆ เดินเร็วๆ หน่อย ข้าบินนำไปไกลแล้วนะ!",
-        "แถวนี้มืดจัง ดีนะที่มีข้าคอยส่องไฟให้อ่ะ!",
-        "ฮั่นแน่! แอบมองข้าอยู่ล่ะสิ มีข้าไปด้วยอุ่นใจใช่ม้า~",
-        "สู้เขานะเจ้าสองขา ข้าเอาใจช่วยอยู่ข้างๆ นี่แหละ!",
-        "เหนื่อยรึยัง? ข้าลอยตัวสบายจัง ไม่เมื่อยขาเลยสักนิด อิอิ",
-        "ระวังหัวด้วยนะข้างหน้า ข้าตัวเล็กข้าหลบง่าย แต่เจ้าตัวโตนะ!",
-        "ข้าเป็นวิญญาณแห่งแสงที่น่ารักที่สุดในป่าแล้ว ยอมรับมาซะดีๆ!"
+        "เดินระวังหน่อยสิเจ้ามนุษย์!\nเดี๋ยวก็สะดุดหินหรอก ฮิๆ~",
+        "ว้าว ลาวาตรงนั้นสีสวยจัง...\nแต่อย่ากระโดดลงไปเล่นนะ!",
+        "ปีกข้าสวยมั้ยล่ะ?\nบินทั้งวันยังไม่เหนื่อยเลยนะจะบอกให้~",
+        "นี่ๆ เดินเร็วๆ หน่อย\nข้าบินนำไปไกลแล้วนะ!",
+        "แถวนี้มืดจัง\nดีนะที่มีข้าคอยส่องไฟให้อ่ะ!",
+        "ฮั่นแน่! แอบมองข้าอยู่ล่ะสิ\nมีข้าไปด้วยอุ่นใจใช่ม้า~",
+        "สู้เขานะเจ้าสองขา\nข้าเอาใจช่วยอยู่ข้างๆ นี่แหละ!",
+        "เหนื่อยรึยัง? ข้าลอยตัวสบายจัง\nไม่เมื่อยขาเลยสักนิด อิอิ",
+        "ระวังหัวด้วยนะข้างหน้า\nข้าตัวเล็กข้าหลบง่าย แต่เจ้าตัวโตนะ!",
+        "ข้าเป็นวิญญาณแห่งแสง\nที่น่ารักที่สุดในป่าแล้ว ยอมรับมาซะดีๆ!"
     };
 
     private Vector3 currentVelocity;
@@ -117,6 +117,19 @@ public class LumiCompanion : MonoBehaviour
             target = player.transform;
     }
 
+    public bool isCutsceneControlled = false;
+
+    public void SetCutsceneMode(bool enabled, float facingAngleY = 180f)
+    {
+        isCutsceneControlled = enabled;
+        if (enabled)
+        {
+            currentVelocity = Vector3.zero;
+            SetIdleFacingAngle(facingAngleY);
+            if (animator != null) animator.speed = idleAnimSpeed;
+        }
+    }
+
     private void Update()
     {
         if (target == null)
@@ -125,9 +138,19 @@ public class LumiCompanion : MonoBehaviour
             if (target == null) return;
         }
 
-        HandleMovement();
-        HandleRotation();
-        HandleAnimationSpeed();
+        if (!isCutsceneControlled)
+        {
+            HandleMovement();
+            HandleRotation();
+            HandleAnimationSpeed();
+        }
+        else
+        {
+            // Keep idle rotation facing the camera during cutscene
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, idleFacingAngleY, 0f), Time.deltaTime * rotationSpeed);
+            if (animator != null) animator.speed = idleAnimSpeed;
+        }
+
         HandleDialogueTimer();
         HandleAuraPulse();
     }
@@ -143,6 +166,8 @@ public class LumiCompanion : MonoBehaviour
             if (mainCamera != null)
             {
                 dialogueCanvas.transform.rotation = mainCamera.transform.rotation;
+                if (dialogueCanvas.worldCamera == null)
+                    dialogueCanvas.worldCamera = mainCamera;
             }
         }
     }
@@ -237,8 +262,12 @@ public class LumiCompanion : MonoBehaviour
         auraLight.intensity = baseLightIntensity + pulse;
     }
 
+    public bool disableAutoDialogue = false;
+
     private void HandleDialogueTimer()
     {
+        if (disableAutoDialogue) return;
+
         if (Time.time >= nextDialogueTime)
         {
             TriggerRandomDialogue();
@@ -252,6 +281,15 @@ public class LumiCompanion : MonoBehaviour
     }
 
     /// <summary>
+    /// Set custom idle facing angle (useful for cutscenes).
+    /// </summary>
+    public void SetIdleFacingAngle(float angleY)
+    {
+        idleFacingAngleY = angleY;
+        useFixedIdleAngle = true;
+    }
+
+    /// <summary>
     /// Trigger a random playful dialogue bubble.
     /// </summary>
     public void TriggerRandomDialogue()
@@ -262,17 +300,36 @@ public class LumiCompanion : MonoBehaviour
     }
 
     /// <summary>
-    /// Speak a custom dialogue text.
+    /// Speak a custom dialogue text with optional display duration.
     /// </summary>
-    public void Speak(string message)
+    public void Speak(string message, float customDuration = -1f)
     {
         if (dialogueCoroutine != null)
             StopCoroutine(dialogueCoroutine);
 
-        dialogueCoroutine = StartCoroutine(ShowBubbleRoutine(message));
+        float duration = customDuration > 0f ? customDuration : bubbleDisplayDuration;
+        dialogueCoroutine = StartCoroutine(ShowBubbleRoutine(message, duration));
     }
 
-    private IEnumerator ShowBubbleRoutine(string message)
+    /// <summary>
+    /// Immediately dismiss the dialogue speech bubble.
+    /// </summary>
+    public void HideBubble()
+    {
+        if (dialogueCoroutine != null)
+        {
+            StopCoroutine(dialogueCoroutine);
+            dialogueCoroutine = null;
+        }
+
+        if (bubbleTransform != null)
+            bubbleTransform.localScale = Vector3.zero;
+
+        if (bubbleCanvasGroup != null)
+            bubbleCanvasGroup.alpha = 0f;
+    }
+
+    private IEnumerator ShowBubbleRoutine(string message, float duration)
     {
         if (dialogueText != null)
             dialogueText.text = message;
@@ -305,7 +362,7 @@ public class LumiCompanion : MonoBehaviour
             bubbleCanvasGroup.alpha = 1f;
 
         // Hold display duration
-        yield return new WaitForSeconds(bubbleDisplayDuration);
+        yield return new WaitForSeconds(duration);
 
         // Pop out animation (1.0 -> 0)
         float fadeTime = 0.2f;
