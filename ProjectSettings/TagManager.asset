@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Wall
+  - Aya
+  - Oga
+  - Ura
   layers:
   - Default
   - TransparentFX
@@ -65,6 +68,9 @@ TagManager:
     locked: 0
   - name: 'background Layer 1 '
     uniqueID: 1544237963
+    locked: 0
+  - name: UI_Dialogue
+    uniqueID: 1999999
     locked: 0
   m_RenderingLayers:
   - Default

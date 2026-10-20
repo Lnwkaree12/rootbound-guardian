@@ -181,6 +181,15 @@ public class PlayerHealth : MonoBehaviour
         ResetHealthAfterRespawn();
     }
 
+    public void Heal(int amount)
+    {
+        if (amount <= 0 || currentHealth <= 0) return;
+        currentHealth += amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        onHealthChanged?.Invoke(currentHealth, maxHealth);
+        Debug.Log($"[PlayerHealth] ฟื้นฟูเลือด {amount} | เลือดคงเหลือ: {currentHealth}/{maxHealth}");
+    }
+
     public void ResetHealth()
     {
         ResetHealth(true);

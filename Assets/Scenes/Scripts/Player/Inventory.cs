@@ -9,7 +9,7 @@ public class Inventory : MonoBehaviour
 
     public List<ItemData> Items => items;
 
-    // เพิ่มไอเทมเข้ากระเป๋า
+    // ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝาก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ
     public bool AddItem(ItemData newItem)
     {
         if (items.Count >= maxSlots)
@@ -21,7 +21,7 @@ public class Inventory : MonoBehaviour
         items.Add(newItem);
         Debug.Log($"Picked up: {newItem.itemName}");
 
-        // เชื่อมต่อกับ QuestManager เมื่อเก็บกุญแจ
+        // ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝอกับ QuestManager ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ็บกุญ๏ฟฝ
         if (newItem.itemType == ItemType.Key)
         {
             if (QuestManager.Instance != null)
@@ -33,21 +33,21 @@ public class Inventory : MonoBehaviour
         return true;
     }
 
-    // ใช้งานไอเทมตาม Index ในกระเป๋า
+    // ๏ฟฝ๏ฟฝาน๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ Index ในก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ
     public void UseItem(int index)
     {
         if (index < 0 || index >= items.Count) return;
 
         ItemData itemToUse = items[index];
 
-        // แยก Logic การใช้งานตามประเภทของไอเทม
+        // ๏ฟฝยก Logic ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝาน๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝอง๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ
         switch (itemToUse.itemType)
         {
             case ItemType.HealthPotion:
                 PlayerHealth health = GetComponent<PlayerHealth>();
                 if (health != null)
                 {
-                    //health.Heal(itemToUse.healAmount);
+                    health.Heal((int)itemToUse.healAmount);
                     Debug.Log($"Used {itemToUse.itemName}, Healed {itemToUse.healAmount} HP");
                     RemoveItem(index);
                 }
@@ -56,19 +56,19 @@ public class Inventory : MonoBehaviour
             case ItemType.Key:
                 Debug.Log($"Used Key: {itemToUse.itemName}");
 
-                // เชื่อมต่อกับ QuestManager เมื่อใช้กุญแจไขประตู
+                // ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝอกับ QuestManager ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝุญ๏ฟฝไขป๏ฟฝะต๏ฟฝ
                 if (QuestManager.Instance != null)
                 {
                     QuestManager.Instance.UseKeyOnDoor();
                 }
 
-                // ลบกุญแจออกจากกระเป๋าหลังจากใช้งานสำเร็จ
+                // ลบ๏ฟฝุญ๏ฟฝ๏ฟฝอก๏ฟฝาก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝัง๏ฟฝาก๏ฟฝ๏ฟฝาน๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ
                 RemoveItem(index);
                 break;
         }
     }
 
-    // ลบไอเทมออกจากกระเป๋า
+    // ลบ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝอก๏ฟฝาก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ
     public void RemoveItem(int index)
     {
         if (index >= 0 && index < items.Count)
@@ -77,7 +77,7 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    // ตรวจสอบว่ามีกุญแจอยู่ในกระเป๋าหรือไม่
+    // ๏ฟฝ๏ฟฝวจ๏ฟฝอบ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝีกุญ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝในก๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ
     public bool HasKey()
     {
         return items.Exists(item => item != null && item.itemType == ItemType.Key);
@@ -92,7 +92,7 @@ public class Inventory : MonoBehaviour
     {
         items = new List<ItemData>(savedItems);
 
-        // ตรวจสอบว่าในข้อมูลที่โหลดมามีกุญแจหรือไม่ เพื่ออัปเดต QuestManager ให้ถูกต้อง
+        // ๏ฟฝ๏ฟฝวจ๏ฟฝอบ๏ฟฝ๏ฟฝ๏ฟฝในข๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝลท๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝลด๏ฟฝ๏ฟฝ๏ฟฝีกุญ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝัปเดต QuestManager ๏ฟฝ๏ฟฝ๏ฟฝูก๏ฟฝ๏ฟฝอง
         if (HasKey() && QuestManager.Instance != null)
         {
             QuestManager.Instance.CollectKey();

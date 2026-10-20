@@ -1,17 +1,34 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using Image = UnityEngine.UI.Image;
+using Text = UnityEngine.UI.Text;
+using TMPro;
 
 public class DoorController : MonoBehaviour
 {
-    [Header("Door Panel Reference")]
+    [Header("Single Door Panel Reference (Legacy/Single Doors)")]
     public Transform doorPanel;
+    public float openAngle = -90f;
+
+    [Header("Double Door References (Castle Gate)")]
+    public Transform leftDoorLeaf;
+    public Transform rightDoorLeaf;
+    public float doubleDoorOpenAngle = 90f;
 
     [Header("Door Settings")]
-    public float openAngle = -90f;
-    public float openSpeed = 3.5f;
-    public float interactRadius = 3.0f;
-    public bool autoUnlockOnContact = true;
+    public float openSpeed = 2.0f;
+    public float openDuration = 1.8f;
+    public float interactRadius = 8.0f;
+    public bool autoUnlockOnContact = false;
+
+    [Header("Interaction Settings")]
+    public KeyCode interactKey = KeyCode.E;
+    public bool allowKeyFBackup = true;
+
+    [Header("Colliders")]
+    public Collider barrierCollider;
+    public Collider interactionTrigger;
 
     [Header("Key Requirement Settings")]
     [Tooltip("ระบุชื่อของกุญแจที่ต้องใช้ (ถ้าปล่อยว่างไว้ ขอแค่เป็น ItemType.Key อันไหนก็ได้จะใช้เปิดได้เลย)")]
@@ -20,22 +37,68 @@ public class DoorController : MonoBehaviour
     public bool consumeKeyOnUse = true;
 
     [Header("Audio")]
+    public AudioClip keyUnlockSfx;
     public AudioClip doorOpenSfx;
     private AudioSource audioSource;
 
+    [Header("Victory Settings")]
+    public bool triggerWinOnOpen = true;
+    public float winUIDelay = 1.2f;
+
     [Header("Floating Prompt UI")]
     public GameObject promptObject;
-    public Text promptText;
+    public TextMeshProUGUI promptTextTMP;
+    public Text promptTextLegacy;
+    public Image promptKeyIcon;
+    public Image promptBgImage;
 
     private bool isOpen = false;
+    private bool isOpening = false;
     private Quaternion closedRotation;
     private Quaternion openRotation;
+    private Quaternion closedLeftRot;
+    private Quaternion openLeftRot;
+    private Quaternion closedRightRot;
+    private Quaternion openRightRot;
+
+    private bool isDoubleDoor = false;
     private bool playerInRange = false;
     private bool playerInTrigger = false;
     private PlayerMovement cachedPlayer;
+    private Coroutine flashCoroutine;
+    private Vector3 promptBaseLocalPos;
+
+    public bool IsOpen => isOpen;
 
     void Start()
     {
+        InitializeDoors();
+        InitializeAudio();
+        cachedPlayer = FindObjectOfType<PlayerMovement>();
+        SetupFloatingPrompt();
+    }
+
+    private void InitializeDoors()
+    {
+        // Auto-detect double doors if not assigned
+        if (leftDoorLeaf == null) leftDoorLeaf = transform.Find("Door_Leaf_Left");
+        if (rightDoorLeaf == null) rightDoorLeaf = transform.Find("Door_Leaf_Right");
+
+        if (leftDoorLeaf != null && rightDoorLeaf != null)
+        {
+            isDoubleDoor = true;
+            closedLeftRot = leftDoorLeaf.localRotation;
+            closedRightRot = rightDoorLeaf.localRotation;
+
+            // In local space of castle_door: Left opens inward (+Y rot), Right opens inward (-Y rot)
+            openLeftRot = Quaternion.Euler(0f, doubleDoorOpenAngle, 0f) * closedLeftRot;
+            openRightRot = Quaternion.Euler(0f, -doubleDoorOpenAngle, 0f) * closedRightRot;
+
+            EnsureDoorLeafForwarder(leftDoorLeaf);
+            EnsureDoorLeafForwarder(rightDoorLeaf);
+        }
+
+        // Single door fallback
         if (doorPanel == null)
         {
             doorPanel = transform.Find("DoorPanel");
@@ -54,6 +117,34 @@ public class DoorController : MonoBehaviour
             forwarder.parentDoor = this;
         }
 
+        // Auto-find barrier collider if attached
+        if (barrierCollider == null)
+        {
+            Collider[] cols = GetComponents<Collider>();
+            foreach (var c in cols)
+            {
+                if (!c.isTrigger)
+                {
+                    barrierCollider = c;
+                    break;
+                }
+            }
+        }
+    }
+
+    private void EnsureDoorLeafForwarder(Transform leaf)
+    {
+        if (leaf == null) return;
+        DoorPanelCollisionForwarder forwarder = leaf.GetComponent<DoorPanelCollisionForwarder>();
+        if (forwarder == null)
+        {
+            forwarder = leaf.gameObject.AddComponent<DoorPanelCollisionForwarder>();
+        }
+        forwarder.parentDoor = this;
+    }
+
+    private void InitializeAudio()
+    {
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -62,59 +153,104 @@ public class DoorController : MonoBehaviour
             audioSource.spatialBlend = 0.5f;
         }
 
-        cachedPlayer = FindObjectOfType<PlayerMovement>();
-        SetupFloatingPrompt();
+        if (keyUnlockSfx == null)
+        {
+#if UNITY_EDITOR
+            keyUnlockSfx = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/Key.mp3");
+#endif
+        }
     }
 
     private void SetupFloatingPrompt()
     {
-        if (promptObject != null) return;
+        if (promptObject != null)
+        {
+            promptBaseLocalPos = promptObject.transform.localPosition;
+            return;
+        }
+
+        // Determine prompt position based on door setup
+        Vector3 spawnLocalPos = new Vector3(-0.6f, 1.4f, 0f);
+        if (!isDoubleDoor)
+        {
+            spawnLocalPos = new Vector3(0f, 2.35f, 0f);
+        }
 
         GameObject promptCanvasGO = new GameObject("DoorPromptCanvas");
         promptCanvasGO.transform.SetParent(transform, false);
-        promptCanvasGO.transform.localPosition = new Vector3(0f, 2.35f, 0f);
+        promptCanvasGO.transform.localPosition = spawnLocalPos;
+        promptBaseLocalPos = spawnLocalPos;
 
         Canvas canvas = promptCanvasGO.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
-        RectTransform canvasRect = promptCanvasGO.GetComponent<RectTransform>();
-        canvasRect.sizeDelta = new Vector2(300f, 60f);
-        promptCanvasGO.transform.localScale = new Vector3(0.012f, 0.012f, 0.012f);
+        canvas.sortingOrder = 50;
 
+        RectTransform canvasRect = promptCanvasGO.GetComponent<RectTransform>();
+        canvasRect.sizeDelta = new Vector2(460f, 90f);
+        promptCanvasGO.transform.localScale = new Vector3(0.0075f, 0.0075f, 0.0075f);
+
+        // Background pill
         GameObject bgGO = new GameObject("Background");
         bgGO.transform.SetParent(promptCanvasGO.transform, false);
-        Image bgImg = bgGO.AddComponent<Image>();
-        bgImg.color = new Color(0.12f, 0.08f, 0.06f, 0.88f);
+        promptBgImage = bgGO.AddComponent<Image>();
+        promptBgImage.color = new Color(0.10f, 0.08f, 0.06f, 0.92f);
+
+#if UNITY_EDITOR
+        Sprite pillSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Image/UI/Cute_Tree_Bubble_Bg.png");
+        if (pillSprite == null) pillSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Image/UI/Prompt_Pill_Bg.png");
+        if (pillSprite != null)
+        {
+            promptBgImage.sprite = pillSprite;
+            promptBgImage.type = Image.Type.Sliced;
+        }
+#endif
+
         RectTransform bgRect = bgGO.GetComponent<RectTransform>();
         bgRect.anchorMin = Vector2.zero;
         bgRect.anchorMax = Vector2.one;
         bgRect.sizeDelta = Vector2.zero;
 
-        GameObject textGO = new GameObject("Text");
-        textGO.transform.SetParent(bgGO.transform, false);
-        promptText = textGO.AddComponent<Text>();
-
-        Font customFont = Resources.Load<Font>("Itim-Regular");
-        if (customFont == null)
-        {
+        // Key [E] Icon
+        GameObject iconGO = new GameObject("KeyIcon");
+        iconGO.transform.SetParent(bgGO.transform, false);
+        promptKeyIcon = iconGO.AddComponent<Image>();
 #if UNITY_EDITOR
-            customFont = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/Itim-Regular.ttf");
-#endif
-        }
-        if (customFont == null)
+        Sprite keySprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Image/UI/Cute_Key_E_Candy.png");
+        if (keySprite == null) keySprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Image/UI/Prompt_Key_E_Cute.png");
+        if (keySprite != null)
         {
-            try { customFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); }
-            catch { try { customFont = Resources.GetBuiltinResource<Font>("Arial.ttf"); } catch { } }
+            promptKeyIcon.sprite = keySprite;
         }
+#endif
+        RectTransform iconRect = iconGO.GetComponent<RectTransform>();
+        iconRect.anchorMin = new Vector2(0f, 0.5f);
+        iconRect.anchorMax = new Vector2(0f, 0.5f);
+        iconRect.pivot = new Vector2(0.5f, 0.5f);
+        iconRect.anchoredPosition = new Vector3(48f, 0f, 0f);
+        iconRect.sizeDelta = new Vector2(64f, 64f);
 
-        promptText.font = customFont;
-        promptText.fontSize = 22;
-        promptText.alignment = TextAnchor.MiddleCenter;
-        promptText.color = new Color(1f, 0.85f, 0.3f);
-        promptText.text = "🔒 ประตูล็อคอยู่";
+        // Text (TMP)
+        GameObject textGO = new GameObject("TextTMP");
+        textGO.transform.SetParent(bgGO.transform, false);
+        promptTextTMP = textGO.AddComponent<TextMeshProUGUI>();
+
+#if UNITY_EDITOR
+        TMP_FontAsset thaiFont = UnityEditor.AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/Itim_Thai_SDF.asset");
+        if (thaiFont != null)
+        {
+            promptTextTMP.font = thaiFont;
+        }
+#endif
+        promptTextTMP.fontSize = 28f;
+        promptTextTMP.alignment = TextAlignmentOptions.MidlineLeft;
+        promptTextTMP.color = new Color(1f, 0.92f, 0.65f);
+        promptTextTMP.text = "กด [E] เพื่อเปิดประตู";
+
         RectTransform textRect = textGO.GetComponent<RectTransform>();
         textRect.anchorMin = Vector2.zero;
         textRect.anchorMax = Vector2.one;
-        textRect.sizeDelta = Vector2.zero;
+        textRect.offsetMin = new Vector2(90f, 5f);
+        textRect.offsetMax = new Vector2(-20f, -5f);
 
         promptObject = promptCanvasGO;
         promptObject.SetActive(false);
@@ -122,13 +258,7 @@ public class DoorController : MonoBehaviour
 
     void Update()
     {
-        if (doorPanel != null)
-        {
-            Quaternion targetRot = isOpen ? openRotation : closedRotation;
-            doorPanel.localRotation = Quaternion.Slerp(doorPanel.localRotation, targetRot, Time.deltaTime * openSpeed);
-        }
-
-        if (isOpen)
+        if (isOpen || isOpening)
         {
             if (promptObject != null && promptObject.activeSelf)
             {
@@ -142,26 +272,11 @@ public class DoorController : MonoBehaviour
         if (playerInRange)
         {
             bool hasKey = CheckPlayerHasKey();
-            if (promptObject != null)
-            {
-                if (!promptObject.activeSelf) promptObject.SetActive(true);
+            UpdatePromptDisplay(hasKey);
 
-                if (promptText != null)
-                {
-                    if (hasKey)
-                    {
-                        promptText.text = "🗝️ กด [F] เพื่อไขประตู (มีกุญแจแล้ว)";
-                        promptText.color = new Color(0.4f, 1f, 0.4f);
-                    }
-                    else
-                    {
-                        promptText.text = "🔒 ประตูล็อคอยู่! (ต้องหากุญแจก่อน)";
-                        promptText.color = new Color(1f, 0.6f, 0.4f);
-                    }
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.F))
+            // Handle Interaction Input: KeyCode.E (or F as backup if configured)
+            bool interactPressed = Input.GetKeyDown(interactKey) || (allowKeyFBackup && Input.GetKeyDown(KeyCode.F));
+            if (interactPressed)
             {
                 TryOpenDoor();
             }
@@ -175,6 +290,39 @@ public class DoorController : MonoBehaviour
         }
     }
 
+    private void UpdatePromptDisplay(bool hasKey)
+    {
+        if (promptObject == null) return;
+        if (!promptObject.activeSelf) promptObject.SetActive(true);
+
+        // Floating hover animation
+        float hover = Mathf.Sin(Time.time * 3.5f) * 0.05f;
+        promptObject.transform.localPosition = promptBaseLocalPos + new Vector3(0f, hover, 0f);
+
+        if (flashCoroutine != null) return; // Keep flash state active if currently flashing
+
+        if (promptTextTMP != null)
+        {
+            if (hasKey)
+            {
+                promptTextTMP.text = "กด <color=#FFEE44>[E]</color> เพื่อเปิดประตู";
+                promptTextTMP.color = new Color(1f, 0.95f, 0.7f);
+                if (promptKeyIcon != null) promptKeyIcon.gameObject.SetActive(true);
+            }
+            else
+            {
+                promptTextTMP.text = "<color=#FFAA77>ประตูล็อคแน่นหนา (ต้องหากุญแจก่อน)</color>";
+                promptTextTMP.color = new Color(1f, 0.7f, 0.5f);
+                if (promptKeyIcon != null) promptKeyIcon.gameObject.SetActive(false);
+            }
+        }
+
+        if (promptTextLegacy != null)
+        {
+            promptTextLegacy.text = hasKey ? "กด [E] เพื่อเปิดประตู" : "ประตูล็อคแน่นหนา (ต้องหากุญแจก่อน)";
+        }
+    }
+
     private void CheckProximityToPlayer()
     {
         if (cachedPlayer == null)
@@ -185,13 +333,13 @@ public class DoorController : MonoBehaviour
 
         float dist = Vector3.Distance(transform.position, cachedPlayer.transform.position);
         float maxScale = Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z, 1f);
-        float effectiveRadius = Mathf.Max(interactRadius * maxScale, 6.5f);
+        float effectiveRadius = Mathf.Max(interactRadius, 3.0f * maxScale);
 
         if (dist <= effectiveRadius)
         {
             playerInRange = true;
             float touchRadius = Mathf.Max(2.5f * maxScale, 4.0f);
-            if (autoUnlockOnContact && dist <= touchRadius && CheckPlayerHasKey() && !isOpen)
+            if (autoUnlockOnContact && dist <= touchRadius && CheckPlayerHasKey() && !isOpen && !isOpening)
             {
                 TryOpenDoor();
             }
@@ -207,6 +355,11 @@ public class DoorController : MonoBehaviour
         if (promptObject != null && promptObject.activeSelf)
         {
             Camera cam = Camera.main;
+            if (cam == null && cachedPlayer != null)
+            {
+                cam = cachedPlayer.GetComponentInChildren<Camera>(false);
+            }
+
             if (cam != null)
             {
                 promptObject.transform.rotation = cam.transform.rotation;
@@ -215,7 +368,7 @@ public class DoorController : MonoBehaviour
     }
 
     // ========================================================================
-    // 🔑 การเชื่อมต่อกับคลาส Inventory
+    // 🔑 การตรวจสอบและจัดการกุญแจ
     // ========================================================================
 
     private Inventory GetPlayerInventory()
@@ -233,29 +386,32 @@ public class DoorController : MonoBehaviour
         return FindObjectOfType<Inventory>();
     }
 
-    private bool CheckPlayerHasKey()
+    public bool CheckPlayerHasKey()
     {
-        Inventory inventory = GetPlayerInventory();
-        if (inventory == null) return false;
-
-        foreach (ItemData item in inventory.Items)
+        // 1. ตรวจสอบผ่าน QuestManager
+        if (QuestManager.Instance != null && QuestManager.Instance.hasKey)
         {
-            if (item == null) continue;
+            return true;
+        }
 
-            // เช็กว่าเป็น ItemType.Key
-            if (item.itemType == ItemType.Key)
+        // 2. ตรวจสอบผ่าน Player Inventory
+        Inventory inventory = GetPlayerInventory();
+        if (inventory != null)
+        {
+            foreach (ItemData item in inventory.Items)
             {
-                // ถ้าไม่ได้ระบุชื่อกุญแจเฉพาะ ถือว่าใช้กุญแจอะไรก็เปิดได้
-                if (string.IsNullOrEmpty(requiredKeyName))
+                if (item == null) continue;
+
+                if (item.itemType == ItemType.Key)
                 {
-                    return true;
-                }
-                // ถ้ามีระบุชื่อกุญแจเฉพาะ ต้องชื่อตรงกัน
-                else if (item.itemName == requiredKeyName)
-                {
-                    return true;
+                    if (string.IsNullOrEmpty(requiredKeyName) || item.itemName == requiredKeyName)
+                    {
+                        return true;
+                    }
                 }
             }
+
+            if (inventory.HasKey()) return true;
         }
 
         return false;
@@ -264,6 +420,12 @@ public class DoorController : MonoBehaviour
     private void ConsumeKeyFromInventory()
     {
         if (!consumeKeyOnUse) return;
+
+        // แจ้งเตือน QuestManager
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.UseKeyOnDoor();
+        }
 
         Inventory inventory = GetPlayerInventory();
         if (inventory == null) return;
@@ -284,35 +446,109 @@ public class DoorController : MonoBehaviour
     }
 
     // ========================================================================
+    // 🚪 การเปิดประตู & แอนิเมชัน
+    // ========================================================================
 
     public void TryOpenDoor()
     {
-        if (isOpen) return;
+        if (isOpen || isOpening) return;
 
         if (CheckPlayerHasKey())
         {
-            isOpen = true;
-            Debug.Log("[DoorController] Key found in Inventory! Opening door...");
-
-            if (promptObject != null) promptObject.SetActive(false);
-
-            Collider[] colliders = GetComponentsInChildren<Collider>();
-            foreach (Collider c in colliders)
-            {
-                c.isTrigger = true;
-            }
-
-            // ลบกุญแจออกจากกระเป๋าเมื่อเปิดประตู
-            ConsumeKeyFromInventory();
-
-            PlayDoorOpenAudio();
-            TriggerWinUI();
+            StartCoroutine(OpenDoorSequence());
         }
         else
         {
-            Debug.Log("[DoorController] No matching key found in Inventory.");
-            StartCoroutine(FlashLockedPrompt());
+            Debug.Log("[DoorController] Player does not have the required key.");
+            if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+            flashCoroutine = StartCoroutine(FlashLockedPrompt());
         }
+    }
+
+    private IEnumerator OpenDoorSequence()
+    {
+        isOpening = true;
+        Debug.Log("[DoorController] Key found! Opening door with animation...");
+
+        if (promptObject != null) promptObject.SetActive(false);
+
+        // ปลดล็อค Barrier Collider เพื่อให้ผู้เล่นเดินผ่านได้
+        if (barrierCollider != null)
+        {
+            barrierCollider.enabled = false;
+        }
+
+        // ปรับ Colliders ทั้งหมดให้เป็น trigger
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (Collider c in colliders)
+        {
+            c.isTrigger = true;
+        }
+
+        // ลบกุญแจออกจากกระเป๋า
+        ConsumeKeyFromInventory();
+
+        // เล่นเสียงเปิดประตู
+        PlayDoorOpenAudio();
+
+        // ล็อคความเร็วผู้เล่นเล็กน้อยเพื่อให้มองเห็นประตูเปิดอย่างสง่างาม
+        if (cachedPlayer != null)
+        {
+            cachedPlayer.Move(Vector2.zero);
+        }
+
+        // หากมีการตั้งค่า TriggerWin ให้เรียก WinUIManager หลังแอนิเมชันเปิดประตูเริ่ม
+        if (triggerWinOnOpen)
+        {
+            StartCoroutine(TriggerWinDelayed(winUIDelay));
+        }
+
+        // Animate door opening smoothly
+        float elapsed = 0f;
+        while (elapsed < openDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / openDuration);
+
+            if (isDoubleDoor)
+            {
+                if (leftDoorLeaf != null)
+                {
+                    leftDoorLeaf.localRotation = Quaternion.Slerp(closedLeftRot, openLeftRot, t);
+                }
+                if (rightDoorLeaf != null)
+                {
+                    rightDoorLeaf.localRotation = Quaternion.Slerp(closedRightRot, openRightRot, t);
+                }
+            }
+            else if (doorPanel != null)
+            {
+                doorPanel.localRotation = Quaternion.Slerp(closedRotation, openRotation, t);
+            }
+
+            yield return null;
+        }
+
+        // Finalize state
+        if (isDoubleDoor)
+        {
+            if (leftDoorLeaf != null) leftDoorLeaf.localRotation = openLeftRot;
+            if (rightDoorLeaf != null) rightDoorLeaf.localRotation = openRightRot;
+        }
+        else if (doorPanel != null)
+        {
+            doorPanel.localRotation = openRotation;
+        }
+
+        isOpen = true;
+        isOpening = false;
+        Debug.Log("[DoorController] Door fully opened!");
+    }
+
+    private IEnumerator TriggerWinDelayed(float delay)
+    {
+        if (delay > 0f) yield return new WaitForSeconds(delay);
+        TriggerWinUI();
     }
 
     private void TriggerWinUI()
@@ -343,7 +579,8 @@ public class DoorController : MonoBehaviour
             return;
         }
 
-        winManager.TriggerWin(0.65f);
+        Debug.Log("[DoorController] Triggering Game Win UI!");
+        winManager.TriggerWin(0.2f);
     }
 
     private IEnumerator FlashLockedPrompt()
@@ -351,28 +588,41 @@ public class DoorController : MonoBehaviour
         if (promptObject == null) yield break;
         promptObject.SetActive(true);
 
-        if (promptText != null)
+        if (promptTextTMP != null)
         {
-            promptText.text = "⚠️ ประตูล็อคแน่นหนา! ต้องใช้กุญแจ 🔑";
-            promptText.color = Color.red;
+            promptTextTMP.text = "<color=#FF3333>ประตูล็อคแน่นหนา! ต้องใช้กุญแจ</color>";
+        }
+        if (promptTextLegacy != null)
+        {
+            promptTextLegacy.text = "ประตูล็อคแน่นหนา! ต้องใช้กุญแจ";
+            promptTextLegacy.color = Color.red;
+        }
+        if (promptBgImage != null)
+        {
+            promptBgImage.color = new Color(0.4f, 0.1f, 0.1f, 0.95f);
         }
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1.8f);
 
-        if (!isOpen && playerInRange)
+        if (promptBgImage != null)
         {
-            if (promptText != null)
-            {
-                promptText.text = "🔒 ประตูล็อคอยู่! (ต้องหากุญแจก่อน)";
-                promptText.color = new Color(1f, 0.6f, 0.4f);
-            }
+            promptBgImage.color = new Color(0.10f, 0.08f, 0.06f, 0.92f);
         }
+
+        flashCoroutine = null;
     }
 
     private void PlayDoorOpenAudio()
     {
         if (audioSource == null) return;
 
+        // เล่นเสียงไขกุญแจ
+        if (keyUnlockSfx != null)
+        {
+            audioSource.PlayOneShot(keyUnlockSfx);
+        }
+
+        // เล่นเสียงเปิดประตู
         if (doorOpenSfx != null)
         {
             audioSource.PlayOneShot(doorOpenSfx);
@@ -390,7 +640,7 @@ public class DoorController : MonoBehaviour
     private AudioClip CreateProceduralUnlockClip()
     {
         int sampleRate = 44100;
-        float duration = 0.8f;
+        float duration = 1.2f;
         int sampleCount = Mathf.FloorToInt(sampleRate * duration);
         float[] samples = new float[sampleCount];
 
@@ -398,11 +648,12 @@ public class DoorController : MonoBehaviour
         {
             float t = (float)i / sampleRate;
             float click = Mathf.Sin(2f * Mathf.PI * 880f * t) * Mathf.Exp(-50f * t);
-            float groan = Mathf.Sin(2f * Mathf.PI * (110f + t * 40f) * t) * Mathf.Exp(-2.5f * t) * 0.5f;
-            samples[i] = (click * 0.4f + groan * 0.35f);
+            float groan = Mathf.Sin(2f * Mathf.PI * (80f + t * 30f) * t) * Mathf.Exp(-1.8f * t) * 0.6f;
+            float rumble = (Mathf.PerlinNoise(t * 15f, 0.5f) - 0.5f) * Mathf.Exp(-1.2f * t) * 0.4f;
+            samples[i] = (click * 0.3f + groan * 0.45f + rumble * 0.35f);
         }
 
-        AudioClip clip = AudioClip.Create("ProceduralDoorUnlock", sampleCount, 1, sampleRate, false);
+        AudioClip clip = AudioClip.Create("ProceduralCastleDoorUnlock", sampleCount, 1, sampleRate, false);
         clip.SetData(samples, 0);
         return clip;
     }
@@ -419,7 +670,7 @@ public class DoorController : MonoBehaviour
         playerInTrigger = true;
         playerInRange = true;
 
-        if (autoUnlockOnContact && CheckPlayerHasKey() && !isOpen)
+        if (autoUnlockOnContact && CheckPlayerHasKey() && !isOpen && !isOpening)
         {
             TryOpenDoor();
         }
@@ -429,14 +680,20 @@ public class DoorController : MonoBehaviour
     private void OnTriggerStay(Collider other) => HandlePlayerContact(other);
     private void OnTriggerExit(Collider other)
     {
-        if (IsPlayer(other)) playerInTrigger = false;
+        if (IsPlayer(other))
+        {
+            playerInTrigger = false;
+        }
     }
 
     private void OnCollisionEnter(Collision collision) => HandlePlayerContact(collision.collider);
     private void OnCollisionStay(Collision collision) => HandlePlayerContact(collision.collider);
     private void OnCollisionExit(Collision collision)
     {
-        if (IsPlayer(collision.collider)) playerInTrigger = false;
+        if (IsPlayer(collision.collider))
+        {
+            playerInTrigger = false;
+        }
     }
 }
 

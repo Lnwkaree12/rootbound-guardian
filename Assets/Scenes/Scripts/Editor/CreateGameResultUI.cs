@@ -17,7 +17,7 @@ public static class CreateGameResultUI
     private const string GAMEOVER_PREFAB_PATH = "Assets/Prefabs/GameOver_Canvas.prefab";
 
     private const string FONT_ONELITTLE = "Assets/Image/OneLittleFont-Full SDF.asset";
-    private const string FONT_ITIM = "Assets/Fonts/Itim_SDF_Valid.asset";
+    private const string FONT_ITIM = "Assets/Fonts/Itim_Thai_SDF.asset";
 
     private const string SPRITE_MODAL_CARD = "Assets/Main Screen/UI/ModalCardBg.png";
     private const string SPRITE_KEY_BADGE = "Assets/Main Screen/UI/KeyBadgeBg.png";

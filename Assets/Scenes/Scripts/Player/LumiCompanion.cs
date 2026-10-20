@@ -81,7 +81,12 @@ public class LumiCompanion : MonoBehaviour
             animator = GetComponentInChildren<Animator>();
 
         if (dialogueCanvas != null)
+        {
             dialogueCanvas.worldCamera = Camera.main;
+            dialogueCanvas.overrideSorting = true;
+            dialogueCanvas.sortingLayerName = "UI_Dialogue";
+            dialogueCanvas.sortingOrder = 100;
+        }
 
         if (bubbleTransform != null)
             bubbleTransform.localScale = Vector3.zero;
@@ -146,8 +151,7 @@ public class LumiCompanion : MonoBehaviour
         }
         else
         {
-            // Keep idle rotation facing the camera during cutscene
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, idleFacingAngleY, 0f), Time.deltaTime * rotationSpeed);
+            // During external cutscene control, keep wings hovering smoothly at idle speed
             if (animator != null) animator.speed = idleAnimSpeed;
         }
 
