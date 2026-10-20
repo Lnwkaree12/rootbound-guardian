@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -82,6 +82,57 @@ public class MainMenuUIController : MonoBehaviour
     public GameObject resolutionArrowRight;
     public GameObject displayModeArrowLeft;
     public GameObject displayModeArrowRight;
+
+    [Header("Settings Category Tabs")]
+    public GameObject categoryTabsRow;
+    public Button audioVideoTabButton;
+    public Button controllerTabButton;
+    public TextMeshProUGUI audioVideoTabText;
+    public TextMeshProUGUI controllerTabText;
+    public UnityEngine.UI.Image audioVideoTabHighlight;
+    public UnityEngine.UI.Image controllerTabHighlight;
+    public GameObject audioVideoContent;
+    public GameObject controllerContent;
+
+    [Header("Controller Configuration UI")]
+    public Button gameplayModeButton;
+    public Button menuModeButton;
+    public UnityEngine.UI.Image gameplayModeHighlight;
+    public UnityEngine.UI.Image menuModeHighlight;
+    public TextMeshProUGUI gameplayModeText;
+    public TextMeshProUGUI menuModeText;
+
+    // Callout labels
+    public TextMeshProUGUI lbCalloutText;
+    public TextMeshProUGUI ltCalloutText;
+    public TextMeshProUGUI rbCalloutText;
+    public TextMeshProUGUI rtCalloutText;
+    public TextMeshProUGUI viewCalloutText;
+    public TextMeshProUGUI menuCalloutText;
+    public TextMeshProUGUI leftStickCalloutText;
+    public TextMeshProUGUI rightStickCalloutText;
+    public TextMeshProUGUI dpadCalloutText;
+    public TextMeshProUGUI abxyCalloutText;
+
+    // Controller Settings Controls
+    public Button vibrationButton;
+    public TextMeshProUGUI vibrationValueText;
+    public Button sensitivityMinusButton;
+    public Button sensitivityPlusButton;
+    public TextMeshProUGUI sensitivityValueText;
+    public Button buttonSwapButton;
+    public TextMeshProUGUI buttonSwapValueText;
+    public Button resetControllerDefaultsButton;
+    public Button controllerBackButton;
+    public TextMeshProUGUI controllerConnectedStatusText;
+
+    // Controller Settings Internal State
+    [HideInInspector] public int currentSettingsCategory = 0; // 0 = Audio & Display, 1 = Controller
+    [HideInInspector] public int controllerModeIndex = 0; // 0 = Game, 1 = Menu
+    private bool controllerVibration = true;
+    private float controllerSensitivity = 1.0f;
+    private bool controllerSwapAB = false;
+    private int controllerNavRowIndex = 0; // 0: SubTabs, 1: Vibration, 2: Sensitivity, 3: Swap, 4: Reset, 5: Back
 
     [Header("Exit Modal Elements")]
     public RectTransform exitModalCardRect;
@@ -499,8 +550,7 @@ public class MainMenuUIController : MonoBehaviour
         }
         else if (newState == MenuState.Settings)
         {
-            settingsIndex = 0;
-            UpdateSettingsVisuals(true);
+            SwitchSettingsCategory(currentSettingsCategory, false);
             UpdateDoorAndCameraTargets();
         }
         else if (newState == MenuState.ExitConfirm)
@@ -1013,6 +1063,30 @@ public class MainMenuUIController : MonoBehaviour
 
     private void UpdateSettingsInput()
     {
+        // Category switching with Q / E, LB / RB, or Tab
+        if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.JoystickButton4))
+        {
+            SwitchSettingsCategory(0);
+            return;
+        }
+        else if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.JoystickButton5) || Input.GetKeyDown(KeyCode.Tab))
+        {
+            SwitchSettingsCategory(1);
+            return;
+        }
+
+        if (currentSettingsCategory == 0)
+        {
+            UpdateAudioSettingsInput();
+        }
+        else
+        {
+            UpdateControllerSettingsInput();
+        }
+    }
+
+    private void UpdateAudioSettingsInput()
+    {
         // Up / Down
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
@@ -1040,7 +1114,7 @@ public class MainMenuUIController : MonoBehaviour
         }
 
         // Confirm
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
             PunchConfirmBadge();
             if (settingsIndex == 5)
@@ -1059,8 +1133,113 @@ public class MainMenuUIController : MonoBehaviour
             }
         }
 
-        // Back: ESC
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // Back: ESC or Gamepad B
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton1))
+        {
+            PunchBackBadge();
+            OnSettingsBackClicked();
+        }
+    }
+
+    private void UpdateControllerSettingsInput()
+    {
+        // 1 / 2 direct mode switch
+        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+        {
+            SetControllerMode(0);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+        {
+            SetControllerMode(1);
+        }
+
+        // Up / Down navigation among controller settings rows
+        // 0: Mode Tabs, 1: Vibration, 2: Sensitivity, 3: Swap, 4: Reset, 5: Back
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        {
+            controllerNavRowIndex = (controllerNavRowIndex - 1 + 6) % 6;
+            PlaySound(navSound);
+            UpdateControllerNavVisuals();
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        {
+            controllerNavRowIndex = (controllerNavRowIndex + 1) % 6;
+            PlaySound(navSound);
+            UpdateControllerNavVisuals();
+        }
+
+        // Left / Right adjustments
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        {
+            if (controllerNavRowIndex == 0)
+            {
+                SetControllerMode(0);
+            }
+            else if (controllerNavRowIndex == 1)
+            {
+                ToggleVibration();
+            }
+            else if (controllerNavRowIndex == 2)
+            {
+                AdjustSensitivity(-0.1f);
+            }
+            else if (controllerNavRowIndex == 3)
+            {
+                ToggleButtonSwap();
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            if (controllerNavRowIndex == 0)
+            {
+                SetControllerMode(1);
+            }
+            else if (controllerNavRowIndex == 1)
+            {
+                ToggleVibration();
+            }
+            else if (controllerNavRowIndex == 2)
+            {
+                AdjustSensitivity(+0.1f);
+            }
+            else if (controllerNavRowIndex == 3)
+            {
+                ToggleButtonSwap();
+            }
+        }
+
+        // Confirm: Enter, Space, or Gamepad A
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+        {
+            PunchConfirmBadge();
+            if (controllerNavRowIndex == 0)
+            {
+                SetControllerMode(controllerModeIndex == 0 ? 1 : 0);
+            }
+            else if (controllerNavRowIndex == 1)
+            {
+                ToggleVibration();
+            }
+            else if (controllerNavRowIndex == 2)
+            {
+                AdjustSensitivity(+0.1f);
+            }
+            else if (controllerNavRowIndex == 3)
+            {
+                ToggleButtonSwap();
+            }
+            else if (controllerNavRowIndex == 4)
+            {
+                ResetControllerDefaults();
+            }
+            else if (controllerNavRowIndex == 5)
+            {
+                OnSettingsBackClicked();
+            }
+        }
+
+        // Back: ESC or Gamepad B
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton1))
         {
             PunchBackBadge();
             OnSettingsBackClicked();
@@ -1316,6 +1495,52 @@ public class MainMenuUIController : MonoBehaviour
             AddHoverTrigger(settingsBackButton.gameObject, () => SelectSettingsItem(5));
         }
 
+        // Category Tabs
+        if (audioVideoTabButton != null)
+        {
+            audioVideoTabButton.onClick.AddListener(() => SwitchSettingsCategory(0));
+        }
+        if (controllerTabButton != null)
+        {
+            controllerTabButton.onClick.AddListener(() => SwitchSettingsCategory(1));
+        }
+
+        // Controller Mode Sub-Tabs
+        if (gameplayModeButton != null)
+        {
+            gameplayModeButton.onClick.AddListener(() => SetControllerMode(0));
+        }
+        if (menuModeButton != null)
+        {
+            menuModeButton.onClick.AddListener(() => SetControllerMode(1));
+        }
+
+        // Controller Settings Actions
+        if (vibrationButton != null)
+        {
+            vibrationButton.onClick.AddListener(ToggleVibration);
+        }
+        if (sensitivityMinusButton != null)
+        {
+            sensitivityMinusButton.onClick.AddListener(() => AdjustSensitivity(-0.1f));
+        }
+        if (sensitivityPlusButton != null)
+        {
+            sensitivityPlusButton.onClick.AddListener(() => AdjustSensitivity(+0.1f));
+        }
+        if (buttonSwapButton != null)
+        {
+            buttonSwapButton.onClick.AddListener(ToggleButtonSwap);
+        }
+        if (resetControllerDefaultsButton != null)
+        {
+            resetControllerDefaultsButton.onClick.AddListener(ResetControllerDefaults);
+        }
+        if (controllerBackButton != null)
+        {
+            controllerBackButton.onClick.AddListener(OnSettingsBackClicked);
+        }
+
         if (confirmExitButton != null)
         {
             confirmExitButton.onClick.AddListener(OnConfirmExitClicked);
@@ -1451,10 +1676,20 @@ public class MainMenuUIController : MonoBehaviour
         if (sfxVolumeSlider != null) sfxVolumeSlider.value = sfx;
 
         AudioListener.volume = master;
+
+        controllerVibration = PlayerPrefs.GetInt("Controller_Vibration", 1) == 1;
+        controllerSensitivity = PlayerPrefs.GetFloat("Controller_Sensitivity", 1.0f);
+        controllerSwapAB = PlayerPrefs.GetInt("Controller_SwapAB", 0) == 1;
+        UpdateControllerSettingsVisuals();
+        UpdateControllerCalloutsVisuals();
+        UpdateCategoryTabsVisuals();
     }
 
     private void SavePreferences()
     {
+        PlayerPrefs.SetInt("Controller_Vibration", controllerVibration ? 1 : 0);
+        PlayerPrefs.SetFloat("Controller_Sensitivity", controllerSensitivity);
+        PlayerPrefs.SetInt("Controller_SwapAB", controllerSwapAB ? 1 : 0);
         PlayerPrefs.Save();
     }
 
@@ -1524,4 +1759,225 @@ public class MainMenuUIController : MonoBehaviour
     }
 
     #endregion
+
+    #region Controller Category & Settings Implementation
+
+    public void SwitchSettingsCategory(int index, bool playSfx = true)
+    {
+        currentSettingsCategory = Mathf.Clamp(index, 0, 1);
+        if (playSfx) PlaySound(navSound);
+
+        if (audioVideoContent != null)
+        {
+            audioVideoContent.SetActive(currentSettingsCategory == 0);
+        }
+        if (controllerContent != null)
+        {
+            controllerContent.SetActive(currentSettingsCategory == 1);
+        }
+
+        UpdateCategoryTabsVisuals();
+
+        if (currentSettingsCategory == 0)
+        {
+            settingsIndex = 0;
+            UpdateSettingsVisuals(true);
+        }
+        else
+        {
+            controllerNavRowIndex = 0;
+            UpdateControllerNavVisuals();
+            UpdateControllerCalloutsVisuals();
+            UpdateControllerSettingsVisuals();
+        }
+    }
+
+    public void SetControllerMode(int modeIndex, bool playSfx = true)
+    {
+        controllerModeIndex = Mathf.Clamp(modeIndex, 0, 1);
+        if (playSfx) PlaySound(navSound);
+        UpdateControllerModeTabsVisuals();
+        UpdateControllerCalloutsVisuals();
+    }
+
+    public void ToggleVibration()
+    {
+        controllerVibration = !controllerVibration;
+        PlaySound(nudgeSound);
+        UpdateControllerSettingsVisuals();
+        SavePreferences();
+    }
+
+    public void AdjustSensitivity(float delta)
+    {
+        controllerSensitivity = Mathf.Clamp(controllerSensitivity + delta, 0.5f, 2.0f);
+        PlaySound(nudgeSound);
+        UpdateControllerSettingsVisuals();
+        SavePreferences();
+    }
+
+    public void ToggleButtonSwap()
+    {
+        controllerSwapAB = !controllerSwapAB;
+        PlaySound(nudgeSound);
+        UpdateControllerSettingsVisuals();
+        UpdateControllerCalloutsVisuals();
+        SavePreferences();
+    }
+
+    public void ResetControllerDefaults()
+    {
+        controllerVibration = true;
+        controllerSensitivity = 1.0f;
+        controllerSwapAB = false;
+        controllerModeIndex = 0;
+        PlaySound(confirmSound);
+        UpdateControllerSettingsVisuals();
+        UpdateControllerCalloutsVisuals();
+        UpdateControllerModeTabsVisuals();
+        SavePreferences();
+    }
+
+    private void UpdateCategoryTabsVisuals()
+    {
+        bool isAudio = (currentSettingsCategory == 0);
+
+        if (audioVideoTabText != null)
+        {
+            audioVideoTabText.color = isAudio ? Color.white : new Color(0.7f, 0.75f, 0.85f, 0.65f);
+        }
+        if (audioVideoTabHighlight != null)
+        {
+            audioVideoTabHighlight.gameObject.SetActive(isAudio);
+        }
+
+        if (controllerTabText != null)
+        {
+            controllerTabText.color = !isAudio ? Color.white : new Color(0.7f, 0.75f, 0.85f, 0.65f);
+        }
+        if (controllerTabHighlight != null)
+        {
+            controllerTabHighlight.gameObject.SetActive(!isAudio);
+        }
+    }
+
+    private void UpdateControllerModeTabsVisuals()
+    {
+        bool isGame = (controllerModeIndex == 0);
+
+        if (gameplayModeText != null)
+        {
+            gameplayModeText.color = isGame ? Color.white : new Color(0.7f, 0.75f, 0.85f, 0.65f);
+        }
+        if (gameplayModeHighlight != null)
+        {
+            gameplayModeHighlight.gameObject.SetActive(isGame);
+        }
+
+        if (menuModeText != null)
+        {
+            menuModeText.color = !isGame ? Color.white : new Color(0.7f, 0.75f, 0.85f, 0.65f);
+        }
+        if (menuModeHighlight != null)
+        {
+            menuModeHighlight.gameObject.SetActive(!isGame);
+        }
+    }
+
+    private void UpdateControllerSettingsVisuals()
+    {
+        if (vibrationValueText != null)
+        {
+            vibrationValueText.text = controllerVibration ? "<color=#58D68D>เปิด (ON)</color>" : "<color=#E74C3C>ปิด (OFF)</color>";
+        }
+
+        if (sensitivityValueText != null)
+        {
+            int percent = Mathf.RoundToInt(controllerSensitivity * 100f);
+            sensitivityValueText.text = $"{percent}%";
+        }
+
+        if (buttonSwapValueText != null)
+        {
+            buttonSwapValueText.text = controllerSwapAB 
+                ? "<color=#58D68D>B</color> ตกลง / <color=#E74C3C>A</color> ย้อนกลับ" 
+                : "<color=#58D68D>A</color> ตกลง / <color=#E74C3C>B</color> ย้อนกลับ";
+        }
+
+        if (controllerConnectedStatusText != null)
+        {
+            string[] joysticks = Input.GetJoystickNames();
+            bool connected = joysticks != null && joysticks.Length > 0 && !string.IsNullOrEmpty(joysticks[0]);
+            string joyName = connected ? joysticks[0] : "XBOX WIRELESS CONTROLLER";
+            controllerConnectedStatusText.text = $"🎮 จอยที่เชื่อมต่อ: <color=#58A6FF>{joyName.ToUpper()}</color> (พร้อมใช้งาน)";
+        }
+    }
+
+    private void UpdateControllerCalloutsVisuals()
+    {
+        if (controllerModeIndex == 0) // GAMEPLAY MODE
+        {
+            if (lbCalloutText != null) lbCalloutText.text = "<b><color=#58A6FF>LB</color></b>  ก่อนหน้า / สลับไอเทม";
+            if (ltCalloutText != null) ltCalloutText.text = "<b><color=#58A6FF>LT</color></b>  เล็ง / วิ่งเร็ว / ป้องกัน";
+            if (rbCalloutText != null) rbCalloutText.text = "<b><color=#58A6FF>RB</color></b>  ถัดไป / แดชหลบหลีก";
+            if (rtCalloutText != null) rtCalloutText.text = "<b><color=#58A6FF>RT</color></b>  โจมตีหลัก / ท่าพิเศษ";
+            if (viewCalloutText != null) viewCalloutText.text = "<b><color=#F1C40F>VIEW</color></b>  ภารกิจ & ข้อมูล";
+            if (menuCalloutText != null) menuCalloutText.text = "<b><color=#F1C40F>MENU</color></b>  หยุดชั่วคราว";
+
+            if (leftStickCalloutText != null)
+            {
+                leftStickCalloutText.text = "<b>LEFT JOYSTICK</b>\n<color=#E0E6ED>โยก: เดิน / เคลื่อนที่\nกด L3: วิ่งสปรินต์</color>";
+            }
+            if (rightStickCalloutText != null)
+            {
+                rightStickCalloutText.text = "<b>RIGHT JOYSTICK</b>\n<color=#E0E6ED>โยก: หมุนมุมกล้องรอบตัว\nกด R3: รีเซ็ตมุมมอง / ล็อกเป้า</color>";
+            }
+            if (dpadCalloutText != null)
+            {
+                dpadCalloutText.text = "<b>DIRECTIONAL PAD</b>\n<color=#E0E6ED>[Up] ช่อง 1  [Down] ช่อง 2\n[Left] ก่อนหน้า  [Right] ถัดไป</color>";
+            }
+            if (abxyCalloutText != null)
+            {
+                string aDesc = controllerSwapAB ? "<color=#E74C3C>(B)</color> กลิ้งตัว / ยกเลิก (Roll)" : "<color=#58D68D>(A)</color> กระโดด / ตรวจสอบ (Jump)";
+                string bDesc = controllerSwapAB ? "<color=#58D68D>(A)</color> กระโดด / ตรวจสอบ (Jump)" : "<color=#E74C3C>(B)</color> กลิ้งตัว / ยกเลิก (Roll)";
+                abxyCalloutText.text = "<b>A, B, X, Y</b>\n<color=#E0E6ED>" + aDesc + "\n" + bDesc + "\n<color=#58A6FF>(X)</color> โจมตีเบา (Attack)\n<color=#F1C40F>(Y)</color> โต้ตอบ / สกิล (Interact)</color>";
+            }
+        }
+        else // MENU MODE
+        {
+            if (lbCalloutText != null) lbCalloutText.text = "<b><color=#58A6FF>LB</color></b>  แท็บก่อนหน้า (Prev Tab)";
+            if (ltCalloutText != null) ltCalloutText.text = "<b><color=#58A6FF>LT</color></b>  เลื่อนหน้าขึ้น (Page Up)";
+            if (rbCalloutText != null) rbCalloutText.text = "<b><color=#58A6FF>RB</color></b>  แท็บถัดไป (Next Tab)";
+            if (rtCalloutText != null) rtCalloutText.text = "<b><color=#58A6FF>RT</color></b>  เลื่อนหน้าลง (Page Down)";
+            if (viewCalloutText != null) viewCalloutText.text = "<b><color=#F1C40F>VIEW</color></b>  ข้อมูลเพิ่มเติม (Info)";
+            if (menuCalloutText != null) menuCalloutText.text = "<b><color=#F1C40F>MENU</color></b>  ปิดเมนู / ดำเนินการต่อ";
+
+            if (leftStickCalloutText != null)
+            {
+                leftStickCalloutText.text = "<b>LEFT JOYSTICK</b>\n<color=#E0E6ED>โยก: เลื่อนเลือกหัวข้อเมนู\nกด L3: คำสั่งด่วน</color>";
+            }
+            if (rightStickCalloutText != null)
+            {
+                rightStickCalloutText.text = "<b>RIGHT JOYSTICK</b>\n<color=#E0E6ED>โยก: เลื่อนหน้าต่าง / ซูม\nกด R3: รีเซ็ตตำแหน่ง</color>";
+            }
+            if (dpadCalloutText != null)
+            {
+                dpadCalloutText.text = "<b>DIRECTIONAL PAD</b>\n<color=#E0E6ED>[Up] เลื่อนขึ้น  [Down] เลื่อนลง\n[Left] ปรับลด  [Right] ปรับเพิ่ม</color>";
+            }
+            if (abxyCalloutText != null)
+            {
+                string aDesc = controllerSwapAB ? "<color=#E74C3C>(B)</color> ย้อนกลับ / ปิด (Back)" : "<color=#58D68D>(A)</color> ตกลง / เลือก (Select)";
+                string bDesc = controllerSwapAB ? "<color=#58D68D>(A)</color> ตกลง / เลือก (Select)" : "<color=#E74C3C>(B)</color> ย้อนกลับ / ปิด (Back)";
+                abxyCalloutText.text = "<b>A, B, X, Y</b>\n<color=#E0E6ED>" + aDesc + "\n" + bDesc + "\n<color=#58A6FF>(X)</color> คืนค่าเดิม (Reset)\n<color=#F1C40F>(Y)</color> สลับหมวด (Toggle)</color>";
+            }
+        }
+    }
+
+    private void UpdateControllerNavVisuals()
+    {
+        // Highlight active setting in controller panel if needed
+    }
+
+    #endregion
+
 }
