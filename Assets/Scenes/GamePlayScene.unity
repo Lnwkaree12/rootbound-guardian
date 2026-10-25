@@ -23099,7 +23099,7 @@ PrefabInstance:
     - target: {fileID: 3722935143760919988, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: onHealthChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1966376712}
+      objectReference: {fileID: 0}
     - target: {fileID: 3722935143760919988, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: onHealthChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: UpdateHealthBar
@@ -23211,7 +23211,7 @@ PrefabInstance:
     - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: onOxygenChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1966376711}
+      objectReference: {fileID: 0}
     - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: onOxygenChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: UpdateHealthBar
@@ -96764,6 +96764,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUD Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 3100008914979723110, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3100008914979723110, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3639487126567039207, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3639487126567039207, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3888914289347528116, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3888914289347528116, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6029432730693973508, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -96860,6 +96884,14 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9065465392824067815, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9065465392824067815, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 7591535971265182904, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
@@ -96867,28 +96899,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
---- !u!114 &1966376711 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8737835370384556503, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
-  m_PrefabInstance: {fileID: 1966376710}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 662b532d5bc4d5e4aae5362a101736b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HealthBarUI
---- !u!114 &1966376712 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1375217368577326380, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
-  m_PrefabInstance: {fileID: 1966376710}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 662b532d5bc4d5e4aae5362a101736b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HealthBarUI
 --- !u!1 &1967294923
 GameObject:
   m_ObjectHideFlags: 0
@@ -113531,6 +113541,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 67586386}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &8417211978670514289
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5588954725162878814, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5588954725162878814, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5588954725162878814, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5588954725162878814, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5588954725162878814, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5588954725162878814, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5588954725162878814, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5588954725162878814, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5588954725162878814, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5588954725162878814, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7893787889916895165, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
+      propertyPath: m_Name
+      value: GameObject (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 93610e7dae042fd4dad0196ae953bbbd, type: 3}
 --- !u!23 &8445712577976899876
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -114093,6 +114160,7 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 1734902067}
+  - {fileID: 8417211978670514289}
   - {fileID: 524994146}
   - {fileID: 1455445779}
   - {fileID: 7483713418631822049}
