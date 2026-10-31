@@ -175,10 +175,19 @@ public class PlayerHealth : MonoBehaviour
 
         if (CheckpointManager.Instance != null)
         {
+            // ถ้าไม่มีจุดเซฟเหลือ CheckpointManager จะสลับไปเรียก GameOver ภายในตัวทันที
             CheckpointManager.Instance.RespawnPlayer(gameObject);
-        }
 
-        ResetHealthAfterRespawn();
+            // ถ้ายังมีเซฟอยู่ ค่อยสั่งรีเซ็ตเลือดปกติ
+            if (CheckpointManager.Instance.HasValidCheckpoint())
+            {
+                ResetHealthAfterRespawn();
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerHealth] ไม่พบ CheckpointManager ในฉาก!");
+        }
     }
 
     public void Heal(int amount)
