@@ -5277,7 +5277,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4645489669308209392, guid: a033372993183b246bfde993f7040fca, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.12
+      value: -0.43
       objectReference: {fileID: 0}
     - target: {fileID: 4645489669308209392, guid: a033372993183b246bfde993f7040fca, type: 3}
       propertyPath: m_LocalRotation.w
@@ -21284,7 +21284,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4645489669308209392, guid: a033372993183b246bfde993f7040fca, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4.24
+      value: -3.77
       objectReference: {fileID: 0}
     - target: {fileID: 4645489669308209392, guid: a033372993183b246bfde993f7040fca, type: 3}
       propertyPath: m_LocalRotation.w
@@ -28120,7 +28120,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4645489669308209392, guid: a033372993183b246bfde993f7040fca, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2
+      value: 2.47
       objectReference: {fileID: 0}
     - target: {fileID: 4645489669308209392, guid: a033372993183b246bfde993f7040fca, type: 3}
       propertyPath: m_LocalRotation.w
@@ -28153,6 +28153,10 @@ PrefabInstance:
     - target: {fileID: 5418895303101940298, guid: a033372993183b246bfde993f7040fca, type: 3}
       propertyPath: m_Name
       value: Thorn Trap (76)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8655946939725144789, guid: a033372993183b246bfde993f7040fca, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.152
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

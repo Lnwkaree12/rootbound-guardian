@@ -276,6 +276,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 87c8e29aae66e3340be409dc4a550580, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 341fc55f33f923f469c38ce86f7c4c4e, type: 2}
     - target: {fileID: 919132149155446097, guid: 87c8e29aae66e3340be409dc4a550580, type: 3}
       propertyPath: m_Name
       value: crushed stone
