@@ -276,7 +276,7 @@ public class DoorController : MonoBehaviour
 
             // Handle Interaction Input: KeyCode.E (or F as backup if configured)
             bool interactPressed = Input.GetKeyDown(interactKey) || (allowKeyFBackup && Input.GetKeyDown(KeyCode.F));
-            if (interactPressed)
+            if (playerInTrigger && interactPressed)
             {
                 TryOpenDoor();
             }

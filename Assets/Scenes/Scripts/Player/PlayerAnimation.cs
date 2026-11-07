@@ -4,7 +4,8 @@ public class PlayerAnimation : MonoBehaviour
 {
     private Animator animator;
     private PlayerInputHandler inputHandler;
-    private SpriteRenderer spriteRenderer; // ใช้กรณีเกม 2D Sprite
+    private SpriteRenderer spriteRenderer;
+    private PlayerOxygen playerOxygen; // 🫧 อ้างอิงระบบออกซิเจน
 
     // Animator Parameter Hashes
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
@@ -12,105 +13,122 @@ public class PlayerAnimation : MonoBehaviour
     private static readonly int InjuredHash = Animator.StringToHash("Injured");
     private static readonly int DeadHash = Animator.StringToHash("Dead");
     private static readonly int PickupHash = Animator.StringToHash("Pickup");
+    private static readonly int IsClimbingHash = Animator.StringToHash("IsClimbing"); // 🪜 บันทึก Hash ท่าปีน
+    private static readonly int OxygenTierHash = Animator.StringToHash("OxygenTier"); // 🫧 บันทึก Hash Oxygen Tier
+    private static readonly int ClimbSpeedHash = Animator.StringToHash("ClimbSpeed"); // 🪜 บันทึก Hash ความเร็วปีน
 
     [Header("Facing Direction Settings")]
-    [SerializeField] private bool is3DModel = false; // เลือก True หากใช้ 3D Model, False หากใช้ 2D Sprite
+    [SerializeField] private bool is3DModel = false;
 
     private void Awake()
     {
         animator = GetComponentInChildren<Animator>();
         inputHandler = GetComponent<PlayerInputHandler>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        playerOxygen = GetComponent<PlayerOxygen>();
     }
 
     private void Update()
     {
         if (animator == null || inputHandler == null) return;
 
-        // อ่านค่าการเคลื่อนที่เฉพาะความเร็ว (Speed) เพื่อสลับระหว่าง Idle กับ Run
+        // 1. อัปเดตความเร็วเดิน/วิ่ง
         float speed = inputHandler.MoveInput.sqrMagnitude;
         animator.SetFloat(SpeedHash, speed);
 
-        // 🔄 ระบบหันหน้าตามทิศทางวิ่ง
+        // 2. อัปเดตระดับ OxygenTier ส่งเข้า Animator (0 = ปกติ, 1 = เหนื่อย, 2 = วิกฤต) เป็น Float
+        UpdateOxygenTier();
+
+        // 3. ระบบหันหน้าตามทิศทางวิ่ง
         HandleFacingDirection(inputHandler.MoveInput.x);
+    }
+
+    private void UpdateOxygenTier()
+    {
+        if (playerOxygen == null || animator == null) return;
+
+        float oxygenPercent = (float)playerOxygen.CurrentOxygen / playerOxygen.MaxOxygen;
+        float tier = 0f;
+
+        if (oxygenPercent > 0.5f) tier = 0f;
+        else if (oxygenPercent > 0.25f) tier = 1f;
+        else tier = 2f;
+
+        // ใช้ SetFloat ให้ตรงกับ Blend Tree ที่ตั้งไว้
+        animator.SetFloat(OxygenTierHash, tier);
+    }
+
+    // 🪜 สั่งเล่น/หยุด ท่าปีนบันได
+    public void SetClimbing(bool isClimbing)
+    {
+        if (animator != null)
+        {
+            animator.SetBool(IsClimbingHash, isClimbing);
+        }
+    }
+
+    // 🪜 ส่งค่าความเร็วไปที่ Parameter "ClimbSpeed" ใน Animator (คุมท่าหยุดนิ่ง / ขยับปีน)
+    public void SetClimbSpeed(float speed)
+    {
+        if (animator != null)
+        {
+            animator.SetFloat(ClimbSpeedHash, speed);
+        }
     }
 
     private void HandleFacingDirection(float moveX)
     {
-        if (Mathf.Abs(moveX) < 0.01f) return; // ไม่กดเดิน ให้ทิศเดิมไว้
+        if (Mathf.Abs(moveX) < 0.01f) return;
 
         if (is3DModel)
         {
-            // สำหรับ 3D Model: การหมุน Y-Axis (180 องศา หรือ 0 องศา)
             float targetAngle = moveX < 0 ? 180f : 0f;
             transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
         }
         else if (spriteRenderer != null)
         {
-            // สำหรับ 2D Sprite: ใช้ flipX ของ SpriteRenderer
             spriteRenderer.flipX = moveX < 0;
         }
         else
         {
-            // หรือพลิก Scale X ในระดับ Transform
             Vector3 scale = transform.localScale;
             scale.x = moveX < 0 ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
             transform.localScale = scale;
         }
     }
 
-    // 💨 แดช
     public void TriggerDash()
     {
-        if (animator != null)
-        {
-            animator.SetTrigger(DashHash);
-        }
+        if (animator != null) animator.SetTrigger(DashHash);
     }
 
-    // 💥 โดนดาเมจ
     public void TriggerInjured()
     {
-        if (animator != null)
-        {
-            animator.SetTrigger(InjuredHash);
-        }
+        if (animator != null) animator.SetTrigger(InjuredHash);
     }
 
-    // 💀 ตาย
     public void TriggerDeath()
     {
-        if (animator != null)
-        {
-            animator.SetTrigger(DeadHash);
-        }
+        if (animator != null) animator.SetTrigger(DeadHash);
     }
 
-    // 📦 เก็บของ
     public void PlayPickUpAnimation()
     {
-        if (animator != null)
-        {
-            animator.SetTrigger(PickupHash);
-        }
+        if (animator != null) animator.SetTrigger(PickupHash);
     }
 
-    // ⏱️ คำนวณความยาวคลิป Animation ตายเพื่อส่งกลับไปให้ PlayerHealth
     public float GetDeadAnimationLength()
     {
         if (animator == null) return 0f;
 
-        // ดึงคลิป animation ที่เปิดใช้งานทั้งหมดใน AnimatorController
         AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
         foreach (AnimationClip clip in clips)
         {
-            // ตรวจสอบชื่อ Clip ให้ตรงกับชื่อใน Animator (เช่น "Dead", "Die", หรือ "Player_Dead")
             if (clip.name.ToLower().Contains("dead") || clip.name.ToLower().Contains("die"))
             {
                 return clip.length;
             }
         }
-
-        return 1f; // ค่า Default สำรองกรณีหาชื่อคลิปไม่เจอ
+        return 1f;
     }
 }
