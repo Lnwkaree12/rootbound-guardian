@@ -47,12 +47,22 @@ public class OxygenSlowZone : MonoBehaviour
 
     private void ApplySlowDrain(Collider other)
     {
+        // เช็คว่า parentTree มีตัวตนและ "ต้องถูกฟื้นฟูอยู่เท่านั้น" ถึงจะสโลว์
         if (parentTree != null && parentTree.IsRestored)
         {
             PlayerOxygen oxygen = GetPlayerOxygen(other);
             if (oxygen != null && !oxygen.IsInSafeZone)
             {
                 oxygen.SetOxygenSlowDrain(true);
+            }
+        }
+        else
+        {
+            // ถ้าต้นไม้ยังไม่ฟื้นฟูหรือพังไปแล้ว ให้บังคับปิด Slow ทันทีแม้จะยืนอยู่ในโซน
+            PlayerOxygen oxygen = GetPlayerOxygen(other);
+            if (oxygen != null)
+            {
+                oxygen.SetOxygenSlowDrain(false);
             }
         }
     }

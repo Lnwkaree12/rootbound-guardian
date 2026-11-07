@@ -62,9 +62,11 @@ public class DoorController : MonoBehaviour
     private Quaternion openRightRot;
 
     private bool isDoubleDoor = false;
-    private bool playerInRange = false;
-    private bool playerInTrigger = false;
+
+    [SerializeField] private bool playerInTrigger = false;
+
     private PlayerMovement cachedPlayer;
+    private readonly HashSet<Collider> playerCollidersInTrigger = new HashSet<Collider>();
     private Coroutine flashCoroutine;
     private Vector3 promptBaseLocalPos;
 
@@ -74,13 +76,11 @@ public class DoorController : MonoBehaviour
     {
         InitializeDoors();
         InitializeAudio();
-        cachedPlayer = FindObjectOfType<PlayerMovement>();
         SetupFloatingPrompt();
     }
 
     private void InitializeDoors()
     {
-        // Auto-detect double doors if not assigned
         if (leftDoorLeaf == null) leftDoorLeaf = transform.Find("Door_Leaf_Left");
         if (rightDoorLeaf == null) rightDoorLeaf = transform.Find("Door_Leaf_Right");
 
@@ -90,7 +90,6 @@ public class DoorController : MonoBehaviour
             closedLeftRot = leftDoorLeaf.localRotation;
             closedRightRot = rightDoorLeaf.localRotation;
 
-            // In local space of castle_door: Left opens inward (+Y rot), Right opens inward (-Y rot)
             openLeftRot = Quaternion.Euler(0f, doubleDoorOpenAngle, 0f) * closedLeftRot;
             openRightRot = Quaternion.Euler(0f, -doubleDoorOpenAngle, 0f) * closedRightRot;
 
@@ -98,7 +97,6 @@ public class DoorController : MonoBehaviour
             EnsureDoorLeafForwarder(rightDoorLeaf);
         }
 
-        // Single door fallback
         if (doorPanel == null)
         {
             doorPanel = transform.Find("DoorPanel");
@@ -117,7 +115,6 @@ public class DoorController : MonoBehaviour
             forwarder.parentDoor = this;
         }
 
-        // Auto-find barrier collider if attached
         if (barrierCollider == null)
         {
             Collider[] cols = GetComponents<Collider>();
@@ -126,6 +123,19 @@ public class DoorController : MonoBehaviour
                 if (!c.isTrigger)
                 {
                     barrierCollider = c;
+                    break;
+                }
+            }
+        }
+
+        if (interactionTrigger == null)
+        {
+            Collider[] cols = GetComponents<Collider>();
+            foreach (var c in cols)
+            {
+                if (c.isTrigger)
+                {
+                    interactionTrigger = c;
                     break;
                 }
             }
@@ -169,7 +179,6 @@ public class DoorController : MonoBehaviour
             return;
         }
 
-        // Determine prompt position based on door setup
         Vector3 spawnLocalPos = new Vector3(-0.6f, 1.4f, 0f);
         if (!isDoubleDoor)
         {
@@ -189,7 +198,6 @@ public class DoorController : MonoBehaviour
         canvasRect.sizeDelta = new Vector2(460f, 90f);
         promptCanvasGO.transform.localScale = new Vector3(0.0075f, 0.0075f, 0.0075f);
 
-        // Background pill
         GameObject bgGO = new GameObject("Background");
         bgGO.transform.SetParent(promptCanvasGO.transform, false);
         promptBgImage = bgGO.AddComponent<Image>();
@@ -210,7 +218,6 @@ public class DoorController : MonoBehaviour
         bgRect.anchorMax = Vector2.one;
         bgRect.sizeDelta = Vector2.zero;
 
-        // Key [E] Icon
         GameObject iconGO = new GameObject("KeyIcon");
         iconGO.transform.SetParent(bgGO.transform, false);
         promptKeyIcon = iconGO.AddComponent<Image>();
@@ -229,7 +236,6 @@ public class DoorController : MonoBehaviour
         iconRect.anchoredPosition = new Vector3(48f, 0f, 0f);
         iconRect.sizeDelta = new Vector2(64f, 64f);
 
-        // Text (TMP)
         GameObject textGO = new GameObject("TextTMP");
         textGO.transform.SetParent(bgGO.transform, false);
         promptTextTMP = textGO.AddComponent<TextMeshProUGUI>();
@@ -267,16 +273,14 @@ public class DoorController : MonoBehaviour
             return;
         }
 
-        CheckProximityToPlayer();
-
-        if (playerInRange)
+        // เช็คจาก Trigger อย่างเดียวเท่านั้น
+        if (playerInTrigger)
         {
             bool hasKey = CheckPlayerHasKey();
             UpdatePromptDisplay(hasKey);
 
-            // Handle Interaction Input: KeyCode.E (or F as backup if configured)
             bool interactPressed = Input.GetKeyDown(interactKey) || (allowKeyFBackup && Input.GetKeyDown(KeyCode.F));
-            if (playerInTrigger && interactPressed)
+            if (interactPressed)
             {
                 TryOpenDoor();
             }
@@ -295,11 +299,10 @@ public class DoorController : MonoBehaviour
         if (promptObject == null) return;
         if (!promptObject.activeSelf) promptObject.SetActive(true);
 
-        // Floating hover animation
         float hover = Mathf.Sin(Time.time * 3.5f) * 0.05f;
         promptObject.transform.localPosition = promptBaseLocalPos + new Vector3(0f, hover, 0f);
 
-        if (flashCoroutine != null) return; // Keep flash state active if currently flashing
+        if (flashCoroutine != null) return;
 
         if (promptTextTMP != null)
         {
@@ -323,78 +326,20 @@ public class DoorController : MonoBehaviour
         }
     }
 
-    private void CheckProximityToPlayer()
-    {
-        if (cachedPlayer == null)
-        {
-            cachedPlayer = FindObjectOfType<PlayerMovement>();
-            if (cachedPlayer == null) return;
-        }
-
-        float dist = Vector3.Distance(transform.position, cachedPlayer.transform.position);
-        float maxScale = Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z, 1f);
-        float effectiveRadius = Mathf.Max(interactRadius, 3.0f * maxScale);
-
-        if (dist <= effectiveRadius)
-        {
-            playerInRange = true;
-            float touchRadius = Mathf.Max(2.5f * maxScale, 4.0f);
-            if (autoUnlockOnContact && dist <= touchRadius && CheckPlayerHasKey() && !isOpen && !isOpening)
-            {
-                TryOpenDoor();
-            }
-        }
-        else if (!playerInTrigger)
-        {
-            playerInRange = false;
-        }
-    }
-
-    void LateUpdate()
-    {
-        if (promptObject != null && promptObject.activeSelf)
-        {
-            Camera cam = Camera.main;
-            if (cam == null && cachedPlayer != null)
-            {
-                cam = cachedPlayer.GetComponentInChildren<Camera>(false);
-            }
-
-            if (cam != null)
-            {
-                promptObject.transform.rotation = cam.transform.rotation;
-            }
-        }
-    }
-
-    // ========================================================================
-    // 🔑 การตรวจสอบและจัดการกุญแจ
-    // ========================================================================
-
     private Inventory GetPlayerInventory()
     {
-        if (cachedPlayer == null)
-        {
-            cachedPlayer = FindObjectOfType<PlayerMovement>();
-        }
-
-        if (cachedPlayer != null)
-        {
-            return cachedPlayer.GetComponent<Inventory>();
-        }
-
-        return FindObjectOfType<Inventory>();
+        return cachedPlayer != null ? cachedPlayer.GetComponent<Inventory>() : null;
     }
 
     public bool CheckPlayerHasKey()
     {
-        // 1. ตรวจสอบผ่าน QuestManager
+        if (!playerInTrigger || cachedPlayer == null) return false;
+
         if (QuestManager.Instance != null && QuestManager.Instance.hasKey)
         {
             return true;
         }
 
-        // 2. ตรวจสอบผ่าน Player Inventory
         Inventory inventory = GetPlayerInventory();
         if (inventory != null)
         {
@@ -421,7 +366,6 @@ public class DoorController : MonoBehaviour
     {
         if (!consumeKeyOnUse) return;
 
-        // แจ้งเตือน QuestManager
         if (QuestManager.Instance != null)
         {
             QuestManager.Instance.UseKeyOnDoor();
@@ -445,13 +389,9 @@ public class DoorController : MonoBehaviour
         }
     }
 
-    // ========================================================================
-    // 🚪 การเปิดประตู & แอนิเมชัน
-    // ========================================================================
-
     public void TryOpenDoor()
     {
-        if (isOpen || isOpening) return;
+        if (isOpen || isOpening || !playerInTrigger || cachedPlayer == null) return;
 
         if (CheckPlayerHasKey())
         {
@@ -472,38 +412,30 @@ public class DoorController : MonoBehaviour
 
         if (promptObject != null) promptObject.SetActive(false);
 
-        // ปลดล็อค Barrier Collider เพื่อให้ผู้เล่นเดินผ่านได้
         if (barrierCollider != null)
         {
             barrierCollider.enabled = false;
         }
 
-        // ปรับ Colliders ทั้งหมดให้เป็น trigger
         Collider[] colliders = GetComponentsInChildren<Collider>();
         foreach (Collider c in colliders)
         {
             c.isTrigger = true;
         }
 
-        // ลบกุญแจออกจากกระเป๋า
         ConsumeKeyFromInventory();
-
-        // เล่นเสียงเปิดประตู
         PlayDoorOpenAudio();
 
-        // ล็อคความเร็วผู้เล่นเล็กน้อยเพื่อให้มองเห็นประตูเปิดอย่างสง่างาม
         if (cachedPlayer != null)
         {
             cachedPlayer.Move(Vector2.zero);
         }
 
-        // หากมีการตั้งค่า TriggerWin ให้เรียก WinUIManager หลังแอนิเมชันเปิดประตูเริ่ม
         if (triggerWinOnOpen)
         {
             StartCoroutine(TriggerWinDelayed(winUIDelay));
         }
 
-        // Animate door opening smoothly
         float elapsed = 0f;
         while (elapsed < openDuration)
         {
@@ -529,7 +461,6 @@ public class DoorController : MonoBehaviour
             yield return null;
         }
 
-        // Finalize state
         if (isDoubleDoor)
         {
             if (leftDoorLeaf != null) leftDoorLeaf.localRotation = openLeftRot;
@@ -616,13 +547,11 @@ public class DoorController : MonoBehaviour
     {
         if (audioSource == null) return;
 
-        // เล่นเสียงไขกุญแจ
         if (keyUnlockSfx != null)
         {
             audioSource.PlayOneShot(keyUnlockSfx);
         }
 
-        // เล่นเสียงเปิดประตู
         if (doorOpenSfx != null)
         {
             audioSource.PlayOneShot(doorOpenSfx);
@@ -658,17 +587,16 @@ public class DoorController : MonoBehaviour
         return clip;
     }
 
-    public bool IsPlayer(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        return PlayerTriggerUtility.IsPlayer(other);
-    }
+        if (other == null) return;
 
-    public void HandlePlayerContact(Collider other)
-    {
-        if (!IsPlayer(other)) return;
+        PlayerMovement player = other.GetComponentInParent<PlayerMovement>();
+        if (player == null || (cachedPlayer != null && cachedPlayer != player)) return;
 
-        playerInTrigger = true;
-        playerInRange = true;
+        cachedPlayer = player;
+        playerCollidersInTrigger.Add(other);
+        playerInTrigger = playerCollidersInTrigger.Count > 0;
 
         if (autoUnlockOnContact && CheckPlayerHasKey() && !isOpen && !isOpening)
         {
@@ -676,43 +604,36 @@ public class DoorController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other) => HandlePlayerContact(other);
-    private void OnTriggerStay(Collider other) => HandlePlayerContact(other);
     private void OnTriggerExit(Collider other)
     {
-        if (IsPlayer(other))
+        if (!playerCollidersInTrigger.Remove(other)) return;
+
+        playerInTrigger = playerCollidersInTrigger.Count > 0;
+        if (playerInTrigger) return;
+
+        cachedPlayer = null;
+        if (promptObject != null && promptObject.activeSelf)
         {
-            playerInTrigger = false;
+            promptObject.SetActive(false);
         }
     }
 
-    private void OnCollisionEnter(Collision collision) => HandlePlayerContact(collision.collider);
-    private void OnCollisionStay(Collision collision) => HandlePlayerContact(collision.collider);
-    private void OnCollisionExit(Collision collision)
+    private void OnDisable()
     {
-        if (IsPlayer(collision.collider))
-        {
-            playerInTrigger = false;
-        }
+        playerCollidersInTrigger.Clear();
+        cachedPlayer = null;
+        playerInTrigger = false;
     }
+
+    private void OnCollisionEnter(Collision collision) { }
+    private void OnCollisionExit(Collision collision) { }
 }
 
 public class DoorPanelCollisionForwarder : MonoBehaviour
 {
     public DoorController parentDoor;
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (parentDoor != null) parentDoor.HandlePlayerContact(collision.collider);
-    }
+    private void OnCollisionEnter(Collision collision) { }
+    private void OnCollisionStay(Collision collision) { }
 
-    private void OnCollisionStay(Collision collision)
-    {
-        if (parentDoor != null) parentDoor.HandlePlayerContact(collision.collider);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (parentDoor != null) parentDoor.HandlePlayerContact(other);
-    }
 }

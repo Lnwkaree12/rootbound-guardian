@@ -10,10 +10,7 @@ public class CheckpointManager : MonoBehaviour
     private bool hasCheckpoint = false;
     private bool lastCheckpointHealsOxygen = true;
 
-    // ��ª�������������㹻Ѩ�غѹ
     private HashSet<string> currentPickedItemIDs = new HashSet<string>();
-
-    // ��ª����������١�ѹ�֡��� � �ش૿����ش
     private HashSet<string> savedPickedItemIDs = new HashSet<string>();
 
     private void Awake()
@@ -29,7 +26,6 @@ public class CheckpointManager : MonoBehaviour
         }
     }
 
-    // ���¡����ͼ�����������
     public void MarkItemAsPicked(string itemID)
     {
         if (!currentPickedItemIDs.Contains(itemID))
@@ -38,7 +34,6 @@ public class CheckpointManager : MonoBehaviour
         }
     }
 
-    // ���¡����ͼ����蹡�૿�������
     public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp = null, Inventory inventoryComp = null)
     {
         SaveCheckpoint(checkpointPos, healthComp, inventoryComp, true);
@@ -50,29 +45,45 @@ public class CheckpointManager : MonoBehaviour
         hasCheckpoint = true;
         lastCheckpointHealsOxygen = healsOxygen;
 
-        // 1. �ѹ�֡�����ż����� (����� Component ��)
         if (healthComp != null || inventoryComp != null)
         {
             currentSaveData = new PlayerDataSave
             {
-                // ૿������ʹ�Ѩ�غѹ᷹ MaxHealth
                 savedHealth = healthComp != null ? healthComp.CurrentHealth : 100,
                 savedItems = inventoryComp != null ? new List<ItemData>(inventoryComp.GetItems()) : new List<ItemData>()
             };
         }
 
-        // 2. ��͡��ª����������١�� � �Թҷշ��૿
         savedPickedItemIDs = new HashSet<string>(currentPickedItemIDs);
-
-        Debug.Log($"[CheckpointManager] �ѹ�֡�ش૿����稷����˹�: {checkpointPos}");
+        Debug.Log($"[CheckpointManager] บันทึกจุดเซฟใหม่ที่ตำแหน่ง: {checkpointPos}");
     }
 
-    // ���¡����ͼ����蹵�� (Respawn)
+    // ลบจุดเซฟทิ้งถ้าตำแหน่งตรงกับต้นไม้ที่เลือดหมด
+    public void InvalidateCheckpointIfMatch(Vector3 treePos)
+    {
+        if (hasCheckpoint && Vector3.Distance(lastCheckpointPosition, treePos) < 3f)
+        {
+            hasCheckpoint = false;
+            currentSaveData = null;
+            Debug.Log("[CheckpointManager] ⚠️ จุดเซฟปัจจุบันถูกทำลายเพราะต้นไม้หมดอายุ! ลบเซฟทิ้งแล้ว");
+        }
+    }
+
+    public bool HasValidCheckpoint()
+    {
+        return hasCheckpoint;
+    }
+
     public void RespawnPlayer(GameObject player)
     {
-        if (!hasCheckpoint) return;
+        // ตรวจสอบว่ามีจุดเซฟที่ใช้งานได้อยู่หรือไม่ หากไม่มี -> สั่ง Game Over ทันที
+        if (!hasCheckpoint)
+        {
+            Debug.LogWarning("[CheckpointManager] ❌ ไม่มีจุดเซฟเหลืออยู่! ทำการเรียกหน้า Game Over");
+            TriggerGameOverDirectly();
+            return;
+        }
 
-        // 1. ���컵���Фá�Ѻ�ش૿
         Rigidbody rb = player.GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -86,7 +97,6 @@ public class CheckpointManager : MonoBehaviour
         }
         Physics.SyncTransforms();
 
-        // 2. �׹������ʹ��С������Թ�ҧ
         PlayerHealth health = player.GetComponent<PlayerHealth>();
         if (health != null)
         {
@@ -99,15 +109,30 @@ public class CheckpointManager : MonoBehaviour
             inventory.LoadSavedItems(currentSaveData.savedItems);
         }
 
-        // 3. Rollback ��ª����������١�纡�Ѻ���ҡѺ�͹૿����ش
         currentPickedItemIDs = new HashSet<string>(savedPickedItemIDs);
 
-        // 4. �ѻവ����㹩ҡ������
         ItemObject[] allItems = FindObjectsByType<ItemObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (ItemObject item in allItems)
         {
             bool isAlreadyPickedBeforeSave = savedPickedItemIDs.Contains(item.ItemID);
             item.ResetItemState(!isAlreadyPickedBeforeSave);
+        }
+    }
+
+    private void TriggerGameOverDirectly()
+    {
+        GameOverUIManager gameOverUI = FindObjectOfType<GameOverUIManager>();
+        if (gameOverUI != null)
+        {
+            gameOverUI.TriggerGameOver("ไม่มีจุดเซฟเหลือรอด! เกมโอเวอร์");
+        }
+        else if (GameOverUIManager.Instance != null)
+        {
+            GameOverUIManager.Instance.TriggerGameOver("ไม่มีจุดเซฟเหลือรอด! เกมโอเวอร์");
+        }
+        else
+        {
+            Debug.LogError("[CheckpointManager] ไม่พบ GameOverUIManager ในฉากเพื่อแสดงหน้าจอ Game Over");
         }
     }
 }
