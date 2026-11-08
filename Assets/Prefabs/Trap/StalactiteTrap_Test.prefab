@@ -146,7 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a71659466554f3488dd2de894059404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
-  damageAmount: 100
+  damageAmount: 20
   wallHitDelay: 0.05
   onHitPlayer:
     m_PersistentCalls:
@@ -190,7 +190,7 @@ GameObject:
   - component: {fileID: 6189945998942590194}
   - component: {fileID: 8112487915241677794}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Box Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
