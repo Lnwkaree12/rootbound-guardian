@@ -28110,6 +28110,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7565055617642483020}
     m_Modifications:
+    - target: {fileID: 2745459079285546698, guid: a033372993183b246bfde993f7040fca, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2745459079285546698, guid: a033372993183b246bfde993f7040fca, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.168
+      objectReference: {fileID: 0}
     - target: {fileID: 4645489669308209392, guid: a033372993183b246bfde993f7040fca, type: 3}
       propertyPath: m_LocalPosition.x
       value: -9.44
@@ -28150,9 +28158,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5296005402111885990, guid: a033372993183b246bfde993f7040fca, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.352
+      objectReference: {fileID: 0}
+    - target: {fileID: 5296005402111885990, guid: a033372993183b246bfde993f7040fca, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.288
+      objectReference: {fileID: 0}
     - target: {fileID: 5418895303101940298, guid: a033372993183b246bfde993f7040fca, type: 3}
       propertyPath: m_Name
       value: Thorn Trap (76)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8099524556497898967, guid: a033372993183b246bfde993f7040fca, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8655946939725144789, guid: a033372993183b246bfde993f7040fca, type: 3}
       propertyPath: m_LocalPosition.z
