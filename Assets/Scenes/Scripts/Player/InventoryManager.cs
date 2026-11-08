@@ -38,7 +38,9 @@ public class InventoryManager : MonoBehaviour
             potionSprite = Resources.Load<Sprite>("HUD_Potion");
             if (potionSprite == null)
             {
+                #if UNITY_EDITOR
                 potionSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Image/HUD_Potion.png");
+#endif
             }
         }
 
