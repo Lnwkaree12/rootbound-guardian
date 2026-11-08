@@ -96,6 +96,8 @@ MonoBehaviour:
     \u0E41\u0E15\u0E48\u0E40\u0E08\u0E49\u0E32\u0E15\u0E31\u0E27\u0E42\u0E15\u0E19\u0E30!"
   - "\u0E02\u0E49\u0E32\u0E40\u0E1B\u0E47\u0E19\u0E27\u0E34\u0E0D\u0E0D\u0E32\u0E13\u0E41\u0E2B\u0E48\u0E07\u0E41\u0E2A\u0E07\u0E17\u0E35\u0E48\u0E19\u0E48\u0E32\u0E23\u0E31\u0E01\u0E17\u0E35\u0E48\u0E2A\u0E38\u0E14\u0E43\u0E19\u0E1B\u0E48\u0E32\u0E41\u0E25\u0E49\u0E27
     \u0E22\u0E2D\u0E21\u0E23\u0E31\u0E1A\u0E21\u0E32\u0E0B\u0E30\u0E14\u0E35\u0E46!"
+  isCutsceneControlled: 0
+  disableAutoDialogue: 0
 --- !u!1 &1288682521985834727
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,8 +198,8 @@ MonoBehaviour:
   m_text: "\u0E40\u0E14\u0E34\u0E19\u0E23\u0E30\u0E27\u0E31\u0E07\u0E2B\u0E19\u0E48\u0E2D\u0E22\u0E2A\u0E34\u0E40\u0E08\u0E49\u0E32\u0E21\u0E19\u0E38\u0E29\u0E22\u0E4C!
     \u0E2E\u0E34\u0E46~"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: bb9c01bcd53eb9149b90cb16caa91b1d, type: 2}
-  m_sharedMaterial: {fileID: 8656500355659377526, guid: bb9c01bcd53eb9149b90cb16caa91b1d, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
+  m_sharedMaterial: {fileID: -8080645981602784202, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
