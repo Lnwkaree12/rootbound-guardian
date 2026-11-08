@@ -2659,6 +2659,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1005115433476632847, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
+      propertyPath: healthDecreaseRate
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5893872911601565698, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_sharedMaterial
       value: 
@@ -85171,6 +85175,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1005115433476632847, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
+      propertyPath: healthDecreaseRate
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5893872911601565698, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_sharedMaterial
       value: 
@@ -95992,6 +96000,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1005115433476632847, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
+      propertyPath: healthDecreaseRate
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5893872911601565698, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_sharedMaterial
       value: 
@@ -102826,6 +102838,10 @@ PrefabInstance:
     - target: {fileID: 177394685186260392, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005115433476632847, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
+      propertyPath: healthDecreaseRate
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5893872911601565698, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_sharedMaterial
@@ -123487,6 +123503,10 @@ PrefabInstance:
       propertyPath: healsOxygen
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1005115433476632847, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
+      propertyPath: healthDecreaseRate
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5893872911601565698, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_sharedMaterial
       value: 
@@ -124038,7 +124058,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: drainPerTick
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: globalVolume
@@ -170091,6 +170111,10 @@ PrefabInstance:
     - target: {fileID: 177394685186260392, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005115433476632847, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
+      propertyPath: healthDecreaseRate
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5893872911601565698, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_sharedMaterial
@@ -348781,6 +348805,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1005115433476632847, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
+      propertyPath: healthDecreaseRate
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5893872911601565698, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_sharedMaterial
       value: 
@@ -449384,6 +449412,10 @@ PrefabInstance:
     - target: {fileID: 177394685186260392, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005115433476632847, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
+      propertyPath: healthDecreaseRate
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5893872911601565698, guid: dea4d7520e94ce64d9ddebe5b3e42d94, type: 3}
       propertyPath: m_sharedMaterial
