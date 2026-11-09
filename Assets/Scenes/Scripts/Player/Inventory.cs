@@ -116,6 +116,23 @@ public class Inventory : MonoBehaviour
         return false;
     }
 
+    // 🌟 นับจำนวน Potion ทั้งหมดที่มีในกระเป๋า
+    public int GetPotionCount()
+    {
+        int count = 0;
+        if (items != null)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (items[i] != null && items[i].itemType == ItemType.Potion)
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     public List<ItemData> GetItems()
     {
         return items;
