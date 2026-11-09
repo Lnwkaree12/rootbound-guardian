@@ -95,7 +95,7 @@ public static class SetupLanguageSwitcherUI
                 "เพิ่มแท็บและระบบเลือกภาษาในหน้า MainScreen เรียบร้อยแล้ว!\n\n" +
                 "1. แท็บ 'ภาษา' (LANGUAGE) ในหน้า Settings (กด E / Q สลับแท็บได้)\n" +
                 "2. แผงเลือกภาษา 3 การ์ด: ภาษาไทย, English, 简体中文\n" +
-                "3. วิดเจ็ตปุ่มสลับภาษาด่วนมุมขวาบน 🌐 [ไทย][EN][中文] (กด L วนได้)\n" +
+                "3. วิดเจ็ตปุ่มสลับภาษาด่วนมุมขวาบน LANG [ไทย][EN][中文] (กด L วนได้)\n" +
                 "4. รองรับ Mouse, Keyboard (1/2/3, W/A/S/D, Enter, ESC), และ Gamepad", "OK");
         }
     }
@@ -348,19 +348,19 @@ public static class SetupLanguageSwitcherUI
         cardsRT.sizeDelta = new Vector2(1060f, 380f);
 
         // Card 1: TH
-        var thCard = CreateLanguageCard(cardsContainer.transform, -360f, "Card_TH", "🇹🇭", "ภาษาไทย", "Thai (ค่าเริ่มต้น)", font, bgSprite);
+        var thCard = CreateLanguageCard(cardsContainer.transform, -360f, "Card_TH", "TH", "ภาษาไทย", "Thai (ค่าเริ่มต้น)", font, bgSprite);
         controller.thLanguageButton = thCard.button;
         controller.thLanguageStatusText = thCard.statusText;
         controller.thCardBorder = thCard.borderImage;
 
         // Card 2: EN
-        var enCard = CreateLanguageCard(cardsContainer.transform, 0f, "Card_EN", "🇬🇧", "English", "ภาษาอังกฤษ", font, bgSprite);
+        var enCard = CreateLanguageCard(cardsContainer.transform, 0f, "Card_EN", "EN", "English", "ภาษาอังกฤษ", font, bgSprite);
         controller.enLanguageButton = enCard.button;
         controller.enLanguageStatusText = enCard.statusText;
         controller.enCardBorder = enCard.borderImage;
 
         // Card 3: ZH
-        var zhCard = CreateLanguageCard(cardsContainer.transform, 360f, "Card_ZH", "🇨🇳", "简体中文", "ภาษาจีนตัวย่อ", font, bgSprite);
+        var zhCard = CreateLanguageCard(cardsContainer.transform, 360f, "Card_ZH", "ZH", "简体中文", "ภาษาจีนตัวย่อ", font, bgSprite);
         controller.zhLanguageButton = zhCard.button;
         controller.zhLanguageStatusText = zhCard.statusText;
         controller.zhCardBorder = zhCard.borderImage;
@@ -375,7 +375,7 @@ public static class SetupLanguageSwitcherUI
         tipRT.anchoredPosition = new Vector2(0f, -220f);
         tipRT.sizeDelta = new Vector2(800f, 32f);
         var tipTMP = tipGO.AddComponent<TextMeshProUGUI>();
-        tipTMP.text = "💡 กด [1] [2] [3] หรือ [L] เพื่อสลับภาษาได้ทันที (Press 1/2/3 or L to switch anytime)";
+        tipTMP.text = "กด [1] [2] [3] หรือ [L] เพื่อสลับภาษาได้ทันที (Press 1/2/3 or L to switch anytime)";
         tipTMP.fontSize = 15f;
         tipTMP.alignment = TextAlignmentOptions.Center;
         tipTMP.color = new Color(0.65f, 0.75f, 0.70f, 0.75f);
@@ -580,7 +580,7 @@ public static class SetupLanguageSwitcherUI
         var pRT = pGO.AddComponent<RectTransform>();
         pRT.sizeDelta = new Vector2(28f, 34f);
         var pTMP = pGO.AddComponent<TextMeshProUGUI>();
-        pTMP.text = "🌐";
+        pTMP.text = "LANG";
         pTMP.fontSize = 16f;
         pTMP.alignment = TextAlignmentOptions.Center;
 

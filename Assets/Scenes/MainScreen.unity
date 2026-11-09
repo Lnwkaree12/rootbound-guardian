@@ -1159,9 +1159,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -1180,7 +1180,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -1415,7 +1415,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -1523,7 +1523,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -1531,9 +1531,9 @@ MonoBehaviour:
   m_fontSize: 17
   m_fontSizeBase: 17
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10.200001
+  m_fontSizeMax: 17
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -1552,7 +1552,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -1797,9 +1797,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -1811,14 +1811,14 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -2272,9 +2272,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -2286,14 +2286,14 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -2401,7 +2401,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -2430,7 +2430,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -2964,6 +2964,26 @@ PrefabInstance:
       propertyPath: m_text
       value: "\u0E40\u0E23\u0E34\u0E48\u0E21\u0E40\u0E01\u0E21"
       objectReference: {fileID: 0}
+    - target: {fileID: 312325329020233448, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_fontSizeMax
+      value: 54
+      objectReference: {fileID: 0}
+    - target: {fileID: 312325329020233448, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 32.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 312325329020233448, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_overflowMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 312325329020233448, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_enableAutoSizing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 312325329020233448, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_enableExtraPadding
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 350409062436218531, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
       propertyPath: m_text
       value: "\u0E40\u0E2A\u0E35\u0E22\u0E07\u0E40\u0E1E\u0E25\u0E07"
@@ -3204,6 +3224,26 @@ PrefabInstance:
       propertyPath: m_margin.z
       value: -86.72485
       objectReference: {fileID: 0}
+    - target: {fileID: 6880399775407321230, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_fontSizeMax
+      value: 54
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880399775407321230, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 32.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880399775407321230, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_overflowMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880399775407321230, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_enableAutoSizing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880399775407321230, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_enableExtraPadding
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6893552058197563685, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 166.2
@@ -3232,6 +3272,26 @@ PrefabInstance:
       propertyPath: m_text
       value: "\u0E01\u0E14\u0E1B\u0E38\u0E48\u0E21\u0E43\u0E14\u0E01\u0E47\u0E44\u0E14\u0E49\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E40\u0E23\u0E34\u0E48\u0E21\u0E15\u0E49\u0E19"
       objectReference: {fileID: 0}
+    - target: {fileID: 8983775586262222685, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_fontSizeMax
+      value: 54
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983775586262222685, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 32.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983775586262222685, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_overflowMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983775586262222685, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_enableAutoSizing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983775586262222685, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_enableExtraPadding
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9012809734056762949, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
       propertyPath: m_text
       value: "\u0E15\u0E31\u0E49\u0E07\u0E04\u0E48\u0E32"
@@ -3243,6 +3303,26 @@ PrefabInstance:
     - target: {fileID: 9012809734056762949, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
       propertyPath: m_margin.z
       value: -15.026367
+      objectReference: {fileID: 0}
+    - target: {fileID: 9012809734056762949, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_fontSizeMax
+      value: 54
+      objectReference: {fileID: 0}
+    - target: {fileID: 9012809734056762949, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 32.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 9012809734056762949, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_overflowMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9012809734056762949, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_enableAutoSizing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9012809734056762949, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
+      propertyPath: m_enableExtraPadding
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9065411750983612605, guid: d2164a2bd5075ed43906294d5ac1df2e, type: 3}
       propertyPath: mainCamera
@@ -3891,7 +3971,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -3899,9 +3979,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -3920,7 +4000,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -4283,7 +4363,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -4767,9 +4847,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 4
   m_VerticalAlignment: 512
@@ -4788,7 +4868,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -4913,9 +4993,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -4934,7 +5014,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -5055,9 +5135,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -5069,14 +5149,14 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -5257,7 +5337,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -10320,7 +10400,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -10428,9 +10508,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -10449,7 +10529,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -10565,9 +10645,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 4
   m_VerticalAlignment: 512
@@ -10586,7 +10666,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -10711,9 +10791,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -10732,7 +10812,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -10959,7 +11039,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -11103,7 +11183,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\U0001F1F9\U0001F1ED"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
   m_sharedMaterial: {fileID: -8080645981602784202, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
@@ -11125,7 +11205,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -11133,9 +11213,9 @@ MonoBehaviour:
   m_fontSize: 50
   m_fontSizeBase: 50
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 30.000002
+  m_fontSizeMax: 50
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -11149,12 +11229,12 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -12144,7 +12224,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -12152,9 +12232,9 @@ MonoBehaviour:
   m_fontSize: 18
   m_fontSizeBase: 18
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10.8
+  m_fontSizeMax: 18
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -12168,12 +12248,12 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 3
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -12297,9 +12377,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -12318,7 +12398,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -12576,7 +12656,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\U0001F1E8\U0001F1F3"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
   m_sharedMaterial: {fileID: -8080645981602784202, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
@@ -12598,7 +12678,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -12606,9 +12686,9 @@ MonoBehaviour:
   m_fontSize: 50
   m_fontSizeBase: 50
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 30.000002
+  m_fontSizeMax: 50
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -12622,12 +12702,12 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -12756,9 +12836,9 @@ MonoBehaviour:
   m_fontSize: 17
   m_fontSizeBase: 17
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10.200001
+  m_fontSizeMax: 17
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -12770,14 +12850,14 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -13164,7 +13244,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -14887,9 +14967,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -14901,14 +14981,14 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -15099,9 +15179,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -15120,7 +15200,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -15228,7 +15308,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -15236,9 +15316,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -15257,7 +15337,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -15476,7 +15556,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -15809,7 +15889,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -15817,9 +15897,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -15838,7 +15918,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -15967,7 +16047,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -16567,9 +16647,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -16588,7 +16668,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -21532,7 +21612,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -21540,9 +21620,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -21561,7 +21641,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -21782,7 +21862,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -21790,9 +21870,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -21811,7 +21891,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -22174,7 +22254,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -22788,7 +22868,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\U0001F1EC\U0001F1E7"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
   m_sharedMaterial: {fileID: -8080645981602784202, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
@@ -22810,7 +22890,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -22818,9 +22898,9 @@ MonoBehaviour:
   m_fontSize: 50
   m_fontSizeBase: 50
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 30.000002
+  m_fontSizeMax: 50
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -22834,12 +22914,12 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -22979,12 +23059,12 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -23092,9 +23172,9 @@ MonoBehaviour:
   m_fontSize: 22
   m_fontSizeBase: 22
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 13.200001
+  m_fontSizeMax: 22
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -23113,7 +23193,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -23369,7 +23449,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\U0001F3AE \u0E08\u0E2D\u0E22\u0E17\u0E35\u0E48\u0E40\u0E0A\u0E37\u0E48\u0E2D\u0E21\u0E15\u0E48\u0E2D:
+  m_text: "\u0E08\u0E2D\u0E22\u0E17\u0E35\u0E48\u0E40\u0E0A\u0E37\u0E48\u0E2D\u0E21\u0E15\u0E48\u0E2D:
     <color=#58A6FF>XBOX WIRELESS CONTROLLER</color> (\u0E1E\u0E23\u0E49\u0E2D\u0E21\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
@@ -23400,9 +23480,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
@@ -23421,7 +23501,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -24024,9 +24104,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -24045,7 +24125,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -24251,9 +24331,9 @@ MonoBehaviour:
   m_fontSize: 13
   m_fontSizeBase: 13
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -24272,7 +24352,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -24657,9 +24737,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -24678,7 +24758,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -25105,7 +25185,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -25113,9 +25193,9 @@ MonoBehaviour:
   m_fontSize: 30
   m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 30
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -25129,12 +25209,12 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 3
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -25234,7 +25314,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -25263,7 +25343,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -26011,9 +26091,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 4
   m_VerticalAlignment: 512
@@ -26032,7 +26112,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -26268,7 +26348,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -26276,9 +26356,9 @@ MonoBehaviour:
   m_fontSize: 15
   m_fontSizeBase: 15
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -26297,7 +26377,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -26586,9 +26666,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -26607,7 +26687,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -26693,7 +26773,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\U0001F4A1 \u0E01\u0E14 [1] [2] [3] \u0E2B\u0E23\u0E37\u0E2D [L] \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E2A\u0E25\u0E31\u0E1A\u0E20\u0E32\u0E29\u0E32\u0E44\u0E14\u0E49\u0E17\u0E31\u0E19\u0E17\u0E35"
+  m_text: "\u0E01\u0E14 [1] [2] [3] \u0E2B\u0E23\u0E37\u0E2D [L] \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E2A\u0E25\u0E31\u0E1A\u0E20\u0E32\u0E29\u0E32\u0E44\u0E14\u0E49\u0E17\u0E31\u0E19\u0E17\u0E35"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
   m_sharedMaterial: {fileID: -8080645981602784202, guid: a2e1a7160a24d9d4c97cc2907e081326, type: 2}
@@ -26715,7 +26795,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -26723,9 +26803,9 @@ MonoBehaviour:
   m_fontSize: 16
   m_fontSizeBase: 16
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -26744,7 +26824,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -27053,9 +27133,9 @@ MonoBehaviour:
   m_fontSize: 17
   m_fontSizeBase: 17
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10.200001
+  m_fontSizeMax: 17
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -27067,14 +27147,14 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -27440,9 +27520,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -27454,14 +27534,14 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 0
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
@@ -27578,9 +27658,9 @@ MonoBehaviour:
   m_fontSize: 14
   m_fontSizeBase: 14
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 10
+  m_fontSizeMax: 16
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -27599,7 +27679,7 @@ MonoBehaviour:
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
   m_ActiveFontFeatures: 
-  m_enableExtraPadding: 0
+  m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1

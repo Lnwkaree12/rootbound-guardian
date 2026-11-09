@@ -247,7 +247,7 @@ public class WinUIManager : MonoBehaviour
         int seconds = Mathf.FloorToInt(elapsed % 60f);
         UpdateLocalizedTexts();
 
-        string timePrefix = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("win_clear_time") : "⏱️ เวลาที่ใช้:";
+        string timePrefix = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("win_clear_time") : "เวลาที่ใช้:";
         string timeStr = $"{timePrefix} {minutes:00}:{seconds:00}";
 
         if (clearTimeTextTMP != null) clearTimeTextTMP.text = timeStr;
