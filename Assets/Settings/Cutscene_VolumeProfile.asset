@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+  m_Name: Cutscene_VolumeProfile
+  m_EditorClassIdentifier: 
+  components:
+  - {fileID: -9167874883656233139, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: 1918650496244738858, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: 853819529557874667, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: 1052315754049611418, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: -1170528603972255243, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: -8270506406425502121, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: -5520245016509672950, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: 7173750748008157695, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: 1666464333004379222, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: 9001657382290151224, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: -6335409530604852063, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: -1216621516061285780, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: 3959858460715838825, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: -7743500325797982168, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: 4644742534064026673, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: -4463884970436517307, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: -6288072647309666549, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: 7518938298396184218, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
+  - {fileID: -1410297666881709256, guid: ab09877e2e707104187f6f83e2f62510, type: 2}

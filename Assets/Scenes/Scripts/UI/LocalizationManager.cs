@@ -790,29 +790,29 @@ public class LocalizationManager : MonoBehaviour
         // 11. CUTSCENES & ENDINGS
         // ══════════════════════════════════════════════════════════════════════
         AddKey("cutscene_opening_1",
-            th: "กาลครั้งหนึ่งนานมาแล้ว... ในใจกลางของผืนป่าโบราณ มีต้นไม้โลกอันยิ่งใหญ่คอยค้ำจุนทุกสรรพสิ่ง",
-            en: "Once upon a time... in the heart of an ancient forest, a great World Tree sustained all living beings.",
-            zh: "很久很久以前... 在古老森林的深处，伫立着一棵庇护万物的伟大世界树。");
+            th: "กาลครั้งหนึ่งนานมาแล้ว... ณ ใจกลางผืนป่าอันเงียบสงบ มี 'ต้นไม้โลก' คอยแผ่กิ่งก้านมอบพลังหล่อเลี้ยงทุกชีวิตให้อยู่เย็นเป็นสุข",
+            en: "Once upon a time... in the peaceful heart of the forest, the great 'World Tree' nurtured all living beings with its radiant blessing.",
+            zh: "很久很久以前... 在宁静祥和的森林深处，耸立着一棵以生机庇佑万物的“世界树”。");
 
         AddKey("cutscene_opening_2",
-            th: "แต่แล้ววันหนึ่ง... พลังแห่งความมืดได้แผ่ขยายเข้ามา ทำให้ต้นไม้โลกเริ่มเหี่ยวเฉาและผืนป่าเริ่มตายลง",
-            en: "But then one day... dark corruption spread, causing the World Tree to wither and the forest to decay.",
-            zh: "然而有一天... 黑暗侵蚀蔓延，世界树开始枯萎，整座森林也陷入了死寂。");
+            th: "ทว่าวันเวลาผันผ่าน... พลังแห่งพฤกษาเริ่มร่วงโรย ต้นไม้ศักดิ์สิทธิ์เริ่มเหี่ยวเฉา ผืนป่าที่เคยเขียวชอุ่มก็ค่อยๆ แห้งแล้งลง",
+            en: "Yet as seasons turned... its vitality began to fade. The sacred tree withered, and the once-vibrant woods grew frail and dry.",
+            zh: "然而岁月流逝... 草木灵力渐次衰微，神圣的世界树开始枯萎，曾经苍翠的林海也慢慢荒芜凋零。");
 
         AddKey("cutscene_opening_3",
-            th: "ต้นไม้โลกยังคงเปล่งรัศมีเรืองรองค้ำจุนป่า แต่กิ่งก้านเริ่มแห้งกรอบและต้องการการปกป้องอย่างเร่งด่วน",
-            en: "The World Tree still shone faintly, but its branches grew brittle, urgently crying out for a guardian.",
-            zh: "世界树依然散发着微弱的光芒守护着森林，但枝桠已渐枯萎，迫切需要守护者的拯救。");
+            th: "แม้ใบไม้สีเขียวจะเปลี่ยนเป็นสีเหลืองทองร่วงหล่น แต่ต้นไม้โลกยังคงเปล่งประกายแสงสุดท้าย เพื่อปกป้องผืนป่าแห่งนี้ไว้",
+            en: "Even as emerald leaves turned gold and fluttered down, the World Tree cast its final gentle glow to shelter what remained.",
+            zh: "纵使碧叶化作碎金飘落，世界树仍散发着最后一抹柔光，拼尽全力守护着这座森林。");
 
         AddKey("cutscene_opening_4",
-            th: "เอลฟ์อาวุโสผู้เฝ้ามองป่ามายาวนาน ได้มอบภารกิจอันศักดิ์สิทธิ์ให้แก่ผู้พิทักษ์รุ่นเยาว์",
-            en: "The Elder Elf, who had watched over the woods for generations, entrusted a sacred quest to a young guardian.",
-            zh: "久居林中的精灵长者，将这项神圣的使命托付给了一位年轻的守护者。");
+            th: "ผู้เฒ่าเอลฟ์จึงมอบหมายภารกิจสำคัญ ให้แก่ผู้พิทักษ์รุ่นเยาว์ออกเดินทางพร้อม 'ลูมิ' ภูติแห่งแสง เพื่อกอบกู้และฟื้นฟูรากแก้วของต้นไม้โลก",
+            en: "The Elder Elf thus entrusted a sacred quest to a young guardian, guided by 'Lumi' the spirit of light, to heal the roots of the World Tree.",
+            zh: "精灵长者将至关重要的使命，托付给了年轻的守护者与光之精灵“露米”，启程拯救并滋养世界树的神圣之根。");
 
         AddKey("cutscene_opening_5",
-            th: "และผู้พิทักษ์ก็ได้ก้าวเข้าสู่ดันเจี้ยนใต้ดิน ที่เต็มไปด้วยกับดักอันตราย เพื่อนำพลังแห่งชีวิตกลับคืนมา...",
-            en: "And so, the guardian stepped into the treacherous subterranean dungeon to restore the essence of life...",
-            zh: "年轻的守护者毅然踏入了布满致命陷阱的地底深窟，誓要迎回生命的生机...");
+            th: "การเดินทางเต็มไปด้วยอันตราย... ผู้พิทักษ์ต้องมุ่งหน้าสู่ดันเจี้ยนโบราณใต้พิภพ และฝ่าฟันกับดัก เพื่อค้นหาหนทางสู่รากไม้ศักดิ์สิทธิ์",
+            en: "A perilous journey awaits... The guardian must venture deep beneath the subterranean dungeon, braving deadly traps to reach the sacred root.",
+            zh: "此行荆棘遍布、凶险重重... 守护者必须深入幽邃的地下遗迹，穿越重重机关陷阱，探寻通往神圣灵根的道路。");
 
         AddKey("endscene_lumi_speech",
             th: "นี้คือต้นไม้โลกแห่งโบราณกาล\nที่เจ้าได้รักษาปกป้องมันเอาไว้...\nข้าขอบคุณเจ้ามากนะ!",
@@ -820,9 +820,9 @@ public class LocalizationManager : MonoBehaviour
             zh: "这就是远古的世界树，\n多亏了你拯救并守护了它...\n我打心底里感谢你！");
 
         AddKey("cutscene_end_narrative",
-            th: "หลังวิกฤติต้นไม้โลกเหี่ยวเฉาถูกแก้ไขแล้ว ป่าได้กลับมาอุดมสมบูรณ์และเหล่าสัตว์ต่างก็ร่าเริงอีกครั้ง",
-            en: "With the World Tree's withering crisis resolved, the forest flourished anew and the animals rejoiced once more.",
-            zh: "世界树枯萎的危机化解后，森林重焕生机，万物精灵也再次欢腾起来。");
+            th: "เมื่อรากแก้วศักดิ์สิทธิ์ได้รับการฟื้นฟู พลังชีวิตก็หวนคืนสู่ต้นไม้โลก ผืนป่ากลับมาเขียวชอุ่ม ร่มเย็น และเปี่ยมด้วยรอยยิ้มอีกครั้ง",
+            en: "As the sacred roots were restored, vitality breathed anew into the World Tree—returning emerald life, serenity, and joy to the forest.",
+            zh: "随着神圣灵根重获生机，生命的灵流再度充盈世界树，整片森林重归苍翠安详，万物生灵重绽欢颜。");
 
         // ══════════════════════════════════════════════════════════════════════
         // 12. END CREDITS

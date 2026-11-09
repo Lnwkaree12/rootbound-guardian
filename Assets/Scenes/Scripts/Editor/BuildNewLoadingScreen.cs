@@ -298,7 +298,7 @@ public static class BuildNewLoadingScreen
                 ExactUserString = "Space Bar แดช",
                 Category = "พุ่งตัวหลบหลีก (Dash)",
                 CategoryColor = "#FFE8A3",
-                Description = "<b>Space Bar แดช</b> — พุ่งตัวเคลื่อนที่อย่างรวดเร็วเพื่อหลบหลีกการโจมตีหรือข้ามช่องว่าง",
+                Description = "<b>Space Bar แดช:</b> พุ่งตัวเคลื่อนที่อย่างรวดเร็วเพื่อหลบหลีกการโจมตีหรือข้ามช่องว่าง",
                 BadgeType = 2, // Space bar
                 CustomSprite = (Sprite)null
             },
@@ -306,7 +306,7 @@ public static class BuildNewLoadingScreen
                 ExactUserString = "ระวังกับดัก",
                 Category = "อันตรายถึงตาย (Hazard Alert)",
                 CategoryColor = "#FF6B6B",
-                Description = "<b>ระวังกับดัก</b> — สังเกตหนามแหลมและหลุมพรางบนพื้น หากสัมผัสจะเสียพลังชีวิตมหาศาล",
+                Description = "<b>ระวังกับดัก:</b> สังเกตหนามแหลมและหลุมพรางบนพื้น หากสัมผัสจะเสียพลังชีวิตมหาศาล",
                 BadgeType = 0, // Sprite only
                 CustomSprite = trapIcon
             },
@@ -314,7 +314,7 @@ public static class BuildNewLoadingScreen
                 ExactUserString = "กด E เพื่อเปิดกล่อง",
                 Category = "เปิดหีบสมบัติ (Chest & Loot)",
                 CategoryColor = "#FFE8A3",
-                Description = "<b>กด E เพื่อเปิดกล่อง</b> — เดินเข้าใกล้หีบสมบัติแล้วกดปุ่มเพื่อค้นหากุญแจและไอเทมสำคัญ",
+                Description = "<b>กด E เพื่อเปิดกล่อง:</b> เดินเข้าใกล้หีบสมบัติแล้วกดปุ่มเพื่อค้นหากุญแจและไอเทมสำคัญ",
                 BadgeType = 3, // Key E + Chest
                 CustomSprite = chestIcon
             },
@@ -322,7 +322,7 @@ public static class BuildNewLoadingScreen
                 ExactUserString = "ใช้โพชั่นรักษาต้นไม้เล็กเพื่อ Save",
                 Category = "ฟื้นฟู & บันทึกจุดเกิด (Save Point)",
                 CategoryColor = "#6EE7B7",
-                Description = "<b>ใช้โพชั่นรักษาต้นไม้เล็กเพื่อ Save</b> — มอบพลังโพชั่นฟื้นฟูต้นไม้เพื่อบันทึกจุดเกิดและฟื้นพลัง",
+                Description = "<b>ใช้โพชั่นรักษาต้นไม้เล็กเพื่อ Save:</b> มอบพลังโพชั่นฟื้นฟูต้นไม้เพื่อบันทึกจุดเกิดและฟื้นพลัง",
                 BadgeType = 4, // Potion + Tree
                 CustomSprite = treeBadge
             },
@@ -330,7 +330,7 @@ public static class BuildNewLoadingScreen
                 ExactUserString = "ระวัง Oxygen หมดไม่งั้นจะแย่แน่",
                 Category = "รักษาระดับออกซิเจน (Oxygen Limit)",
                 CategoryColor = "#38BDF8",
-                Description = "<b>ระวัง Oxygen หมดไม่งั้นจะแย่แน่</b> — หมั่นสังเกตเกจออกซิเจน อย่าปล่อยให้หมด รีบกลับมาพักใกล้ต้นไม้",
+                Description = "<b>ระวัง Oxygen หมดไม่งั้นจะแย่แน่:</b> หมั่นสังเกตเกจออกซิเจน อย่าปล่อยให้หมด รีบกลับมาพักใกล้ต้นไม้",
                 BadgeType = 0, // Sprite only
                 CustomSprite = oxygenIcon
             },
@@ -338,7 +338,7 @@ public static class BuildNewLoadingScreen
                 ExactUserString = "กด W A S D ไปหาบันไดค้างเพื่อปีน",
                 Category = "การปีนป่ายบันได (Ladder Climbing)",
                 CategoryColor = "#FCD34D",
-                Description = "<b>กด W A S D ไปหาบันไดค้างเพื่อปีน</b> — เดินเข้าหาบันไดและกดปุ่มทิศทางค้างไว้เพื่อปีนขึ้น-ลง",
+                Description = "<b>กด W A S D ไปหาบันไดค้างเพื่อปีน:</b> เดินเข้าหาบันไดและกดปุ่มทิศทางค้างไว้เพื่อปีนขึ้น-ลง",
                 BadgeType = 5, // WASD badge + Ladder
                 CustomSprite = ladderIcon
             }
