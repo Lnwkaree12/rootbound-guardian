@@ -73,6 +73,56 @@ public class PauseMenuController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        UpdateLocalizedTexts();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        UpdateLocalizedTexts();
+    }
+
+    public void UpdateLocalizedTexts()
+    {
+        if (LocalizationManager.Instance == null) return;
+        FindUIReferences();
+        if (pausePanel == null) return;
+
+        Transform innerCard = pausePanel.transform.Find("ModalContainer/InnerCard");
+        if (innerCard == null) innerCard = pausePanel.transform.Find("ModalContainer");
+        if (innerCard == null) return;
+
+        SetTMPText(innerCard, "Badge/BadgeText", "pause_badge");
+        SetTMPText(innerCard, "TitleText", "pause_title");
+        SetTMPText(innerCard, "SubtitleText", "pause_subtitle");
+        SetTMPText(innerCard, "SafeBanner/BannerText", "pause_safe_notice");
+        SetTMPText(innerCard, "AudioSettingsSection/Heading/HeadingText", "pause_audio_heading");
+        SetTMPText(innerCard, "AudioSettingsSection/MasterRow/Label", "label_master");
+        SetTMPText(innerCard, "AudioSettingsSection/BgmRow/Label", "label_bgm");
+        SetTMPText(innerCard, "AudioSettingsSection/SfxRow/Label", "label_sfx");
+        SetTMPText(innerCard, "ButtonRow/ResumeButton/Button_Content/Label", "pause_resume");
+        SetTMPText(innerCard, "ButtonRow/RestartButton/Button_Content/Label", "pause_restart");
+        SetTMPText(innerCard, "ButtonRow/MainMenuButton/Button_Content/Label", "pause_main_menu");
+        SetTMPText(innerCard, "KeyHintsBar/KeyHintsText", "pause_key_hints");
+    }
+
+    private void SetTMPText(Transform root, string childPath, string locKey)
+    {
+        Transform t = root.Find(childPath);
+        if (t != null)
+        {
+            var tmp = t.GetComponent<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get(locKey);
+        }
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(pauseKey))
@@ -113,6 +163,7 @@ public class PauseMenuController : MonoBehaviour
         FindUIReferences();
         LoadAudioPreferences();
         BindButtonEvents();
+        UpdateLocalizedTexts();
 
         if (pausePanel != null)
         {

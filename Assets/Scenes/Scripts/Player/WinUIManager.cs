@@ -54,6 +54,53 @@ public class WinUIManager : MonoBehaviour
         EnsureEventSystem();
     }
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        UpdateLocalizedTexts();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        UpdateLocalizedTexts();
+    }
+
+    public void UpdateLocalizedTexts()
+    {
+        if (LocalizationManager.Instance == null) return;
+        FindUIReferences();
+
+        if (titleTextTMP != null) titleTextTMP.text = LocalizationManager.Instance.Get("win_badge");
+        if (titleText != null) titleText.text = LocalizationManager.Instance.Get("win_badge");
+
+        if (subtitleTextTMP != null) subtitleTextTMP.text = LocalizationManager.Instance.Get("win_congrats");
+        if (subtitleText != null) subtitleText.text = LocalizationManager.Instance.Get("win_congrats");
+
+        if (questStatusTextTMP != null) questStatusTextTMP.text = LocalizationManager.Instance.Get("win_quest_completed");
+        if (questStatusText != null) questStatusText.text = LocalizationManager.Instance.Get("win_quest_completed");
+
+        if (restartButton != null)
+        {
+            var tmp = restartButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get("win_btn_replay");
+            var txt = restartButton.GetComponentInChildren<Text>();
+            if (txt != null) txt.text = LocalizationManager.Instance.Get("win_btn_replay");
+        }
+
+        if (mainMenuButton != null)
+        {
+            var tmp = mainMenuButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get("win_btn_menu");
+            var txt = mainMenuButton.GetComponentInChildren<Text>();
+            if (txt != null) txt.text = LocalizationManager.Instance.Get("win_btn_menu");
+        }
+    }
+
     private void EnsureEventSystem()
     {
         if (FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
@@ -198,7 +245,10 @@ public class WinUIManager : MonoBehaviour
         float elapsed = Mathf.Max(0f, Time.timeSinceLevelLoad - levelStartTime);
         int minutes = Mathf.FloorToInt(elapsed / 60f);
         int seconds = Mathf.FloorToInt(elapsed % 60f);
-        string timeStr = string.Format("เวลาที่ใช้: {0:00}:{1:00}", minutes, seconds);
+        UpdateLocalizedTexts();
+
+        string timePrefix = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("win_clear_time") : "⏱️ เวลาที่ใช้:";
+        string timeStr = $"{timePrefix} {minutes:00}:{seconds:00}";
 
         if (clearTimeTextTMP != null) clearTimeTextTMP.text = timeStr;
         if (clearTimeText != null) clearTimeText.text = timeStr;
@@ -206,7 +256,8 @@ public class WinUIManager : MonoBehaviour
         PlayerHealth ph = Object.FindFirstObjectByType<PlayerHealth>();
         if (ph != null)
         {
-            string hpStr = $"พลังชีวิตคงเหลือ: {ph.CurrentHealth} / {ph.MaxHealth} HP";
+            string hpPrefix = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("win_hp_remaining") : "❤️ พลังชีวิตคงเหลือ:";
+            string hpStr = $"{hpPrefix} {ph.CurrentHealth} / {ph.MaxHealth} HP";
             if (hpRemainingTextTMP != null) hpRemainingTextTMP.text = hpStr;
             if (hpRemainingText != null) hpRemainingText.text = hpStr;
         }

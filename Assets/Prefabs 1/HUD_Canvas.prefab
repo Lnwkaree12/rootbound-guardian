@@ -125,6 +125,7 @@ GameObject:
   - component: {fileID: 153418562949378488}
   - component: {fileID: 7234716887003397124}
   - component: {fileID: 9086790895184542694}
+  - component: {fileID: 1486789727166068827}
   m_Layer: 0
   m_Name: InstructionsText
   m_TagString: Untagged
@@ -192,9 +193,21 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u0E01\u0E14 [Tab] \u0E2B\u0E23\u0E37\u0E2D [I] \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E40\u0E1B\u0E34\u0E14/\u0E1B\u0E34\u0E14\u0E01\u0E23\u0E30\u0E40\u0E1B\u0E4B\u0E32\n\u0E01\u0E14
-    [1] \u0E2B\u0E23\u0E37\u0E2D [H] \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E01\u0E34\u0E19\u0E42\u0E1E\u0E0A\u0E31\u0E48\u0E19\u0E1F\u0E37\u0E49\u0E19\u0E1E\u0E25\u0E31\u0E07\u0E40\u0E25\u0E37\u0E2D\u0E14
-    (HP)"
+  m_Text: "\u0E01\u0E14 [Tab] \u0E2B\u0E23\u0E37\u0E2D [I] \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E40\u0E1B\u0E34\u0E14/\u0E1B\u0E34\u0E14\u0E01\u0E23\u0E30\u0E40\u0E1B\u0E4B\u0E32"
+--- !u!114 &1486789727166068827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334476942172843272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee54687a8bcc644cb12a4acb1d7d64f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  localizationKey: hud_backpack_hint
+  staticOverride: 0
 --- !u!1 &452998026956559197
 GameObject:
   m_ObjectHideFlags: 0
@@ -1648,6 +1661,7 @@ GameObject:
   - component: {fileID: 8862379318450657992}
   - component: {fileID: 2027550825548708163}
   - component: {fileID: 5905718166671835341}
+  - component: {fileID: -8369924946529048553}
   m_Layer: 0
   m_Name: TitleText
   m_TagString: Untagged
@@ -1715,7 +1729,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u0E04\u0E49\u0E19\u0E2B\u0E32\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E41\u0E25\u0E30\u0E40\u0E1B\u0E34\u0E14\u0E1B\u0E23\u0E30\u0E15\u0E39\u0E14\u0E31\u0E19\u0E40\u0E08\u0E35\u0E49\u0E22\u0E19"
+  m_Text: "QUEST (\u0E20\u0E32\u0E23\u0E01\u0E34\u0E08\u0E2B\u0E25\u0E31\u0E01)"
 --- !u!114 &5905718166671835341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1731,6 +1745,20 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.8}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!114 &-8369924946529048553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2745113262175053283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee54687a8bcc644cb12a4acb1d7d64f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  localizationKey: quest_title
+  staticOverride: 0
 --- !u!1 &2753280633458326830
 GameObject:
   m_ObjectHideFlags: 0
@@ -4421,6 +4449,7 @@ GameObject:
   - component: {fileID: 5187430646913409529}
   - component: {fileID: 4536513379245123108}
   - component: {fileID: 2612874442432415342}
+  - component: {fileID: 7214786442984953279}
   m_Layer: 0
   m_Name: HintText
   m_TagString: Untagged
@@ -4489,6 +4518,20 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\u0E01\u0E14 [1] \u0E2B\u0E23\u0E37\u0E2D [H] \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E43\u0E0A\u0E49"
+--- !u!114 &7214786442984953279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5698162959099618275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee54687a8bcc644cb12a4acb1d7d64f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  localizationKey: hud_potion_hint
+  staticOverride: 0
 --- !u!1 &5822533997195095253
 GameObject:
   m_ObjectHideFlags: 0
@@ -5105,6 +5148,8 @@ MonoBehaviour:
   gameOverCanvasGroup: {fileID: 500762792533738437}
   titleText: {fileID: 58193085394749315}
   reasonText: {fileID: 2061590604531288662}
+  titleTextTMP: {fileID: 0}
+  reasonTextTMP: {fileID: 0}
   restartButton: {fileID: 1105161922237203309}
   mainMenuButton: {fileID: 3457537379383936602}
 --- !u!1 &6703186858757712511
@@ -5232,6 +5277,7 @@ GameObject:
   - component: {fileID: 5233957713766244202}
   - component: {fileID: 5890876187462236805}
   - component: {fileID: 4000440970033785544}
+  - component: {fileID: -5089504537744015209}
   m_Layer: 0
   m_Name: CategoryText
   m_TagString: Untagged
@@ -5299,8 +5345,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u2726  \u0E20\u0E32\u0E23\u0E01\u0E34\u0E08\u0E2B\u0E25\u0E31\u0E01 (MAIN
-    QUEST)  \u2726"
+  m_Text: "\u0E20\u0E32\u0E23\u0E01\u0E34\u0E08\u0E2B\u0E25\u0E31\u0E01"
 --- !u!114 &4000440970033785544
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5316,6 +5361,20 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.8}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!114 &-5089504537744015209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7445408457104618852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee54687a8bcc644cb12a4acb1d7d64f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  localizationKey: quest_category
+  staticOverride: 0
 --- !u!1 &7464136507320639544
 GameObject:
   m_ObjectHideFlags: 0
@@ -5912,6 +5971,7 @@ GameObject:
   - component: {fileID: 6555885631755216006}
   - component: {fileID: 67977781943731178}
   - component: {fileID: 4242743990817521056}
+  - component: {fileID: 5401957025451768507}
   m_Layer: 0
   m_Name: TitleText
   m_TagString: Untagged
@@ -5980,6 +6040,20 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "BACKPACK (\u0E01\u0E23\u0E30\u0E40\u0E1B\u0E4B\u0E32\u0E40\u0E1B\u0E49\u0E2A\u0E30\u0E1E\u0E32\u0E22)"
+--- !u!114 &5401957025451768507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8571828297573153440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee54687a8bcc644cb12a4acb1d7d64f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  localizationKey: hud_backpack_name
+  staticOverride: 0
 --- !u!1 &8598410972709148508
 GameObject:
   m_ObjectHideFlags: 0

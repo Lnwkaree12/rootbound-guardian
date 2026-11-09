@@ -93,6 +93,20 @@ public class EndingCutsceneManager : MonoBehaviour
         if (skipButton != null)
         {
             skipButton.onClick.AddListener(OnSkipClicked);
+            var tmp = skipButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null && LocalizationManager.Instance != null)
+            {
+                tmp.text = LocalizationManager.Instance.Get("hint_skip");
+            }
+        }
+
+        if (continuePrompt != null && LocalizationManager.Instance != null)
+        {
+            var tmp = continuePrompt.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null)
+            {
+                tmp.text = LocalizationManager.Instance.Get("hint_continue");
+            }
         }
 
         if (mainMenuButton != null)
@@ -170,7 +184,10 @@ public class EndingCutsceneManager : MonoBehaviour
         zoomRoutine = StartCoroutine(AnimateZoomExpansion(startScale, endScale, zoomDuration));
 
         // 3. Run narrative typewriter
-        yield return StartCoroutine(TypewriterRoutine(endingNarrativeText));
+        string narrative = LocalizationManager.Instance != null 
+            ? LocalizationManager.Instance.GetEndingNarrative() 
+            : endingNarrativeText;
+        yield return StartCoroutine(TypewriterRoutine(narrative));
 
         // 4. Show continue prompt
         if (continuePrompt != null)

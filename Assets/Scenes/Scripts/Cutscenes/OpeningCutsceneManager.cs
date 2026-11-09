@@ -85,6 +85,20 @@ public class OpeningCutsceneManager : MonoBehaviour
         if (skipButton != null)
         {
             skipButton.onClick.AddListener(OnSkipClicked);
+            var tmp = skipButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null && LocalizationManager.Instance != null)
+            {
+                tmp.text = LocalizationManager.Instance.Get("hint_skip");
+            }
+        }
+
+        if (continuePrompt != null && LocalizationManager.Instance != null)
+        {
+            var tmp = continuePrompt.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null)
+            {
+                tmp.text = LocalizationManager.Instance.Get("hint_continue");
+            }
         }
     }
 
@@ -188,7 +202,10 @@ public class OpeningCutsceneManager : MonoBehaviour
         }
 
         // Run Typewriter Effect for narrative text
-        yield return StartCoroutine(TypewriterRoutine(slide.subtitleText));
+        string textToType = LocalizationManager.Instance != null 
+            ? LocalizationManager.Instance.GetOpeningCutsceneSlide(index) 
+            : slide.subtitleText;
+        yield return StartCoroutine(TypewriterRoutine(textToType));
 
         // Typing finished, show continue prompt
         if (continuePrompt != null)
