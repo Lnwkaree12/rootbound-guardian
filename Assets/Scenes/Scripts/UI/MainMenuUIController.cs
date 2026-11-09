@@ -113,6 +113,10 @@ public class MainMenuUIController : MonoBehaviour
     public TextMeshProUGUI languageSubtitleText;
     public TextMeshProUGUI languageTipText;
     private int languageNavIndex = 0; // 0=TH, 1=EN, 2=ZH, 3=Back
+    private Vector3 thCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+    private Vector3 enCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+    private Vector3 zhCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+    private bool languageCardScalesCached = false;
 
     [Header("Controller Configuration UI")]
     public Button gameplayModeButton;
@@ -281,6 +285,7 @@ public class MainMenuUIController : MonoBehaviour
 
     private void Awake()
     {
+        CacheLanguageCardScales();
         SetupAudio();
         InitResolutions();
         LoadPreferences();
@@ -2093,8 +2098,47 @@ public class MainMenuUIController : MonoBehaviour
         RefreshLocalization();
     }
 
+    private void CacheLanguageCardScales()
+    {
+        if (languageCardScalesCached) return;
+
+        if (thLanguageButton != null)
+        {
+            thCardBaseScale = thLanguageButton.transform.localScale;
+            if (thCardBaseScale.x < 1.01f) thCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+        else
+        {
+            thCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+
+        if (enLanguageButton != null)
+        {
+            enCardBaseScale = enLanguageButton.transform.localScale;
+            if (enCardBaseScale.x < 1.01f) enCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+        else
+        {
+            enCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+
+        if (zhLanguageButton != null)
+        {
+            zhCardBaseScale = zhLanguageButton.transform.localScale;
+            if (zhCardBaseScale.x < 1.01f) zhCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+        else
+        {
+            zhCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+
+        languageCardScalesCached = true;
+    }
+
     private void UpdateLanguageSettingsVisuals()
     {
+        CacheLanguageCardScales();
+
         int currentLang = LocalizationManager.Instance != null ? (int)LocalizationManager.Instance.CurrentLanguage : 0;
         string activeBadge = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("lang_active_badge") : "● กำลังใช้งาน";
         string selectBadge = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("lang_select_badge") : "เลือกภาษานี้";
@@ -2117,7 +2161,7 @@ public class MainMenuUIController : MonoBehaviour
         }
         if (thLanguageButton != null)
         {
-            thLanguageButton.transform.localScale = Vector3.one * (navTH ? 1.04f : 1.0f);
+            thLanguageButton.transform.localScale = thCardBaseScale * (navTH ? 1.04f : 1.0f);
         }
 
         // Update EN Card
@@ -2135,7 +2179,7 @@ public class MainMenuUIController : MonoBehaviour
         }
         if (enLanguageButton != null)
         {
-            enLanguageButton.transform.localScale = Vector3.one * (navEN ? 1.04f : 1.0f);
+            enLanguageButton.transform.localScale = enCardBaseScale * (navEN ? 1.04f : 1.0f);
         }
 
         // Update ZH Card
@@ -2153,7 +2197,7 @@ public class MainMenuUIController : MonoBehaviour
         }
         if (zhLanguageButton != null)
         {
-            zhLanguageButton.transform.localScale = Vector3.one * (navZH ? 1.04f : 1.0f);
+            zhLanguageButton.transform.localScale = zhCardBaseScale * (navZH ? 1.04f : 1.0f);
         }
     }
 
