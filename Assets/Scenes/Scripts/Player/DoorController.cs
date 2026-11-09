@@ -42,7 +42,7 @@ public class DoorController : MonoBehaviour
     private AudioSource audioSource;
 
     [Header("Victory Settings")]
-    public bool triggerWinOnOpen = true;
+    public bool triggerWinOnOpen = false;
     public float winUIDelay = 1.2f;
 
     [Header("Floating Prompt UI")]
@@ -484,35 +484,21 @@ public class DoorController : MonoBehaviour
 
     private void TriggerWinUI()
     {
-        WinUIManager[] managers = FindObjectsByType<WinUIManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        WinUIManager winManager = null;
-        int highestSortingOrder = int.MinValue;
-
-        foreach (WinUIManager manager in managers)
+        if (WinUIManager.Instance != null)
         {
-            if (manager == null || manager.winPanel == null || manager.gameObject.scene != gameObject.scene)
+            WinUIManager.Instance.TriggerWin(0f);
+        }
+        else
+        {
+            WinUIManager winUI = Object.FindAnyObjectByType<WinUIManager>();
+            if (winUI != null)
             {
-                continue;
-            }
-
-            Canvas canvas = manager.winPanel.GetComponentInParent<Canvas>();
-            int sortingOrder = canvas != null ? canvas.sortingOrder : 0;
-            if (winManager == null || sortingOrder > highestSortingOrder)
-            {
-                winManager = manager;
-                highestSortingOrder = sortingOrder;
+                winUI.TriggerWin(0f);
             }
         }
-
-        if (winManager == null)
-        {
-            Debug.LogError("[DoorController] No WinUIManager with a WinPanel was found in the active scene.");
-            return;
-        }
-
-        Debug.Log("[DoorController] Triggering Game Win UI!");
-        winManager.TriggerWin(0.2f);
     }
+
+   
 
     private IEnumerator FlashLockedPrompt()
     {

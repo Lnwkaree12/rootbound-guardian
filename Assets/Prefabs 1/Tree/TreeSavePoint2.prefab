@@ -52,6 +52,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TreeSavePoint
   isRestored: 0
   healsOxygen: 1
+  maxTreeHealth: 100
+  currentTreeHealth: 0
+  healthDecreaseRate: 5
+  treeHealthCanvasUI: {fileID: 0}
+  treeHealthSlider: {fileID: 0}
   interactPromptUI: {fileID: 4781722593146298484}
   deadTreeVisual: {fileID: 5548819331726517806}
   restoredTreeVisual: {fileID: 6360049728072209629}
@@ -19820,7 +19825,7 @@ MonoBehaviour:
   m_text: REST & SAVE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7c3323697e5099c4cb3e906a47a5230f, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: 4316811578490882673, guid: 7c3323697e5099c4cb3e906a47a5230f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
