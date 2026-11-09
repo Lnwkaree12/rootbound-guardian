@@ -1022,7 +1022,7 @@ public class MainMenuUIController : MonoBehaviour
         if (opt == null) return;
 
         opt.targetScale = isSelected ? 1.10f : 1.0f;
-        opt.targetAlpha = isSelected ? 1.0f : 0.55f;
+        opt.targetAlpha = 1.0f; // Always full opacity (1.0f), never fade to 0.55f!
         opt.targetPawScale = isSelected ? 1.0f : 0.0f;
 
         if (isSelected && !snap)
@@ -1398,7 +1398,7 @@ public class MainMenuUIController : MonoBehaviour
 
             bool isSelected = (i == settingsIndex);
             row.targetScale = isSelected ? 1.08f : 1.0f;
-            row.targetAlpha = isSelected ? 1.0f : 0.55f;
+            row.targetAlpha = 1.0f; // Always full opacity (1.0f), never fade to 0.55f!
             row.targetArrowScale = isSelected ? 1.0f : 0.0f;
 
             if (isSelected && !snap)
@@ -1967,33 +1967,30 @@ public class MainMenuUIController : MonoBehaviour
         bool isCtrl  = (currentSettingsCategory == 1);
         bool isLang  = (currentSettingsCategory == 2);
 
+        // สีเข้มคมชัดสำหรับปุ่มแท็บทั้งหมด ไม่จางเวลาไม่เลือก
+        Color tabDarkColor = new Color(0.27f, 0.18f, 0.12f, 1.0f); // #452E1E ทึบ เข้ม
+
         if (audioVideoTabText != null)
         {
-            audioVideoTabText.color = isAudio ? Color.white : new Color(0.7f, 0.75f, 0.85f, 0.65f);
+            audioVideoTabText.color = tabDarkColor;
+            audioVideoTabText.fontStyle = isAudio ? FontStyles.Bold : FontStyles.Normal;
         }
-        if (audioVideoTabHighlight != null)
-        {
-            audioVideoTabHighlight.gameObject.SetActive(isAudio);
-        }
+        if (audioVideoTabHighlight != null) audioVideoTabHighlight.gameObject.SetActive(isAudio);
 
         if (controllerTabText != null)
         {
-            controllerTabText.color = isCtrl ? Color.white : new Color(0.7f, 0.75f, 0.85f, 0.65f);
+            controllerTabText.color = tabDarkColor;
+            controllerTabText.fontStyle = isCtrl ? FontStyles.Bold : FontStyles.Normal;
         }
-        if (controllerTabHighlight != null)
-        {
-            controllerTabHighlight.gameObject.SetActive(isCtrl);
-        }
+        if (controllerTabHighlight != null) controllerTabHighlight.gameObject.SetActive(isCtrl);
 
         if (languageTabText != null)
         {
-            languageTabText.color = isLang ? Color.white : new Color(0.7f, 0.75f, 0.85f, 0.65f);
+            languageTabText.color = tabDarkColor;
+            languageTabText.fontStyle = isLang ? FontStyles.Bold : FontStyles.Normal;
         }
-        if (languageTabHighlight != null)
-        {
-            languageTabHighlight.gameObject.SetActive(isLang);
-        }
-        }
+        if (languageTabHighlight != null) languageTabHighlight.gameObject.SetActive(isLang); 
+    }
     #endregion
 
     #region Language Selection Category Implementation
@@ -2102,62 +2099,73 @@ public class MainMenuUIController : MonoBehaviour
         string activeBadge = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("lang_active_badge") : "● กำลังใช้งาน";
         string selectBadge = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("lang_select_badge") : "เลือกภาษานี้";
 
+        // สีแผ่นไม้ของทุกการ์ดเหมือนกันทั้งหมด เป็นสีไม้ธรรมชาติสว่างสม่ำเสมอ ไม่มืด/ดำ แตกต่างจากเพื่อน
+        Color cardWoodColor = new Color(1f, 1f, 1f, 0.95f);
+
         // Update TH Card
-        bool isTH = (currentLang == 0);
+        bool isTH = (currentLang == 0);          // 0 = ภาษาไทย
         bool navTH = (languageNavIndex == 0);
         if (thLanguageStatusText != null)
         {
             thLanguageStatusText.text = isTH 
-                ? $"<color=#58D68D><b>{activeBadge}</b></color>" 
-                : $"<color=#A0B0A8>{selectBadge}</color>";
+                ? $"<color=#2ECC71><b>{activeBadge}</b></color>" 
+                : $"<color=#452E1E><b>{selectBadge}</b></color>";
         }
         if (thCardBorder != null)
         {
-            thCardBorder.color = isTH 
-                ? new Color(0.35f, 0.85f, 0.55f, 0.95f) 
-                : (navTH ? new Color(1.0f, 0.90f, 0.50f, 0.80f) : new Color(0.30f, 0.40f, 0.35f, 0.40f));
+            thCardBorder.color = cardWoodColor;
+        }
+        if (thLanguageButton != null)
+        {
+            thLanguageButton.transform.localScale = Vector3.one * (navTH ? 1.04f : 1.0f);
         }
 
         // Update EN Card
-        bool isEN = (currentLang == 1);
+        bool isEN = (currentLang == 1);          // 1 = ภาษาอังกฤษ
         bool navEN = (languageNavIndex == 1);
         if (enLanguageStatusText != null)
         {
             enLanguageStatusText.text = isEN 
-                ? $"<color=#58D68D><b>{activeBadge}</b></color>" 
-                : $"<color=#A0B0A8>{selectBadge}</color>";
+                ? $"<color=#2ECC71><b>{activeBadge}</b></color>" 
+                : $"<color=#452E1E><b>{selectBadge}</b></color>";
         }
         if (enCardBorder != null)
         {
-            enCardBorder.color = isEN 
-                ? new Color(0.35f, 0.85f, 0.55f, 0.95f) 
-                : (navEN ? new Color(1.0f, 0.90f, 0.50f, 0.80f) : new Color(0.30f, 0.40f, 0.35f, 0.40f));
+            enCardBorder.color = cardWoodColor;
+        }
+        if (enLanguageButton != null)
+        {
+            enLanguageButton.transform.localScale = Vector3.one * (navEN ? 1.04f : 1.0f);
         }
 
         // Update ZH Card
-        bool isZH = (currentLang == 2);
+        bool isZH = (currentLang == 2);          // 2 = ภาษาจีน
         bool navZH = (languageNavIndex == 2);
         if (zhLanguageStatusText != null)
         {
             zhLanguageStatusText.text = isZH 
-                ? $"<color=#58D68D><b>{activeBadge}</b></color>" 
-                : $"<color=#A0B0A8>{selectBadge}</color>";
+                ? $"<color=#2ECC71><b>{activeBadge}</b></color>" 
+                : $"<color=#452E1E><b>{selectBadge}</b></color>";
         }
         if (zhCardBorder != null)
         {
-            zhCardBorder.color = isZH 
-                ? new Color(0.35f, 0.85f, 0.55f, 0.95f) 
-                : (navZH ? new Color(1.0f, 0.90f, 0.50f, 0.80f) : new Color(0.30f, 0.40f, 0.35f, 0.40f));
+            zhCardBorder.color = cardWoodColor;
         }
-
+        if (zhLanguageButton != null)
+        {
+            zhLanguageButton.transform.localScale = Vector3.one * (navZH ? 1.04f : 1.0f);
+        }
     }
+
     private void UpdateControllerModeTabsVisuals()
     {
         bool isGame = (controllerModeIndex == 0);
+        Color tabDarkColor = new Color(0.27f, 0.18f, 0.12f, 1.0f); // #452E1E สีเข้ม คมชัด ไม่จาง
 
         if (gameplayModeText != null)
         {
-            gameplayModeText.color = isGame ? Color.white : new Color(0.7f, 0.75f, 0.85f, 0.65f);
+            gameplayModeText.color = isGame ? Color.white : tabDarkColor;
+            gameplayModeText.fontStyle = isGame ? FontStyles.Bold : FontStyles.Normal;
         }
         if (gameplayModeHighlight != null)
         {
@@ -2166,7 +2174,8 @@ public class MainMenuUIController : MonoBehaviour
 
         if (menuModeText != null)
         {
-            menuModeText.color = !isGame ? Color.white : new Color(0.7f, 0.75f, 0.85f, 0.65f);
+            menuModeText.color = !isGame ? Color.white : tabDarkColor;
+            menuModeText.fontStyle = !isGame ? FontStyles.Bold : FontStyles.Normal;
         }
         if (menuModeHighlight != null)
         {

@@ -39,8 +39,8 @@ public class LanguageSwitcherUI : MonoBehaviour
     public Image zhHighlight;
 
     [Header("Active Color / Inactive Color")]
-    public Color activeColor   = new Color(1.00f, 0.95f, 0.70f, 1.0f);  // warm gold
-    public Color inactiveColor = new Color(0.70f, 0.75f, 0.85f, 0.60f); // muted slate
+    public Color activeColor   = new Color(0.27f, 0.18f, 0.12f, 1.0f);  // #452E1E dark wood
+    public Color inactiveColor = new Color(0.27f, 0.18f, 0.12f, 1.0f);  // #452E1E dark wood (ไม่จางเวลาไม่เลือก)
 
     [Header("Prompt Text (optional, e.g. 'ภาษา / Language')")]
     public TextMeshProUGUI promptText;
@@ -222,19 +222,18 @@ public class LanguageSwitcherUI : MonoBehaviour
         }
 
         if (highlight != null)
-        {
-            // If highlight is on the button itself, tint its color instead of disabling
-            if (targetBtn != null && highlight.gameObject == targetBtn.gameObject)
-            {
-                highlight.color = isActive 
-                    ? new Color(0.35f, 0.65f, 1.0f, 0.50f) 
-                    : new Color(0.12f, 0.18f, 0.24f, 0.40f);
-            }
-            else
-            {
-                highlight.gameObject.SetActive(isActive);
-            }
-        }
+{
+    if (targetBtn != null && highlight.gameObject == targetBtn.gameObject)
+    {
+        highlight.color = isActive 
+            ? new Color(0.27f, 0.18f, 0.12f, 0.80f)  // #452E1E เมื่อเลือก
+            : new Color(0.27f, 0.18f, 0.12f, 0.20f); // #452E1E จางๆ เมื่อไม่ได้เลือก
+    }
+    else
+    {
+        highlight.gameObject.SetActive(isActive);
+    }
+}
 
         scaleTargets[index] = isActive ? 1.08f : 1.0f;
     }
