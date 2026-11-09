@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -2211,7 +2211,7 @@ public class MainMenuUIController : MonoBehaviour
             string joyName = connected ? joysticks[0] : "XBOX WIRELESS CONTROLLER";
             string ctrlLabel = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_connected") : "จอยที่เชื่อมต่อ";
             string ctrlReady = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_ready") : "พร้อมใช้งาน";
-            controllerConnectedStatusText.text = $"🎮 {ctrlLabel}: <color=#58A6FF>{joyName.ToUpper()}</color> ({ctrlReady})";
+            controllerConnectedStatusText.text = $"{ctrlLabel}: <color=#58A6FF>{joyName.ToUpper()}</color> ({ctrlReady})";
         }
     }
 

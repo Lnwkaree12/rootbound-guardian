@@ -96,6 +96,20 @@ public class LocalizationManager : MonoBehaviour
         return key;
     }
 
+    /// <summary>ดึงข้อความตามคีย์และภาษาที่ระบุแบบเจาะจง ("TH", "EN", "ZH")</summary>
+    public string GetFromLanguage(string key, string lang)
+    {
+        if (string.IsNullOrEmpty(key)) return "";
+        EnsureInitialized();
+        Dictionary<string, string> targetTable = tablesTH;
+        if (lang == "EN") targetTable = tablesEN;
+        else if (lang == "ZH") targetTable = tablesZH;
+
+        if (targetTable != null && targetTable.TryGetValue(key, out string val)) return val;
+        if (tablesTH != null && tablesTH.TryGetValue(key, out string thVal)) return thVal;
+        return key;
+    }
+
     /// <summary>เรียกเพื่อสร้างตารางภาษาหากยังไม่ได้สร้าง (ปลอดภัยสำหรับ Editor และ Runtime)</summary>
     public void EnsureInitialized()
     {
@@ -310,9 +324,9 @@ public class LocalizationManager : MonoBehaviour
         AddKey("lang_select_badge", th: "เลือกภาษานี้",  en: "SELECT",   zh: "选择");
 
         AddKey("lang_tip",
-            th: "💡 กด [1] [2] [3] หรือ [L] เพื่อสลับภาษาได้ทันที",
-            en: "💡 Press [1] [2] [3] or [L] to switch language instantly",
-            zh: "💡 按 [1] [2] [3] 或 [L] 键即刻切换语言");
+            th: "กด [1] [2] [3] หรือ [L] เพื่อสลับภาษาได้ทันที",
+            en: "Press [1] [2] [3] or [L] to switch language instantly",
+            zh: "按 [1] [2] [3] 或 [L] 键即刻切换语言");
 
         AddKey("label_master",       th: "เสียงรวม",      en: "MASTER VOLUME", zh: "总音量");
         AddKey("label_bgm",          th: "เสียงเพลง",     en: "MUSIC",         zh: "背景音乐");
@@ -392,19 +406,19 @@ public class LocalizationManager : MonoBehaviour
             zh: "寻找钥匙并开启地牢大门");
 
         AddKey("quest_collect_key",
-            th: "🔑 เก็บกุญแจสำคัญ (0/1)",
-            en: "🔑 Collect the key (0/1)",
-            zh: "🔑 收集关键钥匙 (0/1)");
+            th: "เก็บกุญแจสำคัญ (0/1)",
+            en: "Collect the key (0/1)",
+            zh: "收集关键钥匙 (0/1)");
 
         AddKey("quest_key_collected",
-            th: "🔑 เก็บกุญแจสำเร็จ! (1/1)",
-            en: "🔑 Key collected! (1/1)",
-            zh: "🔑 钥匙收集成功！ (1/1)");
+            th: "เก็บกุญแจสำเร็จ! (1/1)",
+            en: "Key collected! (1/1)",
+            zh: "钥匙收集成功！ (1/1)");
 
         AddKey("quest_door_unlocked",
-            th: "🚪 ไขประตูดันเจี้ยนสำเร็จ! (1/1)",
-            en: "🚪 Dungeon gate unlocked! (1/1)",
-            zh: "🚪 地牢大门已解锁！ (1/1)");
+            th: "ไขประตูดันเจี้ยนสำเร็จ! (1/1)",
+            en: "Dungeon gate unlocked! (1/1)",
+            zh: "地牢大门已解锁！ (1/1)");
 
         // ══════════════════════════════════════════════════════════════════════
         // 4. IN-WORLD INTERACTIONS
@@ -645,9 +659,9 @@ public class LocalizationManager : MonoBehaviour
         // 9. VICTORY / WIN UI
         // ══════════════════════════════════════════════════════════════════════
         AddKey("win_badge",
-            th: "★ ✦  VICTORY  ✦ ★",
-            en: "★ ✦  VICTORY  ✦ ★",
-            zh: "★ ✦  胜 利  ✦ ★");
+            th: "VICTORY ",
+            en: "VICTORY ",
+            zh: "胜利 ");
 
         AddKey("win_quest_completed",
             th: "ภารกิจสำเร็จ!",
@@ -660,24 +674,24 @@ public class LocalizationManager : MonoBehaviour
             zh: "恭喜！你用钥匙打开了地牢大门并成功通关");
 
         AddKey("win_hp_remaining",
-            th: "❤️ พลังชีวิตคงเหลือ:",
-            en: "❤️ Remaining HP:",
-            zh: "❤️ 剩余生命值:");
+            th: "พลังชีวิตคงเหลือ:",
+            en: "Remaining HP:",
+            zh: "剩余生命值:");
 
         AddKey("win_clear_time",
-            th: "⏱️ เวลาที่ใช้:",
-            en: "⏱️ Clear Time:",
-            zh: "⏱️ 通关时间:");
+            th: "️ เวลาที่ใช้:",
+            en: "️ Clear Time:",
+            zh: "️ 通关时间:");
 
         AddKey("win_btn_replay",
-            th: "🔄 เล่นใหม่อีกครั้ง",
-            en: "🔄 Play Again",
-            zh: "🔄 重新游玩");
+            th: "เล่นใหม่อีกครั้ง",
+            en: "Play Again",
+            zh: "重新游玩");
 
         AddKey("win_btn_menu",
-            th: "🏠 กลับหน้าหลัก",
-            en: "🏠 Main Menu",
-            zh: "🏠 返回主菜单");
+            th: "กลับหน้าหลัก",
+            en: "Main Menu",
+            zh: "返回主菜单");
 
         // ══════════════════════════════════════════════════════════════════════
         // 10. LOADING SCREEN
