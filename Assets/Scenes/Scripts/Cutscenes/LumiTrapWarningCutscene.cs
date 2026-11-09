@@ -207,10 +207,13 @@ public class LumiTrapWarningCutscene : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         // 5. Lumi Delivers the Warning Dialogue!
+        string warningText = LocalizationManager.Instance != null 
+            ? LocalizationManager.Instance.GetLumiTrapWarning() 
+            : warningDialogueText;
         if (lumi != null)
         {
-            Debug.Log($"[LumiTrapWarningCutscene] Lumi speaks: '{warningDialogueText}'");
-            lumi.Speak(warningDialogueText, dialogueDuration - 0.4f);
+            Debug.Log($"[LumiTrapWarningCutscene] Lumi speaks: '{warningText}'");
+            lumi.Speak(warningText, dialogueDuration - 0.4f);
         }
 
         // Gentle floating hover while speaking at center screen

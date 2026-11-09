@@ -12,6 +12,7 @@ public class QuestManager : MonoBehaviour
 
     [Header("Quest Progress")]
     public bool hasKey = false;
+    private bool doorUnlocked = false;
 
     private static QuestManager instance;
     public static QuestManager Instance => instance;
@@ -32,7 +33,22 @@ public class QuestManager : MonoBehaviour
         FindQuestUIReferences();
     }
 
+    void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+    }
+
+    void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
     void Start()
+    {
+        UpdateQuestUI();
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language newLang)
     {
         UpdateQuestUI();
     }
@@ -85,16 +101,36 @@ public class QuestManager : MonoBehaviour
         // Ensure references are set
         if (questDescText == null) FindQuestUIReferences();
 
-        if (questDescText != null)
+        if (questCategoryText != null && LocalizationManager.Instance != null)
         {
-            if (hasKey)
+            questCategoryText.text = LocalizationManager.Instance.Get("quest_category");
+        }
+
+        if (questTitleText != null && LocalizationManager.Instance != null)
+        {
+            questTitleText.text = LocalizationManager.Instance.Get("quest_title");
+        }
+
+        if (questDetailText != null && LocalizationManager.Instance != null)
+        {
+            questDetailText.text = LocalizationManager.Instance.Get("quest_find_key");
+        }
+
+        if (questDescText != null && LocalizationManager.Instance != null)
+        {
+            if (doorUnlocked)
             {
-                questDescText.text = "🔑 เก็บกุญแจสำเร็จ! (1/1)";
+                questDescText.text = LocalizationManager.Instance.Get("quest_door_unlocked");
+                questDescText.color = new Color(1f, 0.85f, 0.2f); // Gold
+            }
+            else if (hasKey)
+            {
+                questDescText.text = LocalizationManager.Instance.Get("quest_key_collected");
                 questDescText.color = new Color(0.3f, 0.85f, 0.3f); // Green
             }
             else
             {
-                questDescText.text = "🔑 เก็บกุญแจสำคัญ (0/1)";
+                questDescText.text = LocalizationManager.Instance.Get("quest_collect_key");
                 questDescText.color = Color.white;
             }
         }
@@ -102,13 +138,8 @@ public class QuestManager : MonoBehaviour
 
     public void UseKeyOnDoor()
     {
-        if (questDescText == null) FindQuestUIReferences();
-
-        if (questDescText != null)
-        {
-            questDescText.text = "🚪 ไขประตูดันเจี้ยนสำเร็จ! (1/1)";
-            questDescText.color = new Color(1f, 0.85f, 0.2f); // Gold
-        }
+        doorUnlocked = true;
+        UpdateQuestUI();
         Debug.Log("[QuestManager] Key used on door! Quest cleared.");
     }
 }

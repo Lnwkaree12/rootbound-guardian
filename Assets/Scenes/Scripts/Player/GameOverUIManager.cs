@@ -22,6 +22,7 @@ public class GameOverUIManager : MonoBehaviour
     [SerializeField] public Button mainMenuButton;
 
     private bool isGameOver;
+    private string currentReasonKey = "gameover_oxygen_depleted";
 
     private void Awake()
     {
@@ -44,6 +45,22 @@ public class GameOverUIManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        UpdateLocalizedTexts();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        UpdateLocalizedTexts();
+    }
+
     public void TriggerGameOver(string reason = "")
     {
         if (isGameOver) return;
@@ -52,14 +69,24 @@ public class GameOverUIManager : MonoBehaviour
         FindUIReferences();
         BindButtonEvents();
 
-        if (reasonText != null && !string.IsNullOrEmpty(reason))
+        // Detect appropriate localization key
+        if (!string.IsNullOrEmpty(reason))
         {
-            reasonText.text = reason;
+            if (reason.Contains("ออกซิเจน") || reason.ToLower().Contains("oxygen"))
+            {
+                currentReasonKey = "gameover_oxygen_depleted";
+            }
+            else if (reason.Contains("พลังชีวิต") || reason.ToLower().Contains("health") || reason.ToLower().Contains("hp"))
+            {
+                currentReasonKey = "gameover_hp_depleted";
+            }
+            else
+            {
+                currentReasonKey = reason;
+            }
         }
-        if (reasonTextTMP != null && !string.IsNullOrEmpty(reason))
-        {
-            reasonTextTMP.text = reason;
-        }
+
+        UpdateLocalizedTexts();
 
         if (gameOverPanel != null)
         {
@@ -77,6 +104,58 @@ public class GameOverUIManager : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         Time.timeScale = 0f;
+    }
+
+    public void UpdateLocalizedTexts()
+    {
+        if (LocalizationManager.Instance == null) return;
+        FindUIReferences();
+
+        string localizedTitle = LocalizationManager.Instance.Get("gameover_title");
+        string localizedReason = LocalizationManager.Instance.Get(currentReasonKey);
+
+        if (titleTextTMP != null) titleTextTMP.text = localizedTitle;
+        if (titleText != null) titleText.text = localizedTitle;
+
+        if (reasonTextTMP != null) reasonTextTMP.text = localizedReason;
+        if (reasonText != null) reasonText.text = localizedReason;
+
+        if (gameOverPanel != null)
+        {
+            // Subtitle
+            Transform sub = gameOverPanel.transform.Find("ModalContainer/InnerCard/SubtitleText");
+            if (sub == null) sub = gameOverPanel.transform.Find("ModalContainer/SubtitleText");
+            if (sub != null)
+            {
+                var tmp = sub.GetComponent<TextMeshProUGUI>();
+                if (tmp != null) tmp.text = LocalizationManager.Instance.Get("gameover_subtitle");
+            }
+
+            // Survival tips heading
+            Transform tips = gameOverPanel.transform.Find("ModalContainer/InnerCard/TipsContainer/TipsHeading");
+            if (tips != null)
+            {
+                var tmp = tips.GetComponent<TextMeshProUGUI>();
+                if (tmp != null) tmp.text = LocalizationManager.Instance.Get("gameover_survival_tips");
+            }
+
+            // Buttons
+            if (restartButton != null)
+            {
+                var tmp = restartButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (tmp != null) tmp.text = LocalizationManager.Instance.Get("gameover_btn_retry");
+                var txt = restartButton.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = LocalizationManager.Instance.Get("gameover_btn_retry");
+            }
+
+            if (mainMenuButton != null)
+            {
+                var tmp = mainMenuButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (tmp != null) tmp.text = LocalizationManager.Instance.Get("gameover_btn_menu");
+                var txt = mainMenuButton.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = LocalizationManager.Instance.Get("gameover_btn_menu");
+            }
+        }
     }
 
     public void ResetGameOverState()

@@ -74,6 +74,25 @@ public class LumiCompanion : MonoBehaviour
     private Coroutine dialogueCoroutine;
     private Camera mainCamera;
     private Vector3 lastTargetPos;
+    private int currentBanterIndex = -1;
+
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        if (currentBanterIndex >= 0 && dialogueText != null && LocalizationManager.Instance != null)
+        {
+            dialogueText.text = LocalizationManager.Instance.GetLumiBanter(currentBanterIndex);
+        }
+    }
 
     private void Awake()
     {
@@ -298,9 +317,12 @@ public class LumiCompanion : MonoBehaviour
     /// </summary>
     public void TriggerRandomDialogue()
     {
-        if (banterLines == null || banterLines.Count == 0) return;
-        int randomIndex = Random.Range(0, banterLines.Count);
-        Speak(banterLines[randomIndex]);
+        int count = banterLines != null && banterLines.Count > 0 ? banterLines.Count : 10;
+        currentBanterIndex = Random.Range(0, count);
+        string line = LocalizationManager.Instance != null 
+            ? LocalizationManager.Instance.GetLumiBanter(currentBanterIndex) 
+            : (banterLines != null && currentBanterIndex < banterLines.Count ? banterLines[currentBanterIndex] : "...");
+        Speak(line);
     }
 
     /// <summary>

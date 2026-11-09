@@ -33,6 +33,9 @@ public class TreeSavePoint : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
 
     public bool IsRestored => isRestored;
+    public float CurrentTreeHealth => currentTreeHealth;
+    public float MaxTreeHealth => maxTreeHealth;
+    public float HealthDecreaseRate => healthDecreaseRate;
 
     private bool isPlayerInRange = false;
     private bool isProcessing = false; // ตัวแปรล็อกสถานะป้องกันการกดซ้ำซ้อน
@@ -61,6 +64,20 @@ public class TreeSavePoint : MonoBehaviour
 
     private void Update()
     {
+        // 🌟 Decay Logic: ถ้าต้นไม้ถูกฟื้นฟูอยู่ ให้ลดค่าพลังชีวิตลงอย่างต่อเนื่องทุกเฟรม
+        if (isRestored && currentTreeHealth > 0f)
+        {
+            currentTreeHealth -= healthDecreaseRate * Time.deltaTime;
+            currentTreeHealth = Mathf.Max(0f, currentTreeHealth);
+            UpdateTreeHealthUI();
+
+            if (currentTreeHealth <= 0f)
+            {
+                CollapseTree();
+                return;
+            }
+        }
+
         // 1. ถ้าต้นไม้ถูกฟื้นฟูไปแล้ว, ผู้เล่นไม่อยู่ในระยะ, หรือกำลังประมวลผลอยู่ -> ตัดจบ ไม่รับอินพุตใดๆ ทั้งสิ้น
         if (isRestored || !isPlayerInRange || isProcessing) return;
 
@@ -230,9 +247,6 @@ public class TreeSavePoint : MonoBehaviour
         }
 
         SaveGame();
-
-        if (treeDecayRoutine != null) StopCoroutine(treeDecayRoutine);
-        treeDecayRoutine = StartCoroutine(TreeDecayRoutine());
     }
 
     public void RestoreTree()
@@ -240,24 +254,6 @@ public class TreeSavePoint : MonoBehaviour
         if (isRestored) return;
         isRestored = true;
         ExecuteTreeRestoration();
-    }
-
-    private IEnumerator TreeDecayRoutine()
-    {
-        while (isRestored && currentTreeHealth > 0)
-        {
-            currentTreeHealth -= healthDecreaseRate * Time.deltaTime;
-            currentTreeHealth = Mathf.Max(0f, currentTreeHealth);
-
-            UpdateTreeHealthUI();
-
-            if (currentTreeHealth <= 0f)
-            {
-                CollapseTree();
-                yield break;
-            }
-            yield return null;
-        }
     }
 
     private void CollapseTree()
@@ -286,6 +282,27 @@ public class TreeSavePoint : MonoBehaviour
 
     private void UpdateTreeHealthUI()
     {
+        if (treeHealthSlider == null)
+        {
+            treeHealthSlider = GetComponentInChildren<Slider>(true);
+        }
+
+        if (treeHealthCanvasUI == null)
+        {
+            if (treeHealthSlider != null)
+            {
+                var canvas = treeHealthSlider.GetComponentInParent<Canvas>(true);
+                if (canvas != null) treeHealthCanvasUI = canvas.gameObject;
+            }
+            if (treeHealthCanvasUI == null)
+            {
+                var cd = transform.Find("CoolDown Tree Canvas");
+                if (cd == null) cd = transform.Find("CooldownTree Canvas");
+                if (cd == null) cd = transform.Find("Canvas");
+                if (cd != null) treeHealthCanvasUI = cd.gameObject;
+            }
+        }
+
         if (treeHealthSlider != null)
         {
             treeHealthSlider.maxValue = maxTreeHealth;
@@ -340,7 +357,7 @@ public class TreeSavePoint : MonoBehaviour
             CheckpointManager.Instance.SaveCheckpoint(checkpointPosition, playerHealth, playerInventory, healsOxygen);
             Debug.Log("[Tree Save Point] บันทึกจุด Checkpoint เรียบร้อย!");
         }
-        else
+        else if (Application.isPlaying)
         {
             Debug.LogError("❌ หา CheckpointManager.Instance ไม่เจอใน Scene!");
         }
@@ -377,6 +394,21 @@ public class TreeSavePoint : MonoBehaviour
             var prompt = transform.Find("InteractUI_Canvas");
             if (prompt != null) interactPromptUI = prompt.gameObject;
         }
+
+        if (treeHealthCanvasUI == null)
+        {
+            var cd = transform.Find("CoolDown Tree Canvas");
+            if (cd == null) cd = transform.Find("CooldownTree Canvas");
+            if (cd == null) cd = transform.Find("Canvas");
+            if (cd != null)
+            {
+                treeHealthCanvasUI = cd.gameObject;
+                if (treeHealthSlider == null)
+                {
+                    treeHealthSlider = cd.GetComponentInChildren<Slider>(true);
+                }
+            }
+        }
     }
 
     private void FindVFXReferences()
@@ -408,7 +440,7 @@ public class TreeSavePoint : MonoBehaviour
     public void ConfigureVisuals(GameObject deadVisual, GameObject restoredVisual, GameObject promptUI)
     {
         deadTreeVisual = deadVisual;
-        restoredVisual = restoredVisual;
+        restoredTreeVisual = restoredVisual;
         interactPromptUI = promptUI;
     }
 
@@ -416,7 +448,6 @@ public class TreeSavePoint : MonoBehaviour
     {
         isRestored = false;
         currentTreeHealth = 0f;
-        if (treeDecayRoutine != null) StopCoroutine(treeDecayRoutine);
         UpdateTreeVisual();
         UpdateTreeHealthUI();
         if (restoreVfxInstance != null) restoreVfxInstance.gameObject.SetActive(false);

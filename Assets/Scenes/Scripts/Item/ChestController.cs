@@ -233,12 +233,14 @@ public class ChestController : MonoBehaviour
         Vector3 keyStartScale = new Vector3(0.12f, 0.12f, 0.12f);
         float currentSpinAngle = 0f;
 
+        float keyZRot = (keyTransform != null && keyTransform.GetComponentInChildren<SpriteRenderer>() != null) ? 0f : -90f;
+
         if (keyTransform != null)
         {
             keyTransform.gameObject.SetActive(true);
             keyTransform.localPosition = keyInitialLocalPos;
             keyTransform.localScale = keyStartScale;
-            keyTransform.localRotation = Quaternion.Euler(0f, 0f, -90f);
+            keyTransform.localRotation = Quaternion.Euler(0f, 0f, keyZRot);
         }
 
         if (radiantLight != null)
@@ -289,7 +291,7 @@ public class ChestController : MonoBehaviour
                 currentSpinAngle += keySpinSpeed * Time.deltaTime;
                 keyTransform.localPosition = Vector3.Lerp(keyInitialLocalPos, keyTargetLocalPos, t);
                 keyTransform.localScale = Vector3.Lerp(keyStartScale, keyTargetScale, t);
-                keyTransform.localRotation = Quaternion.Euler(0f, currentSpinAngle, -90f);
+                keyTransform.localRotation = Quaternion.Euler(0f, currentSpinAngle, keyZRot);
             }
 
             // Camera smoothly glides into dramatic Close-Up
@@ -323,7 +325,7 @@ public class ChestController : MonoBehaviour
                 currentSpinAngle += keySpinSpeed * 1.2f * Time.deltaTime;
                 float bob = Mathf.Sin(Time.time * 4f) * 0.02f;
                 keyTransform.localPosition = keyTargetLocalPos + new Vector3(0f, bob, 0f);
-                keyTransform.localRotation = Quaternion.Euler(0f, currentSpinAngle, -90f);
+                keyTransform.localRotation = Quaternion.Euler(0f, currentSpinAngle, keyZRot);
             }
 
             if (radiantLight != null)

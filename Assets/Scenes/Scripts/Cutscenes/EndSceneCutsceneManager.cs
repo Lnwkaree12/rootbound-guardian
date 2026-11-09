@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 /// <summary>
@@ -60,8 +61,13 @@ public class EndSceneCutsceneManager : MonoBehaviour
     [SerializeField] private Vector3 treeBaseVfxOffset = new Vector3(45.4f, 5.0f, 44.5f);
     [SerializeField] private Vector3 treeCanopyVfxOffset = new Vector3(45.4f, 20.0f, 44.5f);
 
-    [Header("End Game Victory UI")]
-    [Tooltip("Victory celebration UI shown after tree restoration cutscene")]
+    [Header("End Scene Transition")]
+    [Tooltip("Target cutscene scene to load after tree blooming animation finishes")]
+    [SerializeField] private string endingCutsceneSceneName = "cutscene End";
+    [SerializeField] private float fadeOutDuration = 1.2f;
+
+    [Header("End Game Victory UI (Disabled)")]
+    [Tooltip("Victory celebration UI (disabled per user requirement - transitions to cutscene End instead)")]
     [SerializeField] private EndGameVictoryUI victoryUI;
     [SerializeField] private float victoryUIDelay = 1.2f;
 
@@ -326,7 +332,10 @@ public class EndSceneCutsceneManager : MonoBehaviour
         // -------------------------------------------------------------
         if (lumi != null)
         {
-            lumi.Speak(lumiDialogueText, dialogueReadDuration - 0.5f);
+            string speech = LocalizationManager.Instance != null 
+                ? LocalizationManager.Instance.GetEndSceneLumiDialogue() 
+                : lumiDialogueText;
+            lumi.Speak(speech, dialogueReadDuration - 0.5f);
         }
 
         yield return new WaitForSeconds(dialogueReadDuration);
@@ -407,72 +416,53 @@ public class EndSceneCutsceneManager : MonoBehaviour
         }
 
         // -------------------------------------------------------------
-        // Step 7: Smoothly Return Camera & Controls to Player
+        // Step 7: Transition to CutsceneEnd (No Victory UI)
         // -------------------------------------------------------------
-        if (mainCamera != null && playerObj != null)
+        yield return StartCoroutine(FadeToEndingCutscene());
+    }
+
+    private IEnumerator FadeToEndingCutscene()
+    {
+        // Create full screen fade overlay
+        GameObject faderObj = new GameObject("CutsceneTransitionFader");
+        var canvas = faderObj.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 9999;
+        var cg = faderObj.AddComponent<CanvasGroup>();
+        cg.alpha = 0f;
+        cg.blocksRaycasts = true;
+
+        GameObject blackImg = new GameObject("BlackImage");
+        blackImg.transform.SetParent(faderObj.transform, false);
+        var img = blackImg.AddComponent<UnityEngine.UI.Image>();
+        img.color = Color.black;
+        var rt = blackImg.GetComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.sizeDelta = Vector2.zero;
+
+        float elapsed = 0f;
+        while (elapsed < fadeOutDuration)
         {
-            Vector3 camCurrentPos = mainCamera.transform.position;
-            Quaternion camCurrentRot = mainCamera.transform.rotation;
+            elapsed += Time.deltaTime;
+            cg.alpha = Mathf.Clamp01(elapsed / fadeOutDuration);
+            yield return null;
+        }
+        cg.alpha = 1f;
+        yield return new WaitForSeconds(0.25f);
 
-            elapsed = 0f;
-            while (elapsed < camReturnToPlayerTime)
-            {
-                elapsed += Time.deltaTime;
-                float t = Mathf.SmoothStep(0f, 1f, elapsed / camReturnToPlayerTime);
-
-                Vector3 targetCamWorldPos = playerObj.transform.TransformPoint(originalCamLocalPos);
-                Quaternion targetCamWorldRot = playerObj.transform.rotation * originalCamLocalRot;
-
-                mainCamera.transform.position = Vector3.Lerp(camCurrentPos, targetCamWorldPos, t);
-                mainCamera.transform.rotation = Quaternion.Slerp(camCurrentRot, targetCamWorldRot, t);
-                yield return null;
-            }
-
-            // Re-parent camera to player with exact original transform
-            mainCamera.transform.SetParent(playerObj.transform, false);
-            mainCamera.transform.localPosition = originalCamLocalPos;
-            mainCamera.transform.localRotation = originalCamLocalRot;
-            mainCamera.transform.localScale = originalCamLocalScale;
+        // Load ending cutscene scene
+        string targetScene = endingCutsceneSceneName;
+        if (!Application.CanStreamedLevelBeLoaded(targetScene))
+        {
+            if (Application.CanStreamedLevelBeLoaded("cutscene End"))
+                targetScene = "cutscene End";
+            else if (Application.CanStreamedLevelBeLoaded("CutsceneEnd"))
+                targetScene = "CutsceneEnd";
         }
 
-        // Anchor player solidly on top of Cube (2) platform
-        if (playerObj != null)
-        {
-            playerObj.transform.position = playerStagePosition;
-            playerObj.transform.rotation = Quaternion.identity;
-        }
-
-        // Return Lumi to normal companion following behavior
-        if (lumi != null)
-        {
-            lumi.SetCutsceneMode(false);
-            lumi.disableAutoDialogue = false;
-        }
-
-        // Unfreeze physics and restore Player Controls for free exploration of the restored sacred island
-        if (playerRb != null)
-        {
-            playerRb.isKinematic = false;
-            playerRb.linearVelocity = Vector3.zero;
-            playerRb.angularVelocity = Vector3.zero;
-        }
-
-        if (playerMovement != null) playerMovement.enabled = true;
-        if (playerController != null) playerController.enabled = true;
-
-        // -------------------------------------------------------------
-        // Step 8: Trigger Victory / The End Celebration UI
-        // -------------------------------------------------------------
-        if (victoryUI == null)
-        {
-            victoryUI = Object.FindFirstObjectByType<EndGameVictoryUI>();
-        }
-
-        if (victoryUI != null)
-        {
-            yield return new WaitForSeconds(victoryUIDelay);
-            victoryUI.ShowVictoryScreen();
-        }
+        Debug.Log("[EndSceneCutsceneManager] Loading ending cutscene: " + targetScene);
+        SceneManager.LoadScene(targetScene);
     }
 
     private IEnumerator SpawnCanopyVfxRoutine()
