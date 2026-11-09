@@ -332,7 +332,10 @@ public class EndSceneCutsceneManager : MonoBehaviour
         // -------------------------------------------------------------
         if (lumi != null)
         {
-            lumi.Speak(lumiDialogueText, dialogueReadDuration - 0.5f);
+            string speech = LocalizationManager.Instance != null 
+                ? LocalizationManager.Instance.GetEndSceneLumiDialogue() 
+                : lumiDialogueText;
+            lumi.Speak(speech, dialogueReadDuration - 0.5f);
         }
 
         yield return new WaitForSeconds(dialogueReadDuration);

@@ -83,6 +83,62 @@ public class EndCreditController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        UpdateLocalizedTexts();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        UpdateLocalizedTexts();
+    }
+
+    public void UpdateLocalizedTexts()
+    {
+        if (LocalizationManager.Instance == null) return;
+
+        SetTMPText("AdvisorRole", "credits_advisor_role");
+        SetTMPText("TeamHeader", "credits_team_role");
+        SetTMPText("ThanksHeader", "credits_thanks_role");
+        SetTMPText("ThaiThanksMsg", "credits_finale_title");
+        SetTMPText("EnglishSubMsg", "credits_finale_sub");
+        SetTMPText("FastForwardPrompt/Text", "credits_hint_ff");
+
+        if (mainMenuButton != null)
+        {
+            var tmp = mainMenuButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get("credits_btn_menu");
+        }
+
+        if (replayButton != null)
+        {
+            var tmp = replayButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get("credits_btn_replay");
+        }
+
+        if (skipButton != null)
+        {
+            var tmp = skipButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get("credits_hint_skip");
+        }
+    }
+
+    private void SetTMPText(string goNameOrPath, string locKey)
+    {
+        GameObject go = GameObject.Find(goNameOrPath);
+        if (go != null)
+        {
+            var tmp = go.GetComponent<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get(locKey);
+        }
+    }
+
     private void Start()
     {
         StartCoroutine(ScreenFadeInRoutine());

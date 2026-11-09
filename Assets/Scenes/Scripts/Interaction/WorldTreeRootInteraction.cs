@@ -103,10 +103,37 @@ public class WorldTreeRootInteraction : MonoBehaviour
         SetupRootMaterials();
     }
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        RefreshPromptText();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        RefreshPromptText();
+    }
+
+    private void RefreshPromptText()
+    {
+        if (promptTextTMP != null && !isWatered)
+        {
+            promptTextTMP.text = LocalizationManager.Instance != null 
+                ? LocalizationManager.Instance.Get("root_prompt_water") 
+                : "กด E รดน้ำต้นไม้";
+        }
+    }
+
     private void Start()
     {
         FindPlayer();
         mainCamera = Camera.main;
+        RefreshPromptText();
 
         // Ensure root starts with initial shadow color #1B0E0A
         ApplyShadowColor(startShadowColor);
@@ -256,7 +283,9 @@ public class WorldTreeRootInteraction : MonoBehaviour
         // Update Prompt message and fade it out
         if (promptTextTMP != null)
         {
-            promptTextTMP.text = "<color=#7CE29C><b>รากไม้โลกกำลังฟื้นคืนพลัง...</b></color>";
+            promptTextTMP.text = LocalizationManager.Instance != null 
+                ? LocalizationManager.Instance.Get("root_prompt_restoring") 
+                : "<color=#7CE29C><b>รากไม้โลกกำลังฟื้นคืนพลัง...</b></color>";
         }
         StartCoroutine(FadePromptRoutine(0f, 0.6f));
 

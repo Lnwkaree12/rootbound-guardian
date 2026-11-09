@@ -42,7 +42,7 @@ public class DoorController : MonoBehaviour
     private AudioSource audioSource;
 
     [Header("Victory Settings")]
-    public bool triggerWinOnOpen = false;
+    public bool triggerWinOnOpen = true;
     public float winUIDelay = 1.2f;
 
     [Header("Floating Prompt UI")]
@@ -308,13 +308,13 @@ public class DoorController : MonoBehaviour
         {
             if (hasKey)
             {
-                promptTextTMP.text = "กด <color=#FFEE44>[E]</color> เพื่อเปิดประตู";
+                promptTextTMP.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_open") : "กด <color=#FFEE44>[E]</color> เพื่อเปิดประตู";
                 promptTextTMP.color = new Color(1f, 0.95f, 0.7f);
                 if (promptKeyIcon != null) promptKeyIcon.gameObject.SetActive(true);
             }
             else
             {
-                promptTextTMP.text = "<color=#FFAA77>ประตูล็อคแน่นหนา (ต้องหากุญแจก่อน)</color>";
+                promptTextTMP.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_locked") : "<color=#FFAA77>ประตูล็อคแน่นหนา (ต้องหากุญแจก่อน)</color>";
                 promptTextTMP.color = new Color(1f, 0.7f, 0.5f);
                 if (promptKeyIcon != null) promptKeyIcon.gameObject.SetActive(false);
             }
@@ -322,7 +322,9 @@ public class DoorController : MonoBehaviour
 
         if (promptTextLegacy != null)
         {
-            promptTextLegacy.text = hasKey ? "กด [E] เพื่อเปิดประตู" : "ประตูล็อคแน่นหนา (ต้องหากุญแจก่อน)";
+            promptTextLegacy.text = hasKey 
+                ? (LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_open") : "กด [E] เพื่อเปิดประตู") 
+                : (LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_locked") : "ประตูล็อคแน่นหนา (ต้องหากุญแจก่อน)");
         }
     }
 
@@ -484,21 +486,35 @@ public class DoorController : MonoBehaviour
 
     private void TriggerWinUI()
     {
-        if (WinUIManager.Instance != null)
+        WinUIManager[] managers = FindObjectsByType<WinUIManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        WinUIManager winManager = null;
+        int highestSortingOrder = int.MinValue;
+
+        foreach (WinUIManager manager in managers)
         {
-            WinUIManager.Instance.TriggerWin(0f);
-        }
-        else
-        {
-            WinUIManager winUI = Object.FindAnyObjectByType<WinUIManager>();
-            if (winUI != null)
+            if (manager == null || manager.winPanel == null || manager.gameObject.scene != gameObject.scene)
             {
-                winUI.TriggerWin(0f);
+                continue;
+            }
+
+            Canvas canvas = manager.winPanel.GetComponentInParent<Canvas>();
+            int sortingOrder = canvas != null ? canvas.sortingOrder : 0;
+            if (winManager == null || sortingOrder > highestSortingOrder)
+            {
+                winManager = manager;
+                highestSortingOrder = sortingOrder;
             }
         }
-    }
 
-   
+        if (winManager == null)
+        {
+            Debug.LogError("[DoorController] No WinUIManager with a WinPanel was found in the active scene.");
+            return;
+        }
+
+        Debug.Log("[DoorController] Triggering Game Win UI!");
+        winManager.TriggerWin(0.2f);
+    }
 
     private IEnumerator FlashLockedPrompt()
     {
@@ -507,11 +523,11 @@ public class DoorController : MonoBehaviour
 
         if (promptTextTMP != null)
         {
-            promptTextTMP.text = "<color=#FF3333>ประตูล็อคแน่นหนา! ต้องใช้กุญแจ</color>";
+            promptTextTMP.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_need_key") : "<color=#FF3333>ประตูล็อคแน่นหนา! ต้องใช้กุญแจ</color>";
         }
         if (promptTextLegacy != null)
         {
-            promptTextLegacy.text = "ประตูล็อคแน่นหนา! ต้องใช้กุญแจ";
+            promptTextLegacy.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_need_key") : "ประตูล็อคแน่นหนา! ต้องใช้กุญแจ";
             promptTextLegacy.color = Color.red;
         }
         if (promptBgImage != null)

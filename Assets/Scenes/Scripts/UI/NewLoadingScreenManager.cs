@@ -81,6 +81,82 @@ public class NewLoadingScreenManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        UpdateLocalizedTutorialUI();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        UpdateLocalizedTutorialUI();
+    }
+
+    private void UpdateLocalizedTutorialUI()
+    {
+        if (LocalizationManager.Instance == null) return;
+
+        // Spirit Name
+        GameObject nameObj = GameObject.Find("Name_Text");
+        if (nameObj != null)
+        {
+            var tmp = nameObj.GetComponent<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get("load_guide_spirit_name");
+        }
+
+        // Tag text
+        GameObject tagObj = GameObject.Find("Tag_Text");
+        if (tagObj != null)
+        {
+            var tmp = tagObj.GetComponent<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get("load_guide_tag");
+        }
+
+        // Header controls
+        GameObject headerObj = GameObject.Find("Header_Text");
+        if (headerObj != null)
+        {
+            var tmp = headerObj.GetComponent<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get("load_header_controls");
+        }
+
+        // Rows 1-7
+        string[] rowKeys = new string[]
+        {
+            "load_row_move",
+            "load_row_sprint",
+            "load_row_interact",
+            "load_row_potion",
+            "load_row_chest",
+            "load_row_tree",
+            "load_row_climb"
+        };
+
+        for (int i = 0; i < rowKeys.Length; i++)
+        {
+            GameObject rowObj = GameObject.Find($"Tutorial_Row_{i + 1}");
+            if (rowObj != null)
+            {
+                Transform textContainer = rowObj.transform.Find("Text_Container");
+                if (textContainer != null)
+                {
+                    var tmp = textContainer.GetComponent<TextMeshProUGUI>();
+                    if (tmp != null) tmp.text = LocalizationManager.Instance.Get(rowKeys[i]);
+                }
+            }
+        }
+
+        if (readyPromptText != null)
+        {
+            readyPromptText.text = LocalizationManager.Instance.Get("load_ready_prompt");
+        }
+    }
+
     private void Start()
     {
         // Start atmospheric BGM
@@ -169,6 +245,11 @@ public class NewLoadingScreenManager : MonoBehaviour
             }
         }
 
+        if (statusText != null)
+        {
+            statusText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("load_status_preparing") : "กำลังเตรียมพร้อมเข้าสู่ดันเจี้ยน...";
+        }
+
         // Progress simulation & tracking
         while ((Time.time - startTime < minimumDisplayTime) || (asyncOperation != null && asyncOperation.progress < 0.9f))
         {
@@ -195,7 +276,7 @@ public class NewLoadingScreenManager : MonoBehaviour
 
         if (statusText != null)
         {
-            statusText.text = "เตรียมพร้อมผจญภัยเรียบร้อย!";
+            statusText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("load_status_ready") : "เตรียมพร้อมผจญภัยเรียบร้อย!";
         }
 
         // Show Ready Prompt
@@ -248,8 +329,11 @@ public class NewLoadingScreenManager : MonoBehaviour
                     yield return StartCoroutine(FadeGroup(lumiSpeechBubbleGroup, 1f, 0f, 0.25f));
                 }
 
-                lumiDialogueTMP.text = lumiTips[currentTipIndex];
-                currentTipIndex = (currentTipIndex + 1) % lumiTips.Count;
+                string tip = LocalizationManager.Instance != null 
+                    ? LocalizationManager.Instance.GetLoadingTip(currentTipIndex) 
+                    : (currentTipIndex < lumiTips.Count ? lumiTips[currentTipIndex] : "");
+                lumiDialogueTMP.text = tip;
+                currentTipIndex = (currentTipIndex + 1) % Mathf.Max(1, lumiTips.Count);
 
                 // Fade in bubble
                 if (lumiSpeechBubbleGroup != null)
