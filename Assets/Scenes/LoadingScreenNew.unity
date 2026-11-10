@@ -2795,13 +2795,13 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 
   m_enableExtraPadding: 1
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
-  m_isOrthographic: 0
+  m_isOrthographic: 1
   m_isCullingEnabled: 0
   m_horizontalMapping: 0
   m_verticalMapping: 0
@@ -4420,7 +4420,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1466644288
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4587,6 +4587,10 @@ PrefabInstance:
     - target: {fileID: 156269329079132932, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_Name
       value: Lumi_Model
+      objectReference: {fileID: 0}
+    - target: {fileID: 156269329079132932, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_fontSize
@@ -5901,7 +5905,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1854085173
 MonoBehaviour:
   m_ObjectHideFlags: 0
