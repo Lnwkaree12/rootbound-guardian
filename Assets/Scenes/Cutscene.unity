@@ -2007,7 +2007,7 @@ MonoBehaviour:
   blackFader: {fileID: 26436736}
   bgmSource: {fileID: 1128287953}
   bgmClip: {fileID: 8300000, guid: cba050cd2e36a174eb3355817d49bf32, type: 3}
-  transitionSFX: {fileID: 8300000, guid: 52ac4812dc7ab894e9748300b59c8d05, type: 3}
+  transitionSFX: {fileID: 0}
   maxBgmVolume: 0.65
   dustmotesObj: {fileID: 0}
 --- !u!4 &1128287955

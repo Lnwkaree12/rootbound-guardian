@@ -48,8 +48,17 @@ public class EndCreditController : MonoBehaviour
 
     private void Awake()
     {
+        if (scrollRect != null && scrollRect.viewport != null)
+        {
+            var vpImg = scrollRect.viewport.GetComponent<Image>();
+            if (vpImg != null) vpImg.enabled = true;
+            var mask = scrollRect.viewport.GetComponent<Mask>();
+            if (mask != null) mask.enabled = true;
+        }
+
         if (blackScreenFader != null)
         {
+            blackScreenFader.gameObject.SetActive(true);
             blackScreenFader.alpha = 1f;
             blackScreenFader.blocksRaycasts = true;
         }

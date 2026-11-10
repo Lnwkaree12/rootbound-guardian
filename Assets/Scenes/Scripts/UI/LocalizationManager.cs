@@ -338,7 +338,8 @@ public class LocalizationManager : MonoBehaviour
             en: "BACK TO MAIN MENU (ESC)",
             zh: "返回主菜单 (ESC)");
 
-        AddKey("label_master",       th: "เสียงรวม",      en: "MASTER VOLUME", zh: "总音量");
+        AddKey("label_master",       th: "เสียงรวม",      en: "MASTER ", zh: "总音量");
+        AddKey("label_master",       th: "เสียงรวม",      en: "MASTER ", zh: "总音量");
         AddKey("label_bgm",          th: "เสียงเพลง",     en: "MUSIC",         zh: "背景音乐");
         AddKey("label_sfx",          th: "เสียงเอฟเฟกต์", en: "SFX",           zh: "音效");
         AddKey("label_resolution",   th: "ความละเอียด",   en: "RESOLUTION",    zh: "分辨率");
@@ -566,9 +567,9 @@ public class LocalizationManager : MonoBehaviour
             zh: "按 [1] 或 [H] 使用");
 
         AddKey("hud_shift_hint",
-            th: "[SHIFT] วิ่งเร็ว",
-            en: "[SHIFT] Sprint",
-            zh: "[SHIFT] 冲刺");
+            th: "[SPACEBAR] วิ่งเร็ว",
+            en: "[SPACEBAR] Sprint",
+            zh: "[SPACEBAR] 冲刺");
 
         // ══════════════════════════════════════════════════════════════════════
         // 7. IN-GAME PAUSE MENU
