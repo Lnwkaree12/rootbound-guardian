@@ -9,9 +9,20 @@ public class CheckpointManager : MonoBehaviour
     private PlayerDataSave currentSaveData;
     private bool hasCheckpoint = false;
     private bool lastCheckpointHealsOxygen = true;
+    private TreeSavePoint lastCheckpointTree;
+    private bool lastCheckpointUsesTree;
 
     private HashSet<string> currentPickedItemIDs = new HashSet<string>();
     private HashSet<string> savedPickedItemIDs = new HashSet<string>();
+
+    private HashSet<string> currentOpenedChestIDs = new HashSet<string>();
+    private HashSet<string> savedOpenedChestIDs = new HashSet<string>();
+
+    private HashSet<string> currentFallenStalactites = new HashSet<string>();
+    private HashSet<string> savedFallenStalactites = new HashSet<string>();
+
+    private bool savedHasKey = false;
+    private bool savedDoorUnlocked = false;
 
     private void Awake()
     {
@@ -41,9 +52,23 @@ public class CheckpointManager : MonoBehaviour
 
     public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp, Inventory inventoryComp, bool healsOxygen)
     {
+        SaveCheckpoint(checkpointPos, healthComp, inventoryComp, healsOxygen, null);
+    }
+
+    public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp, Inventory inventoryComp, bool healsOxygen, TreeSavePoint sourceTree)
+    {
         lastCheckpointPosition = checkpointPos;
         hasCheckpoint = true;
         lastCheckpointHealsOxygen = healsOxygen;
+        lastCheckpointTree = sourceTree;
+        lastCheckpointUsesTree = sourceTree != null;
+
+        // 🌟 บันทึกสถานะ Quest ปัจจุบัน
+        if (QuestManager.Instance != null)
+        {
+            savedHasKey = QuestManager.Instance.hasKey;
+            // หากต้องการเซฟตัวแปร doorUnlocked ด้วย สามารถเพิ่มเงื่อนไขดึงค่าได้ที่นี่
+        }
 
         if (healthComp != null || inventoryComp != null)
         {
@@ -54,6 +79,8 @@ public class CheckpointManager : MonoBehaviour
             };
         }
 
+        savedOpenedChestIDs = new HashSet<string>(currentOpenedChestIDs);
+        savedFallenStalactites = new HashSet<string>(currentFallenStalactites);
         savedPickedItemIDs = new HashSet<string>(currentPickedItemIDs);
         Debug.Log($"[CheckpointManager] บันทึกจุดเซฟใหม่ที่ตำแหน่ง: {checkpointPos}");
     }
@@ -76,6 +103,19 @@ public class CheckpointManager : MonoBehaviour
 
     public void RespawnPlayer(GameObject player)
     {
+        if (!hasCheckpoint)
+        {
+            Debug.LogWarning("[CheckpointManager] ❌ ไม่มีจุดเซฟเหลืออยู่! ทำการเรียกหน้า Game Over");
+            TriggerGameOverDirectly();
+            return;
+        }
+
+        // 🌟 โหลดสถานะ Quest กลับคืนมาเมื่อเกิดใหม่
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.LoadQuestState(savedHasKey, savedDoorUnlocked);
+        }
+
         // ตรวจสอบว่ามีจุดเซฟที่ใช้งานได้อยู่หรือไม่ หากไม่มี -> สั่ง Game Over ทันที
         if (!hasCheckpoint)
         {
@@ -97,10 +137,16 @@ public class CheckpointManager : MonoBehaviour
         }
         Physics.SyncTransforms();
 
+        bool shouldHealOxygen = lastCheckpointHealsOxygen &&
+            (!lastCheckpointUsesTree || (lastCheckpointTree != null && lastCheckpointTree.IsRestored));
+
+        PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
+        oxygen?.SetOxygenRegenSuppressedUntilSafeZoneExit(!shouldHealOxygen);
+
         PlayerHealth health = player.GetComponent<PlayerHealth>();
         if (health != null)
         {
-            health.ResetHealth(lastCheckpointHealsOxygen);
+            health.ResetHealth(shouldHealOxygen);
         }
 
         Inventory inventory = player.GetComponent<Inventory>();
@@ -111,12 +157,33 @@ public class CheckpointManager : MonoBehaviour
 
         currentPickedItemIDs = new HashSet<string>(savedPickedItemIDs);
 
+
         ItemObject[] allItems = FindObjectsByType<ItemObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (ItemObject item in allItems)
         {
             bool isAlreadyPickedBeforeSave = savedPickedItemIDs.Contains(item.ItemID);
             item.ResetItemState(!isAlreadyPickedBeforeSave);
         }
+
+        currentOpenedChestIDs = new HashSet<string>(savedOpenedChestIDs);
+
+        // ค้นหาหีบทั้งหมดในฉากแล้วสั่งรีเซ็ตสถานะเปิด/ปิด
+        ChestController[] allChests = FindObjectsByType<ChestController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (ChestController chest in allChests)
+        {
+            bool isOpenedBeforeSave = savedOpenedChestIDs.Contains(chest.ChestID);
+            chest.ResetChestState(isOpenedBeforeSave);
+        }
+
+        currentFallenStalactites = new HashSet<string>(savedFallenStalactites);
+
+        StalactiteTrap[] allStalactites = FindObjectsByType<StalactiteTrap>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (StalactiteTrap trap in allStalactites)
+        {
+            bool fallenBeforeSave = savedFallenStalactites.Contains(trap.StalactiteID);
+            trap.ResetStalactiteState(fallenBeforeSave);
+        }
+
     }
 
     private void TriggerGameOverDirectly()
@@ -133,6 +200,27 @@ public class CheckpointManager : MonoBehaviour
         else
         {
             Debug.LogError("[CheckpointManager] ไม่พบ GameOverUIManager ในฉากเพื่อแสดงหน้าจอ Game Over");
+        }
+    }
+
+    public void MarkChestAsOpened(string chestID)
+    {
+        if (!currentOpenedChestIDs.Contains(chestID))
+        {
+            currentOpenedChestIDs.Add(chestID);
+        }
+    }
+
+    public bool IsChestOpened(string chestID)
+    {
+        return savedOpenedChestIDs.Contains(chestID) || currentOpenedChestIDs.Contains(chestID);
+    }
+
+    public void MarkStalactiteAsFallen(string stalactiteID)
+    {
+        if (!currentFallenStalactites.Contains(stalactiteID))
+        {
+            currentFallenStalactites.Add(stalactiteID);
         }
     }
 }

@@ -142,4 +142,12 @@ public class QuestManager : MonoBehaviour
         UpdateQuestUI();
         Debug.Log("[QuestManager] Key used on door! Quest cleared.");
     }
+
+    public void LoadQuestState(bool keyStatus, bool doorStatus)
+    {
+        hasKey = keyStatus;
+        doorUnlocked = doorStatus;
+        UpdateQuestUI();
+        Debug.Log($"[QuestManager] โหลดสถานะเควสจาก Checkpoint สำเร็จ (HasKey: {hasKey})");
+    }
 }

@@ -18,11 +18,19 @@ public class AutomaticSmashTrap : MonoBehaviour
 
     private Vector3 startPosition;
     private Vector3 targetPosition;
+    private BoxCollider trapCollider;
+    private int playersInsideCount = 0; // ตัวนับจำนวนผู้เล่นที่อยู่ในเขตกับดัก
 
     private void Start()
     {
         startPosition = transform.position;
         targetPosition = startPosition + Vector3.down * smashDistance;
+
+        trapCollider = GetComponent<BoxCollider>();
+        if (trapCollider == null)
+        {
+            Debug.LogError("[AutomaticSmashTrap] ไม่พบ Box Collider บนตัวกับดัก!");
+        }
 
         if (audioSource == null)
         {
@@ -32,14 +40,36 @@ public class AutomaticSmashTrap : MonoBehaviour
         StartCoroutine(TrapLoop());
     }
 
+    // ตรวจจับเมื่อผู้เล่นเดินเข้ามาในเขตกับดัก
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.GetComponentInParent<PlayerHealth>() != null)
+        {
+            playersInsideCount++;
+        }
+    }
+
+    // ตรวจจับเมื่อผู้เล่นเดินออกจากเขตกับดัก
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.GetComponentInParent<PlayerHealth>() != null)
+        {
+            playersInsideCount = Mathf.Max(0, playersInsideCount - 1);
+        }
+    }
+
     private IEnumerator TrapLoop()
     {
         while (true)
         {
-            // 1. รอที่จุดบนสุด
+            // 1. รอที่จุดบนสุด (ปิด Trigger เพื่อให้บล็อกผู้เล่นตามปกติ)
+            if (trapCollider != null) trapCollider.isTrigger = false;
+            playersInsideCount = 0; // รีเซ็ตค่า
             yield return new WaitForSeconds(waitTimeAtTop);
 
-            // 2. ทุบลงมา (แก้ไข: เช็กระยะห่างแทนการใช้ !=)
+            // 2. จังหวะทุบลงมา: เปิด Is Trigger ให้ทะลุผ่านตัวผู้เล่นและทำดาเมจ
+            if (trapCollider != null) trapCollider.isTrigger = true;
+
             while (Vector3.Distance(transform.position, targetPosition) > 0.01f)
             {
                 transform.position = Vector3.MoveTowards(transform.position, targetPosition, smashSpeed * Time.deltaTime);
@@ -50,10 +80,20 @@ public class AutomaticSmashTrap : MonoBehaviour
             transform.position = targetPosition;
             PlaySmashSound();
 
-            // 3. เมื่อถึงจุดล่างสุด ให้รอสักพัก
+            // 🌟 3. เมื่อถึงพื้น: เช็คว่ามีผู้เล่นอยู่ข้างในไหม
+            // ถ้ายังมีผู้เล่นอยู่ ให้รอ (Loop วนไปเรื่อยๆ) จนกว่าผู้เล่นจะเดินออก (playersInsideCount จะเหลือ 0)
+            while (playersInsideCount > 0)
+            {
+                yield return null;
+            }
+
+            // 4. เมื่อไม่มีผู้เล่นอยู่ข้างในแล้ว (หรือเดินออกไปแล้ว) ปิด Is Trigger ทันทีให้กลับมาเป็นทึบ
+            if (trapCollider != null) trapCollider.isTrigger = false;
+
+            // 5. รอพักตามเวลาที่กำหนดที่พื้น
             yield return new WaitForSeconds(waitTimeAtBottom);
 
-            // 4. ค่อยๆ ลอยกลับขึ้นไป (แก้ไข: เช็กระยะห่างแทนการใช้ !=)
+            // 6. ค่อยๆ ลอยกลับขึ้นไป
             while (Vector3.Distance(transform.position, startPosition) > 0.01f)
             {
                 transform.position = Vector3.MoveTowards(transform.position, startPosition, riseSpeed * Time.deltaTime);

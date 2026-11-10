@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8768548582112106451}
   - component: {fileID: 4917920035088866822}
   - component: {fileID: 5572359220139809753}
+  - component: {fileID: 2321890692979421810}
   m_Layer: 3
   m_Name: Camera
   m_TagString: MainCamera
@@ -137,6 +138,24 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &2321890692979421810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7687779392390447534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 723df833041c3d5428394e0f5ea4d295, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraOcclusionFade
+  playerTransform: {fileID: 2303497211585763477}
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  fadedAlpha: 0.3
+  fadeSpeed: 5
 --- !u!1001 &6510911344209373364
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -260,6 +279,11 @@ PrefabInstance:
       addedObject: {fileID: 2198398331640359335}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
+--- !u!4 &2303497211585763477 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5020614035394342945, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}
+  m_PrefabInstance: {fileID: 6510911344209373364}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6516659407432570624 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 14835071610585012, guid: 503c0520403d5f84b998a3f683dd3b58, type: 3}

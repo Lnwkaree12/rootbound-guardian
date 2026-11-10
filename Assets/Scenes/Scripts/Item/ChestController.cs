@@ -39,7 +39,15 @@ public class ChestController : MonoBehaviour
     private Quaternion lidInitialRot;
     private Vector3 keyInitialLocalPos;
 
+    [SerializeField] 
+    private Vector3 camFocus ;
+
     public bool IsOpened => isOpened;
+
+    [Header("Save Settings")]
+    [SerializeField] private string chestID;
+
+    public string ChestID => chestID;
 
     public void ConfigureChest(Transform lid, Transform key, GameObject promptUIObj, ParticleSystem burstVFX, ParticleSystem auraVFX, Light lightComp, AudioClip sfxOpen, AudioClip sfxFanfare)
     {
@@ -110,7 +118,11 @@ public class ChestController : MonoBehaviour
         {
             OpenChest();
         }
+
+        CheckInitialOpenState();
     }
+  
+
 
     private float GetHorizontalDistance(Vector3 a, Vector3 b)
     {
@@ -163,6 +175,14 @@ public class ChestController : MonoBehaviour
     {
         if (isOpened) return;
         isOpened = true;
+
+        // 🌟 บันทึกสถานะว่าหีบใบนี้ถูกเปิดแล้วลงในระบบเซฟ
+        
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.MarkChestAsOpened(chestID);
+        }
+        
 
         SetPromptActive(false);
         StartCoroutine(ChestOpeningCinematicRoutine());
@@ -276,7 +296,7 @@ public class ChestController : MonoBehaviour
 
         // Calculate close-up world position focusing directly on the rising key hovering above chest
         Vector3 keyFocusWorldPos = transform.position + Vector3.up * (keyInitialLocalPos.y + keyRiseHeight + 0.1f);
-        Vector3 camCloseUpWorldPos = keyFocusWorldPos + new Vector3(0.7f, 4.5f, -2.5f);
+        Vector3 camCloseUpWorldPos = keyFocusWorldPos + new Vector3(0.45f, 0.35f, -1.2f);
         Quaternion camCloseUpWorldRot = Quaternion.LookRotation((keyFocusWorldPos - Vector3.up * 0.1f) - camCloseUpWorldPos);
         float closeUpFOV = 48f;
 
@@ -416,6 +436,67 @@ public class ChestController : MonoBehaviour
         if (playerController != null) playerController.enabled = true;
 
         Debug.Log("[ChestController] Chest opening cinematic complete! Camera returned to original angle.");
+    }
+
+    private void OnValidate()
+    {
+        if (string.IsNullOrEmpty(chestID))
+        {
+            chestID = gameObject.name + "_" + transform.position.ToString();
+        }
+    }
+
+    private void CheckInitialOpenState()
+    {
+        // สมมติว่าคุณเก็บสถานะ Chest IDs ไว้ใน CheckpointManager หรือระบบ Save ของคุณ
+        // ตัวอย่างเช่นถ้า CheckpointManager มีฟังก์ชันเช็ค IsChestOpened(chestID)
+
+        if (CheckpointManager.Instance != null && CheckpointManager.Instance.IsChestOpened(chestID))
+        {
+            isOpened = true;
+            if (lidTransform != null)
+            {
+                Quaternion lidTargetRot = lidInitialRot * Quaternion.Euler(lidOpenAngle, 0f, 0f);
+                lidTransform.localRotation = lidTargetRot;
+            }
+            if (radiantLight != null) radiantLight.enabled = false;
+            if (keyTransform != null) keyTransform.gameObject.SetActive(false);
+            return;
+        }
+    }
+
+    public void ResetChestState(bool opened)
+    {
+        isOpened = opened;
+
+        if (lidTransform != null)
+        {
+            if (isOpened)
+            {
+                Quaternion lidTargetRot = lidInitialRot * Quaternion.Euler(lidOpenAngle, 0f, 0f);
+                lidTransform.localRotation = lidTargetRot;
+            }
+            else
+            {
+                lidTransform.localRotation = lidInitialRot;
+            }
+        }
+
+        if (keyTransform != null)
+        {
+            keyTransform.gameObject.SetActive(false);
+        }
+
+        if (radiantLight != null)
+        {
+            radiantLight.enabled = false;
+        }
+
+        // เปิด Prompt กลับมาถ้ายังไม่เคยเปิด
+        if (!isOpened && isPlayerInRange)
+        {
+            SetPromptActive(true);
+        }
     }
 }
 

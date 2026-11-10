@@ -263,7 +263,7 @@ public class EndSceneCutsceneManager : MonoBehaviour
             var oxy = playerObj.GetComponent<PlayerOxygen>();
             if (oxy != null)
             {
-                oxy.ResetOxygen();
+                //oxy.ResetOxygen();
                 oxy.UpdateSafeZoneState(true);
             }
         }
