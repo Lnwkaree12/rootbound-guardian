@@ -229,29 +229,17 @@ public class LumiCompanion : MonoBehaviour
 
     private void HandleRotation()
     {
-        float speed = currentVelocity.magnitude;
+        // 🛠️ แก้ไขให้ลูมิหันหน้าตามมุมกล้อง หรือใช้มุมคงที่แบบ 2.5D เสมอโดยไม่หมุนแกน 3D ตามทิศทางบิน
+        Quaternion targetRot;
 
-        if (speed > 0.5f)
+        if (mainCamera != null)
         {
-            // Face the direction of movement
-            Vector3 moveDir = currentVelocity.normalized;
-            moveDir.y *= 0.3f; // Damp vertical tilt
-            if (moveDir.sqrMagnitude > 0.001f)
-            {
-                Quaternion targetRot = Quaternion.LookRotation(moveDir, Vector3.up);
-                
-                // Add playful banking tilt based on turn rate
-                Vector3 localVel = transform.InverseTransformDirection(currentVelocity);
-                float bank = -Mathf.Clamp(localVel.x * 3f, -bankAmount, bankAmount);
-                targetRot *= Quaternion.Euler(0, 0, bank);
-
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * rotationSpeed);
-            }
+            // ให้หันหน้าตรงตามทิศทางที่กล้องมองอยู่ (เหมาะสำหรับเกม 2.5D ที่ใช้ Sprite แบน)
+            targetRot = mainCamera.transform.rotation;
         }
         else
         {
-            // When idle, smoothly face the designated angle (e.g. 155.4 degrees)
-            Quaternion targetRot;
+            // ค่าสำรองหากหาล้องไม่พบ
             if (useFixedIdleAngle)
             {
                 targetRot = Quaternion.Euler(0f, idleFacingAngleY, 0f);
@@ -264,9 +252,10 @@ public class LumiCompanion : MonoBehaviour
             {
                 targetRot = Quaternion.Euler(0f, idleFacingAngleY, 0f);
             }
-
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * (rotationSpeed * 0.5f));
         }
+
+        // หมุนตัวอย่างนุ่มนวลเข้าหาเป้าหมายโดยไม่พลิกตะแคง
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * rotationSpeed);
     }
 
     private void HandleAnimationSpeed()

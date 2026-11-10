@@ -10,6 +10,7 @@ public class CameraOcclusionFade : MonoBehaviour
     [Header("Fade Settings")]
     [SerializeField] private float fadedAlpha = 0.3f;   // ความโปร่งใสเวลาโดนบัง (0 = ใส, 1 = ทึบ)
     [SerializeField] private float fadeSpeed = 5f;      // ความเร็วในการเปลี่ยนความโปร่งใส
+    [SerializeField] private float castRadius = 0.4f;   // รัศมีลำแสงสำหรับตรวจจับด้านข้าง
 
     private List<RendererAndMaterial> currentlyFadedObjects = new List<RendererAndMaterial>();
 
@@ -33,8 +34,8 @@ public class CameraOcclusionFade : MonoBehaviour
             obj.isHitThisFrame = false;
         }
 
-        // ยิง Raycast หาวัตถุที่บังระหว่างกล้องกับผู้เล่น
-        RaycastHit[] hits = Physics.RaycastAll(transform.position, direction.normalized, distance, obstacleLayer);
+        // ใช้ SphereCastAll เพื่อยิงลำแสงแบบมีความกว้าง ครอบคลุมทุกมุมมองด้านข้าง
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, castRadius, direction.normalized, distance, obstacleLayer);
 
         foreach (var hit in hits)
         {
@@ -70,13 +71,13 @@ public class CameraOcclusionFade : MonoBehaviour
 
             foreach (var mat in item.materials)
             {
-                if (mat.HasProperty("_Alpha")) // รองรับตัวแปร Alpha ของ Shader Graph
+                if (mat.HasProperty("_Alpha")) 
                 {
                     float currentAlpha = mat.GetFloat("_Alpha");
                     float newAlpha = Mathf.Lerp(currentAlpha, targetAlpha, fadeSpeed * Time.deltaTime);
                     mat.SetFloat("_Alpha", newAlpha);
                 }
-                else if (mat.HasProperty("_BaseColor"))
+                else if (mat.HasProperty("_BaseColor")) 
                 {
                     Color color = mat.GetColor("_BaseColor");
                     color.a = Mathf.Lerp(color.a, targetAlpha, fadeSpeed * Time.deltaTime);
@@ -104,7 +105,6 @@ public class CameraOcclusionFade : MonoBehaviour
                         currentAlpha = mat.GetColor("_Color").a;
                     }
 
-                    // ถ้าค่า Alpha ยังไม่กลับมาใกล้เคียง 1.0 ให้ถือว่ายังเฟดไม่เสร็จ
                     if (Mathf.Abs(currentAlpha - 1.0f) > 0.01f)
                     {
                         isFullyOpaque = false;

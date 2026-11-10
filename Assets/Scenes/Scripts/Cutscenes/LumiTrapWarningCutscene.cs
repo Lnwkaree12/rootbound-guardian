@@ -207,8 +207,8 @@ public class LumiTrapWarningCutscene : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         // 5. Lumi Delivers the Warning Dialogue!
-        string warningText = LocalizationManager.Instance != null 
-            ? LocalizationManager.Instance.GetLumiTrapWarning() 
+        string warningText = LocalizationManager.Instance != null
+            ? LocalizationManager.Instance.GetLumiTrapWarning()
             : warningDialogueText;
         if (lumi != null)
         {
