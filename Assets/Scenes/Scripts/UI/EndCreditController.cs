@@ -117,7 +117,14 @@ public class EndCreditController : MonoBehaviour
         SetTMPText("ThanksHeader", "credits_thanks_role");
         SetTMPText("ThaiThanksMsg", "credits_finale_title");
         SetTMPText("EnglishSubMsg", "credits_finale_sub");
+        SetTMPText("FastForwardPrompt", "credits_hint_ff");
         SetTMPText("FastForwardPrompt/Text", "credits_hint_ff");
+
+        if (fastForwardIndicator != null)
+        {
+            var tmp = fastForwardIndicator.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get("credits_hint_ff_active");
+        }
 
         if (mainMenuButton != null)
         {

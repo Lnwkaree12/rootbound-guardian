@@ -99,28 +99,38 @@ public class PauseMenuController : MonoBehaviour
         if (innerCard == null) innerCard = pausePanel.transform.Find("ModalContainer");
         if (innerCard == null) return;
 
-        SetTMPText(innerCard, "Badge/BadgeText", "pause_badge");
-        SetTMPText(innerCard, "TitleText", "pause_title");
-        SetTMPText(innerCard, "SubtitleText", "pause_subtitle");
-        SetTMPText(innerCard, "SafeBanner/BannerText", "pause_safe_notice");
-        SetTMPText(innerCard, "AudioSettingsSection/Heading/HeadingText", "pause_audio_heading");
-        SetTMPText(innerCard, "AudioSettingsSection/MasterRow/Label", "label_master");
-        SetTMPText(innerCard, "AudioSettingsSection/BgmRow/Label", "label_bgm");
-        SetTMPText(innerCard, "AudioSettingsSection/SfxRow/Label", "label_sfx");
-        SetTMPText(innerCard, "ButtonRow/ResumeButton/Button_Content/Label", "pause_resume");
-        SetTMPText(innerCard, "ButtonRow/RestartButton/Button_Content/Label", "pause_restart");
-        SetTMPText(innerCard, "ButtonRow/MainMenuButton/Button_Content/Label", "pause_main_menu");
-        SetTMPText(innerCard, "KeyHintsBar/KeyHintsText", "pause_key_hints");
+        SetTMPText(innerCard, "BadgeText", "Badge/BadgeText", "pause_badge");
+        SetTMPText(innerCard, "TitleText", null, "pause_title");
+        SetTMPText(innerCard, "SubtitleText", null, "pause_subtitle");
+        SetTMPText(innerCard, "LoreBubble/Text", "SafeBanner/BannerText", "pause_safe_notice");
+        SetTMPText(innerCard, "AudioSettingsSection/Header", "AudioSettingsSection/Heading/HeadingText", "pause_audio_heading");
+        SetTMPText(innerCard, "AudioSettingsSection/MasterRow/Label", null, "label_master");
+        SetTMPText(innerCard, "AudioSettingsSection/BgmRow/Label", null, "label_bgm");
+        SetTMPText(innerCard, "AudioSettingsSection/SfxRow/Label", null, "label_sfx");
+        SetButtonLabel(innerCard, resumeButton, "ButtonRow/ResumeButton/Content/Label", "ButtonRow/ResumeButton/Button_Content/Label", "pause_resume");
+        SetButtonLabel(innerCard, restartButton, "ButtonRow/RestartButton/Content/Label", "ButtonRow/RestartButton/Button_Content/Label", "pause_restart");
+        SetButtonLabel(innerCard, mainMenuButton, "ButtonRow/MainMenuButton/Content/Label", "ButtonRow/MainMenuButton/Button_Content/Label", "pause_main_menu");
+        SetTMPText(innerCard, "KeyHintsBar/Text", "KeyHintsBar/KeyHintsText", "pause_key_hints");
     }
 
-    private void SetTMPText(Transform root, string childPath, string locKey)
+    private void SetTMPText(Transform root, string primaryPath, string fallbackPath, string locKey)
     {
-        Transform t = root.Find(childPath);
+        Transform t = root.Find(primaryPath);
+        if (t == null && !string.IsNullOrEmpty(fallbackPath)) t = root.Find(fallbackPath);
         if (t != null)
         {
             var tmp = t.GetComponent<TextMeshProUGUI>();
             if (tmp != null) tmp.text = LocalizationManager.Instance.Get(locKey);
         }
+    }
+
+    private void SetButtonLabel(Transform root, Button btn, string primaryPath, string fallbackPath, string locKey)
+    {
+        Transform t = root.Find(primaryPath);
+        if (t == null && !string.IsNullOrEmpty(fallbackPath)) t = root.Find(fallbackPath);
+        TextMeshProUGUI tmp = t != null ? t.GetComponent<TextMeshProUGUI>() : null;
+        if (tmp == null && btn != null) tmp = btn.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (tmp != null) tmp.text = LocalizationManager.Instance.Get(locKey);
     }
 
     private void Update()

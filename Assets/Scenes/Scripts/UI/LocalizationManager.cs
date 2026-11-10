@@ -590,9 +590,9 @@ public class LocalizationManager : MonoBehaviour
             zh: "冒险暂停 — 森林正在静候你的归来");
 
         AddKey("pause_safe_notice",
-            th: "ผืนป่าเงียบสงบลง... ปลอดภัยจากการโจมตีในระหว่างนี้",
-            en: "The forest rests... You are safe from attacks while paused",
-            zh: "森林归于宁静... 暂停期间不会受到攻击");
+            th: "PAUSE อยู่ในขณะนี้",
+            en: "CURRENTLY PAUSED",
+            zh: "当前处于暂停状态");
 
         AddKey("pause_audio_heading",
             th: "การตั้งค่าเสียง (AUDIO SETTINGS)",
@@ -600,19 +600,19 @@ public class LocalizationManager : MonoBehaviour
             zh: "音频设置");
 
         AddKey("pause_resume",
-            th: "ดำเนินการต่อ",
+            th: "เล่นต่อ",
             en: "RESUME",
-            zh: "继续游戏");
+            zh: "继续");
 
         AddKey("pause_restart",
-            th: "เริ่มใหม่อีกครั้ง",
+            th: "เริ่มใหม่",
             en: "RESTART",
             zh: "重新开始");
 
         AddKey("pause_main_menu",
-            th: "กลับหน้าหลัก",
+            th: "หน้าหลัก",
             en: "MAIN MENU",
-            zh: "返回主菜单");
+            zh: "主菜单");
 
         AddKey("pause_key_hints",
             th: "[ESC] สลับเมนู / ย้อนกลับ       [ENTER] ยืนยัน",
@@ -918,9 +918,14 @@ public class LocalizationManager : MonoBehaviour
             zh: "重新游玩");
 
         AddKey("credits_hint_ff",
-            th: "»» เร่งความเร็ว (กด Space / Enter ค้าง) »»",
-            en: "»» FAST FORWARD (Hold Space / Enter) »»",
-            zh: "»» 快进（按住 Space / Enter） »»");
+            th: "กดค้าง (Space / คลิก) เพื่อเร่งความเร็ว",
+            en: "Hold (Space / Click) to Fast Forward",
+            zh: "按住（空格 / 点击）加速");
+
+        AddKey("credits_hint_ff_active",
+            th: "»» กำลังเร่งความเร็ว »»",
+            en: "»» FAST FORWARD »»",
+            zh: "»» 快进中 »»");
 
         AddKey("credits_hint_skip",
             th: "ข้าม [ESC]",
