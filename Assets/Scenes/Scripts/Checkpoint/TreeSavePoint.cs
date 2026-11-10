@@ -139,7 +139,6 @@ public class TreeSavePoint : MonoBehaviour
                     playerOxygen.SetOxygenSlowDrain(false);
                     playerOxygen.UpdateSafeZoneState(true);
                 }
-                SaveGame();
             }
         }
         else

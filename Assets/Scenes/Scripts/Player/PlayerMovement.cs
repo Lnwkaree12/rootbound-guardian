@@ -200,6 +200,23 @@ public class PlayerMovement : MonoBehaviour
         rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
     }
 
+    public void ResetAfterRespawn()
+    {
+        isClimbing = false;
+        isDashing = false;
+        forcedExitInputLockTimer = 0f;
+        currentInput = Vector2.zero;
+        rb.useGravity = true;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        if (playerAnim != null)
+        {
+            playerAnim.SetClimbing(false);
+            playerAnim.SetClimbSpeed(0f);
+        }
+    }
+
     public void Move(Vector2 inputDirection)
     {
         // ถือกำหนดว่าถ้ากำลังปีนอยู่ ห้ามให้อินพุตภายนอก (A/D/W/S จากคีย์บอร์ดปกติ) มายุ่ง

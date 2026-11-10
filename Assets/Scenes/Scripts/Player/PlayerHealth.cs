@@ -224,6 +224,12 @@ public class PlayerHealth : MonoBehaviour
         isInvulnerable = false;
         onHealthChanged?.Invoke(currentHealth, maxHealth);
 
+        PlayerController playerController = GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            playerController.ResetAfterRespawn();
+        }
+
         if (playerAnim != null)
         {
             Animator anim = playerAnim.GetComponentInChildren<Animator>();
