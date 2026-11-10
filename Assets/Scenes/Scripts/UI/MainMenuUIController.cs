@@ -109,6 +109,7 @@ public class MainMenuUIController : MonoBehaviour
     public UnityEngine.UI.Image enCardBorder;
     public UnityEngine.UI.Image zhCardBorder;
     public Button languageBackButton;
+    public TextMeshProUGUI languageBackText;
     public TextMeshProUGUI languageTitleText;
     public TextMeshProUGUI languageSubtitleText;
     public TextMeshProUGUI languageTipText;
@@ -128,6 +129,7 @@ public class MainMenuUIController : MonoBehaviour
 
     // Callout labels
     public TextMeshProUGUI lbCalloutText;
+    public TextMeshProUGUI analogCalloutText;
     public TextMeshProUGUI ltCalloutText;
     public TextMeshProUGUI rbCalloutText;
     public TextMeshProUGUI rtCalloutText;
@@ -140,13 +142,17 @@ public class MainMenuUIController : MonoBehaviour
 
     // Controller Settings Controls
     public Button vibrationButton;
+    public TextMeshProUGUI vibrationLabelText;
     public TextMeshProUGUI vibrationValueText;
     public Button sensitivityMinusButton;
     public Button sensitivityPlusButton;
+    public TextMeshProUGUI sensitivityLabelText;
     public TextMeshProUGUI sensitivityValueText;
     public Button buttonSwapButton;
+    public TextMeshProUGUI buttonSwapLabelText;
     public TextMeshProUGUI buttonSwapValueText;
     public Button resetControllerDefaultsButton;
+    public TextMeshProUGUI resetControllerDefaultsText;
     public Button controllerBackButton;
     public TextMeshProUGUI controllerConnectedStatusText;
 
@@ -239,6 +245,7 @@ public class MainMenuUIController : MonoBehaviour
         public RectTransform rightPaw;
         public Vector2 leftPawBasePos;
         public Vector2 rightPawBasePos;
+        public Vector3 baseScale = Vector3.one;
         public float currentScale = 1.0f;
         public float targetScale = 1.0f;
         public float currentAlpha = 0.55f;
@@ -285,6 +292,10 @@ public class MainMenuUIController : MonoBehaviour
 
     private void Awake()
     {
+        if (languageBackText == null && languageBackButton != null)
+        {
+            languageBackText = languageBackButton.GetComponentInChildren<TextMeshProUGUI>();
+        }
         CacheLanguageCardScales();
         SetupAudio();
         InitResolutions();
@@ -349,6 +360,18 @@ public class MainMenuUIController : MonoBehaviour
         if (languageTitleText != null) languageTitleText.text = L.Get("lang_title_select");
         if (languageSubtitleText != null) languageSubtitleText.text = L.Get("lang_subtitle_select");
         if (languageTipText != null) languageTipText.text = L.Get("lang_tip");
+        if (languageBackText != null) languageBackText.text = L.Get("lang_btn_back");
+        else if (languageBackButton != null)
+        {
+            var tmp = languageBackButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = L.Get("lang_btn_back");
+        }
+
+        if (controllerBackButton != null)
+        {
+            var tmp = controllerBackButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = L.Get("ctrl_btn_back");
+        }
         UpdateLanguageSettingsVisuals();
         // Controller callouts (rebuild from current mode)
         UpdateControllerSettingsVisuals();
@@ -423,6 +446,10 @@ public class MainMenuUIController : MonoBehaviour
     {
         AnimatedOption opt = new AnimatedOption();
         opt.rootTransform = root;
+        if (root != null)
+        {
+            opt.baseScale = root.localScale;
+        }
         opt.label = text;
         opt.pawsContainer = paws;
 
@@ -851,7 +878,7 @@ public class MainMenuUIController : MonoBehaviour
         opt.currentScale = Mathf.Lerp(opt.currentScale, opt.targetScale, dt * 15f);
         if (opt.rootTransform != null)
         {
-            opt.rootTransform.localScale = Vector3.one * opt.currentScale;
+            opt.rootTransform.localScale = opt.baseScale * opt.currentScale;
         }
 
         // Smooth Alpha
@@ -1041,6 +1068,10 @@ public class MainMenuUIController : MonoBehaviour
             opt.currentScale = opt.targetScale;
             opt.currentAlpha = opt.targetAlpha;
             opt.pawScale = opt.targetPawScale;
+            if (opt.rootTransform != null)
+            {
+                opt.rootTransform.localScale = opt.baseScale * opt.currentScale;
+            }
         }
     }
 
@@ -2229,6 +2260,12 @@ public class MainMenuUIController : MonoBehaviour
 
     private void UpdateControllerSettingsVisuals()
     {
+        var L = LocalizationManager.Instance;
+        if (vibrationLabelText != null && L != null) vibrationLabelText.text = L.Get("ctrl_vibration_label");
+        if (sensitivityLabelText != null && L != null) sensitivityLabelText.text = L.Get("ctrl_sensitivity_label");
+        if (buttonSwapLabelText != null && L != null) buttonSwapLabelText.text = L.Get("ctrl_swap_label");
+        if (resetControllerDefaultsText != null && L != null) resetControllerDefaultsText.text = L.Get("ctrl_reset_btn");
+
         if (vibrationValueText != null)
         {
             if (LocalizationManager.Instance != null)
@@ -2270,8 +2307,42 @@ public class MainMenuUIController : MonoBehaviour
 
     private void UpdateControllerCalloutsVisuals()
     {
+        if (analogCalloutText == null && controllerContent != null)
+        {
+            var t = controllerContent.transform.Find("LBCallout (1)") ?? controllerContent.transform.Find("AnalogCallout");
+            if (t != null) analogCalloutText = t.GetComponentInChildren<TextMeshProUGUI>();
+        }
+        if (controllerContent != null)
+        {
+            var tuningBar = controllerContent.transform.Find("TuningBar");
+            if (tuningBar != null)
+            {
+                if (vibrationLabelText == null)
+                {
+                    var t = tuningBar.Find("VibLabel");
+                    if (t != null) vibrationLabelText = t.GetComponent<TextMeshProUGUI>();
+                }
+                if (sensitivityLabelText == null)
+                {
+                    var t = tuningBar.Find("SensLabel");
+                    if (t != null) sensitivityLabelText = t.GetComponent<TextMeshProUGUI>();
+                }
+                if (buttonSwapLabelText == null)
+                {
+                    var t = tuningBar.Find("SwapLabel");
+                    if (t != null) buttonSwapLabelText = t.GetComponent<TextMeshProUGUI>();
+                }
+                if (resetControllerDefaultsText == null)
+                {
+                    var t = tuningBar.Find("ResetDefaultsButton");
+                    if (t != null) resetControllerDefaultsText = t.GetComponentInChildren<TextMeshProUGUI>();
+                }
+            }
+        }
+
         if (controllerModeIndex == 0) // GAMEPLAY MODE
         {
+            if (analogCalloutText != null) analogCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_analog_gameplay") : "<b><color=#58A6FF>Analog</color></b> ควบคุมทิศทาง";
             if (lbCalloutText != null) lbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lb_gameplay") : "<b><color=#58A6FF>LB</color></b>  ก่อนหน้า / สลับไอเทม";
             if (ltCalloutText != null) ltCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lt_gameplay") : "<b><color=#58A6FF>LT</color></b>  เล็ง / วิ่งเร็ว / ป้องกัน";
             if (rbCalloutText != null) rbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rb_gameplay") : "<b><color=#58A6FF>RB</color></b>  ถัดไป / แดชหลบหลีก";
@@ -2300,6 +2371,7 @@ public class MainMenuUIController : MonoBehaviour
         }
         else // MENU MODE
         {
+            if (analogCalloutText != null) analogCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_analog_menu") : "<b><color=#58A6FF>Analog</color></b> เลื่อนเลือกเมนู";
             if (lbCalloutText != null) lbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lb_menu") : "<b><color=#58A6FF>LB</color></b>  แท็บก่อนหน้า (Prev Tab)";
             if (ltCalloutText != null) ltCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lt_menu") : "<b><color=#58A6FF>LT</color></b>  เลื่อนหน้าขึ้น (Page Up)";
             if (rbCalloutText != null) rbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rb_menu") : "<b><color=#58A6FF>RB</color></b>  แท็บถัดไป (Next Tab)";

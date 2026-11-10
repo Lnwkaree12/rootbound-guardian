@@ -276,7 +276,7 @@ public class ChestController : MonoBehaviour
 
         // Calculate close-up world position focusing directly on the rising key hovering above chest
         Vector3 keyFocusWorldPos = transform.position + Vector3.up * (keyInitialLocalPos.y + keyRiseHeight + 0.1f);
-        Vector3 camCloseUpWorldPos = keyFocusWorldPos + new Vector3(0.45f, 0.35f, -1.9f);
+        Vector3 camCloseUpWorldPos = keyFocusWorldPos + new Vector3(0.7f, 4.5f, -2.5f);
         Quaternion camCloseUpWorldRot = Quaternion.LookRotation((keyFocusWorldPos - Vector3.up * 0.1f) - camCloseUpWorldPos);
         float closeUpFOV = 48f;
 

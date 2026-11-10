@@ -20447,15 +20447,15 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 9fbc0073d43daa741bc4886de15a16f5, type: 2}
     - target: {fileID: 1097894151340911807, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 520
+      value: -156
       objectReference: {fileID: 0}
     - target: {fileID: 1097894151340911807, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 200
+      value: -122
       objectReference: {fileID: 0}
     - target: {fileID: 1097894151340911807, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 1474176431776188430, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_Pivot.y
@@ -20463,11 +20463,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1474176431776188430, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 580
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1474176431776188430, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 260
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1474176431776188430, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_LocalScale.x
@@ -20491,15 +20491,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_fontSize
-      value: 32
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_fontSizeMax
-      value: 32
+      value: 24
       objectReference: {fileID: 0}
     - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_fontSizeMin
-      value: 20
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_fontMaterial
@@ -20507,7 +20507,7 @@ PrefabInstance:
       objectReference: {fileID: 120931418}
     - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_overflowMode
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2163205095776807545, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_sharedMaterial
@@ -20551,23 +20551,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2224958704386141680, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 600
+      value: 480
       objectReference: {fileID: 0}
     - target: {fileID: 2224958704386141680, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 320
+      value: 182
       objectReference: {fileID: 0}
     - target: {fileID: 2224958704386141680, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.0035
+      value: 0.0055
       objectReference: {fileID: 0}
     - target: {fileID: 2224958704386141680, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.0035
+      value: 0.0055
       objectReference: {fileID: 0}
     - target: {fileID: 2224958704386141680, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.0035
+      value: 0.0055
       objectReference: {fileID: 0}
     - target: {fileID: 2224958704386141680, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -20595,7 +20595,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2224958704386141680, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.65
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: 2519092223681166991, guid: e4492f0398e8cb042a7d015e48922db4, type: 3}
       propertyPath: m_LocalScale.y
