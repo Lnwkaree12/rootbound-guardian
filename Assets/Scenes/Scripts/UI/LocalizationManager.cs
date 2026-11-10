@@ -724,9 +724,9 @@ public class LocalizationManager : MonoBehaviour
             zh: "露米的指引：");
 
         AddKey("load_header_controls",
-            th: "~ <color=#FFE8A3><b>คู่มือการผจญภัย & การควบคุม (CONTROLS & SURVIVAL)</b></color> ~\n<size=15><color=#94A3B8>Turtorial เบื้องต้นสำหรับการเล่น</color></size>",
-            en: "~ <color=#FFE8A3><b>CONTROLS & SURVIVAL GUIDE</b></color> ~\n<size=15><color=#94A3B8>Basic Tutorial</color></size>",
-            zh: "~ <color=#FFE8A3><b>操作与生存指南 (CONTROLS & SURVIVAL)</b></color> ~\n<size=15><color=#94A3B8>新手基础教程</color></size>");
+            th: "~ <color=#4D2C15><b>คู่มือการผจญภัย & การควบคุม (CONTROLS & SURVIVAL)</b></color> ~\n<size=15><color=#4D2C15>Turtorial เบื้องต้นสำหรับการเล่น</color></size>",
+            en: "~ <color=#4D2C15><b>CONTROLS & SURVIVAL GUIDE</b></color> ~\n<size=15><color=#4D2C15>Basic Tutorial</color></size>",
+            zh: "~ <color=#4D2C15><b>操作与生存指南 (CONTROLS & SURVIVAL)</b></color> ~\n<size=15><color=#4D2C15>新手基础教程</color></size>");
 
         // Row 1: Move
         AddKey("load_row_move",
