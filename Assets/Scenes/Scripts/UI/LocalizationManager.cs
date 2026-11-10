@@ -328,6 +328,16 @@ public class LocalizationManager : MonoBehaviour
             en: "Press [1] [2] [3] or [L] to switch language instantly",
             zh: "按 [1] [2] [3] 或 [L] 键即刻切换语言");
 
+        AddKey("lang_btn_back",
+            th: "ย้อนกลับ (ESC)",
+            en: "BACK (ESC)",
+            zh: "返回 (ESC)");
+
+        AddKey("ctrl_btn_back",
+            th: "ย้อนกลับสู่เมนูหลัก (ESC)",
+            en: "BACK TO MAIN MENU (ESC)",
+            zh: "返回主菜单 (ESC)");
+
         AddKey("label_master",       th: "เสียงรวม",      en: "MASTER VOLUME", zh: "总音量");
         AddKey("label_bgm",          th: "เสียงเพลง",     en: "MUSIC",         zh: "背景音乐");
         AddKey("label_sfx",          th: "เสียงเอฟเฟกต์", en: "SFX",           zh: "音效");
@@ -344,10 +354,15 @@ public class LocalizationManager : MonoBehaviour
         AddKey("ctrl_sensitivity",     th: "ความไว",          en: "SENSITIVITY",       zh: "灵敏度");
         AddKey("ctrl_swap_ab",         th: "สลับปุ่ม A/B",    en: "SWAP A/B BUTTONS",  zh: "交换 A/B 键");
         AddKey("ctrl_reset",           th: "รีเซ็ตค่าเริ่มต้น", en: "RESET DEFAULTS",    zh: "重置默认");
+        AddKey("ctrl_vibration_label",   th: "การสั่นสะเทือน:", en: "Vibration:",       zh: "手柄震动:");
+        AddKey("ctrl_sensitivity_label", th: "ความไวแกนมอง:",   en: "Look Sensitivity:", zh: "视角灵敏度:");
+        AddKey("ctrl_swap_label",        th: "รูปแบบปุ่ม:",     en: "Button Layout:",   zh: "按键布局:");
+        AddKey("ctrl_reset_btn",         th: "คืนค่าเริ่มต้น (RESET)", en: "RESET DEFAULTS", zh: "重置默认 (RESET)");
         AddKey("ctrl_connected",       th: "จอยที่เชื่อมต่อ",  en: "CONNECTED CONTROLLER", zh: "已连接手柄");
         AddKey("ctrl_ready",           th: "พร้อมใช้งาน",     en: "READY",             zh: "就绪");
 
         // Callouts Gameplay
+        AddKey("ctrl_analog_gameplay", th: "<b><color=#58A6FF>Analog</color></b> ควบคุมทิศทาง", en: "<b><color=#58A6FF>Analog</color></b> Movement Control", zh: "<b><color=#58A6FF>摇杆</color></b> 方向控制");
         AddKey("ctrl_lb_gameplay",     th: "<b><color=#58A6FF>LB</color></b>  ก่อนหน้า / สลับไอเทม", en: "<b><color=#58A6FF>LB</color></b>  Previous / Swap Item", zh: "<b><color=#58A6FF>LB</color></b>  上一个/切换物品");
         AddKey("ctrl_lt_gameplay",     th: "<b><color=#58A6FF>LT</color></b>  เล็ง / วิ่งเร็ว / ป้องกัน", en: "<b><color=#58A6FF>LT</color></b>  Aim / Sprint / Guard", zh: "<b><color=#58A6FF>LT</color></b>  瞄准/冲刺/防御");
         AddKey("ctrl_rb_gameplay",     th: "<b><color=#58A6FF>RB</color></b>  ถัดไป / แดชหลบหลีก",    en: "<b><color=#58A6FF>RB</color></b>  Next / Dash Dodge",     zh: "<b><color=#58A6FF>RB</color></b>  下一个/闪避");
@@ -359,6 +374,7 @@ public class LocalizationManager : MonoBehaviour
         AddKey("ctrl_dpad_gameplay",   th: "<b>DIRECTIONAL PAD</b>\n<color=#E0E6ED>[Up] ช่อง 1  [Down] ช่อง 2\n[Left] ก่อนหน้า  [Right] ถัดไป</color>", en: "<b>DIRECTIONAL PAD</b>\n<color=#E0E6ED>[Up] Slot 1  [Down] Slot 2\n[Left] Prev  [Right] Next</color>", zh: "<b>方向键</b>\n<color=#E0E6ED>[上]格子1  [下]格子2\n[左]上一个  [右]下一个</color>");
 
         // Callouts Menu
+        AddKey("ctrl_analog_menu",     th: "<b><color=#58A6FF>Analog</color></b> เลื่อนเลือกเมนู", en: "<b><color=#58A6FF>Analog</color></b> Menu Navigation",  zh: "<b><color=#58A6FF>摇杆</color></b> 菜单选择");
         AddKey("ctrl_lb_menu",     th: "<b><color=#58A6FF>LB</color></b>  แท็บก่อนหน้า (Prev Tab)", en: "<b><color=#58A6FF>LB</color></b>  Previous Tab", zh: "<b><color=#58A6FF>LB</color></b>  上一个选项卡");
         AddKey("ctrl_lt_menu",     th: "<b><color=#58A6FF>LT</color></b>  เลื่อนหน้าขึ้น (Page Up)",  en: "<b><color=#58A6FF>LT</color></b>  Page Up",      zh: "<b><color=#58A6FF>LT</color></b>  向上翻页");
         AddKey("ctrl_rb_menu",     th: "<b><color=#58A6FF>RB</color></b>  แท็บถัดไป (Next Tab)",     en: "<b><color=#58A6FF>RB</color></b>  Next Tab",     zh: "<b><color=#58A6FF>RB</color></b>  下一个选项卡");
@@ -707,44 +723,72 @@ public class LocalizationManager : MonoBehaviour
             zh: "露米的指引：");
 
         AddKey("load_header_controls",
-            th: "~ <color=#FFE8A3><b>คู่มือการผจญภัย & การควบคุม (CONTROLS & SURVIVAL)</b></color> ~\n<size=15><color=#94A3B8>เรียนรู้ทักษะและวิธีเอาชีวิตรอดก่อนก้าวเข้าสู่ดันเจี้ยนโบราณ</color></size>",
-            en: "~ <color=#FFE8A3><b>CONTROLS & SURVIVAL GUIDE</b></color> ~\n<size=15><color=#94A3B8>Master your skills and survival tactics before entering the ancient dungeon</color></size>",
-            zh: "~ <color=#FFE8A3><b>操作与生存指南 (CONTROLS & SURVIVAL)</b></color> ~\n<size=15><color=#94A3B8>在踏入远古地牢之前掌握必要的操作与生存技巧</color></size>");
+            th: "~ <color=#FFE8A3><b>คู่มือการผจญภัย & การควบคุม (CONTROLS & SURVIVAL)</b></color> ~\n<size=15><color=#94A3B8>Turtorial เบื้องต้นสำหรับการเล่น</color></size>",
+            en: "~ <color=#FFE8A3><b>CONTROLS & SURVIVAL GUIDE</b></color> ~\n<size=15><color=#94A3B8>Basic Tutorial</color></size>",
+            zh: "~ <color=#FFE8A3><b>操作与生存指南 (CONTROLS & SURVIVAL)</b></color> ~\n<size=15><color=#94A3B8>新手基础教程</color></size>");
 
+        // Row 1: Move
         AddKey("load_row_move",
-            th: "<b>การเคลื่อนที่พื้นฐาน (Movement)</b>\n<color=#CBD5E1>กด <color=#93C5FD><b>[W] [A] [S] [D]</b></color> เพื่อเดินสำรวจ และกด <color=#93C5FD><b>[SPACEBAR]</b></color> เพื่อกระโดดข้ามสิ่งกีดขวาง</color>",
-            en: "<b>Basic Movement</b>\n<color=#CBD5E1>Press <color=#93C5FD><b>[W] [A] [S] [D]</b></color> to move, and <color=#93C5FD><b>[SPACEBAR]</b></color> to jump across obstacles.</color>",
-            zh: "<b>基础移动 (Movement)</b>\n<color=#CBD5E1>按 <color=#93C5FD><b>[W] [A] [S] [D]</b></color> 进行移动，按 <color=#93C5FD><b>[空格键]</b></color> 跳跃跨越障碍。</color>");
+            th: "<size=19><color=#FFE8A3><b>การเคลื่อนที่ (Movement)</b></color></size>",
+            en: "<size=19><color=#FFE8A3><b>Movement</b></color></size>",
+            zh: "<size=19><color=#FFE8A3><b>基础移动 (Movement)</b></color></size>");
 
+        // Row 2: Dash
+        AddKey("load_row_dash",
+            th: "<size=19><color=#FFE8A3><b>พุ่งตัวหลบหลีก (Dash)</b></color></size>",
+            en: "<size=19><color=#FFE8A3><b>Dash</b></color></size>",
+            zh: "<size=19><color=#FFE8A3><b>冲刺闪避 (Dash)</b></color></size>");
+
+        // Row 3: Trap
+        AddKey("load_row_trap",
+            th: "<size=19><color=#FF6B6B><b>ระวังกับดัก (Trap Alert)</b></color></size>",
+            en: "<size=19><color=#FF6B6B><b>Trap Alert</b></color></size>",
+            zh: "<size=19><color=#FF6B6B><b>注意陷阱 (Trap Alert)</b></color></size>");
+
+        // Row 4: Chest & Loot
+        AddKey("load_row_chest",
+            th: "<size=19><color=#FFE8A3><b>เปิดหีบสมบัติ (Chest & Loot)</b></color></size>",
+            en: "<size=19><color=#FFE8A3><b>Chest & Loot</b></color></size>",
+            zh: "<size=19><color=#FFE8A3><b>开启宝箱 (Chest & Loot)</b></color></size>");
+
+        // Row 5: Oxygen & Save
+        AddKey("load_row_oxygen_save",
+            th: "<size=19><color=#6EE7B7><b>ฟื้นฟู Oxygen & บันทึกจุดเกิด (Oxygen & Save)</b></color></size>",
+            en: "<size=19><color=#6EE7B7><b>Oxygen & Save</b></color></size>",
+            zh: "<size=19><color=#6EE7B7><b>恢复氧气与存档 (Oxygen & Save)</b></color></size>");
+
+        // Row 6: Oxygen Limit
+        AddKey("load_row_oxygen_limit",
+            th: "<size=19><color=#38BDF8><b>รักษาระดับออกซิเจน (Oxygen Limit)</b></color></size>",
+            en: "<size=19><color=#38BDF8><b>Oxygen Limit</b></color></size>",
+            zh: "<size=19><color=#38BDF8><b>注意氧气上限 (Oxygen Limit)</b></color></size>");
+
+        // Row 7: Climb
+        AddKey("load_row_climb",
+            th: "<size=19><color=#FCD34D><b>เพื่อปีนป่ายบันได (Ladder Climbing)</b></color></size>",
+            en: "<size=19><color=#FCD34D><b>Ladder Climbing</b></color></size>",
+            zh: "<size=19><color=#FCD34D><b>攀爬梯子 (Ladder Climbing)</b></color></size>");
+
+        // Backwards compatibility aliases
         AddKey("load_row_sprint",
-            th: "<b>การวิ่งสปรินต์ & หลบหลีก (Sprint & Dash)</b>\n<color=#CBD5E1>กด <color=#93C5FD><b>[L-SHIFT]</b></color> ค้างไว้เพื่อวิ่งเร็ว ช่วยให้พุ่งผ่านพื้นที่อันตรายได้เร็วยิ่งขึ้น</color>",
-            en: "<b>Sprint & Dash</b>\n<color=#CBD5E1>Hold <color=#93C5FD><b>[L-SHIFT]</b></color> to sprint quickly across hazardous zones.</color>",
-            zh: "<b>冲刺奔跑 (Sprint & Dash)</b>\n<color=#CBD5E1>按住 <color=#93C5FD><b>[左SHIFT]</b></color> 快速奔跑，助你迅速通过危险地带。</color>");
+            th: "<size=19><color=#FFE8A3><b>พุ่งตัวหลบหลีก (Dash)</b></color></size>",
+            en: "<size=19><color=#FFE8A3><b>Dash</b></color></size>",
+            zh: "<size=19><color=#FFE8A3><b>冲刺闪避 (Dash)</b></color></size>");
 
         AddKey("load_row_interact",
-            th: "<b>การโต้ตอบ & สำรวจ (Interact)</b>\n<color=#CBD5E1>กด <color=#FDE047><b>[E]</b></color> เมื่อเข้าใกล้วัตถุ เช่น ประตูไม้โบราณ, หีบสมบัติ, หรือจุดบันทึกต้นไม้</color>",
-            en: "<b>Interact & Explore</b>\n<color=#CBD5E1>Press <color=#FDE047><b>[E]</b></color> near objects like gates, treasure chests, or tree shrines.</color>",
-            zh: "<b>互动与探索 (Interact)</b>\n<color=#CBD5E1>靠近古代大门、宝箱或神树保存点时按 <color=#FDE047><b>[E]</b></color> 互动。</color>");
+            th: "<size=19><color=#FF6B6B><b>ระวังกับดัก (Trap Alert)</b></color></size>",
+            en: "<size=19><color=#FF6B6B><b>Trap Alert</b></color></size>",
+            zh: "<size=19><color=#FF6B6B><b>注意陷阱 (Trap Alert)</b></color></size>");
 
         AddKey("load_row_potion",
-            th: "<b>การดื่มโพชั่นฟื้นฟู (Use Potion)</b>\n<color=#CBD5E1>กด <color=#93C5FD><b>[1]</b></color> เพื่อดื่มโพชั่นรักษาเมื่อบาดเจ็บ โพชั่นสามารถหาเก็บได้ตามรายทาง</color>",
-            en: "<b>Drink Healing Potion</b>\n<color=#CBD5E1>Press <color=#93C5FD><b>[1]</b></color> to drink a healing potion when wounded.</color>",
-            zh: "<b>饮用恢复药水</b>\n<color=#CBD5E1>受伤时按 <color=#93C5FD><b>[1]</b></color> 饮用治疗药水恢复体力。</color>");
-
-        AddKey("load_row_chest",
-            th: "<b>หีบสมบัติ & กุญแจศักดิ์สิทธิ์ (Treasure & Key)</b>\n<color=#CBD5E1>ค้นหาหีบสมบัติที่ซ่อนอยู่เพื่อรับกุญแจสำคัญสำหรับเปิดประตูดันเจี้ยนลับ</color>",
-            en: "<b>Treasure & Sacred Key</b>\n<color=#CBD5E1>Find hidden chests to obtain essential keys for unlocking secret gates.</color>",
-            zh: "<b>宝箱与神圣钥匙</b>\n<color=#CBD5E1>寻找隐藏的宝箱以获得开启秘密大门的关键钥匙。</color>");
+            th: "<size=19><color=#FFE8A3><b>เปิดหีบสมบัติ (Chest & Loot)</b></color></size>",
+            en: "<size=19><color=#FFE8A3><b>Chest & Loot</b></color></size>",
+            zh: "<size=19><color=#FFE8A3><b>开启宝箱 (Chest & Loot)</b></color></size>");
 
         AddKey("load_row_tree",
-            th: "<b>ต้นไม้ฟื้นฟูออกซิเจน (Tree Checkpoint)</b>\n<color=#CBD5E1>รดน้ำต้นไม้โลกเพื่อฟื้นคืนออกซิเจนและบันทึกจุดเกิดเมื่อคุณพลาดท่า</color>",
-            en: "<b>Tree Checkpoint</b>\n<color=#CBD5E1>Water the tree to replenish oxygen and secure a safe respawn checkpoint.</color>",
-            zh: "<b>神树检查点 (Tree Checkpoint)</b>\n<color=#CBD5E1>给神树浇水以恢复氧气，并保存安全重生检查点。</color>");
-
-        AddKey("load_row_climb",
-            th: "<b>การปีนบันได (Climb Ladders)</b>\n<color=#CBD5E1>เดินชนบันไดไม้แล้วกด <color=#93C5FD><b>[W]</b></color> เพื่อปีนขึ้น หรือกด <color=#93C5FD><b>[S]</b></color> เพื่อไต่ลง</color>",
-            en: "<b>Climbing Ladders</b>\n<color=#CBD5E1>Walk into ladders and press <color=#93C5FD><b>[W]</b></color> to climb up or <color=#93C5FD><b>[S]</b></color> to slide down.</color>",
-            zh: "<b>攀爬梯子 (Climb Ladders)</b>\n<color=#CBD5E1>走近梯子按 <color=#93C5FD><b>[W]</b></color> 向上攀爬，或按 <color=#93C5FD><b>[S]</b></color> 向下攀爬。</color>");
+            th: "<size=19><color=#6EE7B7><b>ฟื้นฟู Oxygen & บันทึกจุดเกิด (Oxygen & Save)</b></color></size>",
+            en: "<size=19><color=#6EE7B7><b>Oxygen & Save</b></color></size>",
+            zh: "<size=19><color=#6EE7B7><b>恢复氧气与存档 (Oxygen & Save)</b></color></size>");
 
         AddKey("load_status_preparing",
             th: "กำลังเตรียมพร้อมเข้าสู่ดันเจี้ยน...",

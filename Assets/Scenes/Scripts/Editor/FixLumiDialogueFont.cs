@@ -14,6 +14,8 @@ public static class FixLumiDialogueFont
     private const string FONT_ASSET_PATH = "Assets/Fonts/Itim_Thai_SDF.asset";
     private const string DYNAMIC_FONT_PATH = "Assets/Fonts/Itim_TMP_Dynamic.asset";
     private const string PREFAB_PATH = "Assets/Prefabs/Lumi_Companion.prefab";
+    private const string PREFAB_PATH_ALT = "Assets/Prefabs 1/Lumi_Companion.prefab";
+    private const string FRAME_SPRITE_PATH = "Assets/Image/UI/Lumi_Dialogue_Frame.png";
 
     [MenuItem("Tools/SproutScout/Fix Lumi Dialogue Font and Speech Bubble")]
     public static void ExecuteFix()
@@ -132,18 +134,23 @@ public static class FixLumiDialogueFont
 
     private static void UpdateLumiPrefab(TMP_FontAsset fontAsset)
     {
-        GameObject prefabRoot = PrefabUtility.LoadPrefabContents(PREFAB_PATH);
-        if (prefabRoot == null)
+        string[] prefabPaths = new string[] { PREFAB_PATH, PREFAB_PATH_ALT };
+        foreach (var path in prefabPaths)
         {
-            Debug.LogError($"[FixLumiDialogueFont] Could not load prefab at {PREFAB_PATH}");
-            return;
+            if (!File.Exists(path)) continue;
+            GameObject prefabRoot = PrefabUtility.LoadPrefabContents(path);
+            if (prefabRoot == null)
+            {
+                Debug.LogError($"[FixLumiDialogueFont] Could not load prefab at {path}");
+                continue;
+            }
+
+            ConfigureLumiComponents(prefabRoot, fontAsset);
+
+            PrefabUtility.SaveAsPrefabAsset(prefabRoot, path);
+            PrefabUtility.UnloadPrefabContents(prefabRoot);
+            Debug.Log($"[FixLumiDialogueFont] Successfully updated {path}");
         }
-
-        ConfigureLumiComponents(prefabRoot, fontAsset);
-
-        PrefabUtility.SaveAsPrefabAsset(prefabRoot, PREFAB_PATH);
-        PrefabUtility.UnloadPrefabContents(prefabRoot);
-        Debug.Log($"[FixLumiDialogueFont] Successfully updated {PREFAB_PATH}");
     }
 
     public static void UpdateLumiInActiveScene(TMP_FontAsset fontAsset)
@@ -183,6 +190,8 @@ public static class FixLumiDialogueFont
 
     public static void ConfigureLumiComponents(GameObject lumiRoot, TMP_FontAsset fontAsset)
     {
+        Sprite frameSprite = AssetDatabase.LoadAssetAtPath<Sprite>(FRAME_SPRITE_PATH);
+
         Canvas canvas = lumiRoot.GetComponentInChildren<Canvas>(true);
         if (canvas != null)
         {
@@ -190,7 +199,6 @@ public static class FixLumiDialogueFont
             // Channel flags for TextMeshPro (TexCoord1 | Normal | Tangent = 25)
             canvas.additionalShaderChannels = AdditionalCanvasShaderChannels.TexCoord1 | AdditionalCanvasShaderChannels.Normal | AdditionalCanvasShaderChannels.Tangent;
 
-            // Remove or disable CanvasScaler if present to prevent downsampling
             CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
             if (scaler != null)
             {
@@ -198,14 +206,13 @@ public static class FixLumiDialogueFont
                 scaler.referencePixelsPerUnit = 100f;
             }
 
-            // High-resolution Canvas Sizing:
-            // Sized for crisp display: 520 x 180 at scale 0.0055 = ~2.8m x 1.0m world size
+            // Sized for wooden sign board: 480 x 182 at scale 0.0055
             RectTransform canvasRect = canvas.GetComponent<RectTransform>();
             if (canvasRect != null)
             {
-                canvasRect.sizeDelta = new Vector2(520f, 180f);
+                canvasRect.sizeDelta = new Vector2(480f, 182f);
                 canvasRect.localScale = new Vector3(0.0055f, 0.0055f, 0.0055f);
-                canvasRect.localPosition = new Vector3(0f, 0.45f, 0f);
+                canvasRect.localPosition = new Vector3(0f, 1.25f, 0f);
             }
         }
 
@@ -213,7 +220,6 @@ public static class FixLumiDialogueFont
         Transform bubbleRoot = lumiRoot.transform.Find("SpeechBubbleCanvas/BubbleRoot");
         if (bubbleRoot == null)
         {
-            // Try find anywhere under canvas
             foreach (var t in lumiRoot.GetComponentsInChildren<Transform>(true))
             {
                 if (t.name == "BubbleRoot") { bubbleRoot = t; break; }
@@ -225,13 +231,23 @@ public static class FixLumiDialogueFont
             RectTransform bubbleRect = bubbleRoot.GetComponent<RectTransform>();
             if (bubbleRect != null)
             {
-                bubbleRect.sizeDelta = new Vector2(510f, 170f);
+                bubbleRect.anchorMin = new Vector2(0f, 0f);
+                bubbleRect.anchorMax = new Vector2(1f, 1f);
+                bubbleRect.offsetMin = Vector2.zero;
+                bubbleRect.offsetMax = Vector2.zero;
+                bubbleRect.sizeDelta = Vector2.zero;
+                bubbleRect.localScale = Vector3.one;
             }
 
-            Image bgImage = bubbleRoot.GetComponent<Image>();
+            UnityEngine.UI.Image bgImage = bubbleRoot.GetComponent<UnityEngine.UI.Image>();
             if (bgImage != null)
             {
-                bgImage.color = new Color(1f, 1f, 1f, 0.98f);
+                if (frameSprite != null)
+                {
+                    bgImage.sprite = frameSprite;
+                }
+                bgImage.type = UnityEngine.UI.Image.Type.Simple;
+                bgImage.color = Color.white;
             }
         }
 
@@ -250,26 +266,28 @@ public static class FixLumiDialogueFont
             {
                 textRect.anchorMin = new Vector2(0f, 0f);
                 textRect.anchorMax = new Vector2(1f, 1f);
-                // Padding: 35px left/right, 25px bottom, 15px top
-                textRect.offsetMin = new Vector2(35f, 25f);
-                textRect.offsetMax = new Vector2(-35f, -15f);
+                // Padding carefully calibrated to inner wooden plank:
+                // Left: 80px, Right: 76px, Bottom: 58px, Top: 64px
+                // Ensures text NEVER touches or overflows the outer dark bark border!
+                textRect.offsetMin = new Vector2(80f, 58f);
+                textRect.offsetMax = new Vector2(-76f, -64f);
             }
 
-            // Typography settings for ultimate clarity:
+            // Typography settings for ultimate clarity inside the plank:
             tmp.enableAutoSizing = true;
-            tmp.fontSizeMin = 24f;
-            tmp.fontSizeMax = 36f;
-            tmp.fontSize = 32f;
+            tmp.fontSizeMin = 16f;
+            tmp.fontSizeMax = 24f;
+            tmp.fontSize = 22f;
             tmp.fontStyle = FontStyles.Bold;
-            tmp.alignment = TextAlignmentOptions.Center;
-            // Line spacing & paragraph spacing for Thai diacritics
-            tmp.lineSpacing = 16f;
-            tmp.paragraphSpacing = 8f;
+            tmp.alignment = TextAlignmentOptions.Midline;
+            tmp.lineSpacing = 4f;
+            tmp.paragraphSpacing = 0f;
             tmp.wordWrappingRatios = 0.4f;
             tmp.textWrappingMode = TextWrappingModes.Normal;
-            tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.overflowMode = TextOverflowModes.Truncate;
+            tmp.margin = Vector4.zero;
 
-            // Rich warm brown text for high contrast against light marshmallow background
+            // Rich warm dark brown text for maximum contrast against light wood plank
             tmp.color = new Color(0.18f, 0.11f, 0.05f, 1.0f);
             tmp.raycastTarget = false;
 

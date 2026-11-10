@@ -8,6 +8,7 @@ public class TreeSavePoint : MonoBehaviour
     [Header("Tree Status")]
     [SerializeField] private bool isRestored = false;
     [SerializeField] private bool healsOxygen = true;
+    [SerializeField] private bool hasBeenRestoredBefore = false;
 
     [Header("Tree Health / Decay Settings")]
     [SerializeField] private float maxTreeHealth = 100f;
@@ -197,11 +198,9 @@ public class TreeSavePoint : MonoBehaviour
             yield break;
         }
 
-        // 🌟 เช็คก่อนว่ามี Potion ในกระเป๋าจริงไหม (ถ้าไม่มี ตัดจบและไม่อนุญาตให้เปิดเด็ดขาด)
         if (!playerInventory.HasPotion())
         {
-            Debug.Log("⚠️ คุณไม่มี Potion! (มีได้แค่ Potion เท่านั้นที่จะฟื้นฟูกลไกนี้ได้)");
-
+            Debug.Log("⚠️ คุณไม่มี Potion!");
             float waitTime = 0.4f;
             while (waitTime > 0f)
             {
@@ -212,7 +211,6 @@ public class TreeSavePoint : MonoBehaviour
             yield break;
         }
 
-        // ถ้ามี Potion จริง ให้ทำการดึงและลบ Potion ออกจากกระเป๋า
         bool success = playerInventory.ConsumePotionDirectly();
 
         if (success)
@@ -220,6 +218,8 @@ public class TreeSavePoint : MonoBehaviour
             isRestored = true;
             ExecuteTreeRestoration();
             Debug.Log("✨ ใช้ Potion ฟื้นฟูต้นไม้สำเร็จ!");
+
+            isProcessing = false; // 🌟 เพิ่มบรรทัดนี้ เพื่อปลดล็อกสถานะการกดให้กลับมาใช้งานได้ปกติ
             yield break;
         }
 
@@ -246,7 +246,19 @@ public class TreeSavePoint : MonoBehaviour
             playerOxygen.UpdateSafeZoneState(true);
         }
 
-        SaveGame();
+        // 🌟 เช็คเงื่อนไขตามที่คุณต้องการ:
+        // - ถ้าเป็นการฟื้นฟู "รอบแรก" ให้เซฟเกมด้วย
+        // - ถ้าเป็นการฟื้นฟู "รอบที่ 2 ขึ้นไป" ให้ฟื้นฟูอย่างเดียว ไม่ต้องเซฟทับ
+        if (!hasBeenRestoredBefore)
+        {
+            SaveGame();
+            hasBeenRestoredBefore = true; // ล็อคไว้ว่าเคยฟื้นฟูรอบแรกไปแล้วนะ
+            Debug.Log("[TreeSavePoint] ฟื้นฟูรอบแรก: ทำการบันทึก Checkpoint สำเร็จ");
+        }
+        else
+        {
+            Debug.Log("[TreeSavePoint] ฟื้นฟูรอบที่ 2 ขึ้นไป: ฟื้นฟูต้นไม้อย่างเดียว ไม่บันทึก Checkpoint ซ้ำ");
+        }
     }
 
     public void RestoreTree()
@@ -272,12 +284,13 @@ public class TreeSavePoint : MonoBehaviour
             playerOxygen.UpdateSafeZoneState(false);
         }
 
-        if (CheckpointManager.Instance != null)
+        // 🌟 ถ้าผู้เล่นยังยืนอยู่ในระยะตอนที่ต้นไม้พัง ให้แสดงปุ่มกด (Prompt) ขึ้นมาทันที
+        if (isPlayerInRange)
         {
-            CheckpointManager.Instance.InvalidateCheckpointIfMatch(transform.position);
+            SetPromptActive(true);
         }
 
-        Debug.Log($"[TreeSavePoint] ต้นไม้ {gameObject.name} พลังชีวิตหมดและกลับคืนสภาพเดิม จุดเซฟถูกลบ!");
+        Debug.Log($"[TreeSavePoint] ต้นไม้ {gameObject.name} พลังชีวิตหมดและกลับคืนสภาพเดิม");
     }
 
     private void UpdateTreeHealthUI()
@@ -354,7 +367,7 @@ public class TreeSavePoint : MonoBehaviour
         if (CheckpointManager.Instance != null)
         {
             Vector3 checkpointPosition = playerObject != null ? playerObject.transform.root.position : transform.position;
-            CheckpointManager.Instance.SaveCheckpoint(checkpointPosition, playerHealth, playerInventory, healsOxygen);
+            CheckpointManager.Instance.SaveCheckpoint(checkpointPosition, playerHealth, playerInventory, healsOxygen, this);
             Debug.Log("[Tree Save Point] บันทึกจุด Checkpoint เรียบร้อย!");
         }
         else if (Application.isPlaying)

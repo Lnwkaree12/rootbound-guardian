@@ -129,11 +129,11 @@ public class NewLoadingScreenManager : MonoBehaviour
         string[] rowKeys = new string[]
         {
             "load_row_move",
-            "load_row_sprint",
-            "load_row_interact",
-            "load_row_potion",
+            "load_row_dash",
+            "load_row_trap",
             "load_row_chest",
-            "load_row_tree",
+            "load_row_oxygen_save",
+            "load_row_oxygen_limit",
             "load_row_climb"
         };
 
