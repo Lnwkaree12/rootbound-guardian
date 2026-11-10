@@ -622,6 +622,11 @@ public class LocalizationManager : MonoBehaviour
         // ══════════════════════════════════════════════════════════════════════
         // 8. GAME OVER UI
         // ══════════════════════════════════════════════════════════════════════
+        AddKey("gameover_badge",
+            th: "G A M E   O V E R",
+            en: "G A M E   O V E R",
+            zh: "游 戏 结 束");
+
         AddKey("gameover_title",
             th: "G A M E   O V E R",
             en: "G A M E   O V E R",
@@ -642,10 +647,20 @@ public class LocalizationManager : MonoBehaviour
             en: "Your health has depleted!",
             zh: "你的生命值已耗尽！");
 
+        AddKey("gameover_no_checkpoint",
+            th: "ไม่มีจุดเซฟเหลือรอด! เกมโอเวอร์",
+            en: "No checkpoints remaining! Game Over",
+            zh: "已无可用重生点！游戏结束");
+
         AddKey("gameover_survival_tips",
-            th: "คำแนะนำในการเอาชีวิตรอด",
-            en: "Survival Tips",
-            zh: "生存指南");
+            th: "คำแนะนำในการเอาชีวิตรอด (Survival Guide)",
+            en: "Survival Guide",
+            zh: "生存指南 (Survival Guide)");
+
+        AddKey("gameover_tips_body",
+            th: "• ระวังกับดักใน Dungeon คอยดู Pattern ของกับดักให้ดีๆ\n• เมื่อออกนอก Safe Zone ออกซิเจนจะลดลงเรื่อยๆ\n• หมั่นเก็บ Potion water เพื่อฟื้นฟูต้นไม้\n• พยายามตามหา Potion Water เพื่อเก็บไว้ใช้ยามคับขัน",
+            en: "• Watch out for Dungeon traps and learn their patterns\n• Oxygen steadily drains when outside Safe Zones\n• Collect Potion Water to restore sacred trees\n• Gather Potion Water to keep for emergencies",
+            zh: "• 小心地下城陷阱，仔细观察陷阱规律\n• 离开安全区后氧气会持续下降\n• 记得收集药水之水以恢复神树\n• 尽量寻找药水之水以备急用");
 
         AddKey("gameover_tip_1",
             th: "• ระวังกับดักและแผ่นหินที่ตกลงมา",
@@ -658,9 +673,9 @@ public class LocalizationManager : MonoBehaviour
             zh: "• 给神树浇水以补充氧气并设立重生点");
 
         AddKey("gameover_encouragement",
-            th: "อย่ายอมแพ้! ผืนป่ายังคงรอคอยการกลับมาของผู้พิทักษ์",
-            en: "Don't give up! The forest still awaits the guardian's return",
-            zh: "不要放弃！森林仍在守候守护者的归来");
+            th: "พยายามเข้า",
+            en: "Keep trying!",
+            zh: "继续加油！");
 
         AddKey("gameover_btn_retry",
             th: "ลองใหม่อีกครั้ง",

@@ -234,20 +234,6 @@ public class GameWideLocalization : MonoBehaviour
                 if (tmp != null) tmp.text = LocalizationManager.Instance.Get("hud_shift_hint");
             }
         }
-
-        // Localize Survival Tips Box
-        GameObject tipBox = GameObject.Find("TipBox");
-        if (tipBox != null)
-        {
-            Transform tipText = tipBox.transform.Find("TipText");
-            if (tipText != null)
-            {
-                var txt = tipText.GetComponent<Text>();
-                if (txt != null) txt.text = LocalizationManager.Instance.Get("gameover_survival_tips");
-                var tmp = tipText.GetComponent<TextMeshProUGUI>();
-                if (tmp != null) tmp.text = LocalizationManager.Instance.Get("gameover_survival_tips");
-            }
-        }
     }
 }
 

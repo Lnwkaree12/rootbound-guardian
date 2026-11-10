@@ -80,6 +80,10 @@ public class GameOverUIManager : MonoBehaviour
             {
                 currentReasonKey = "gameover_hp_depleted";
             }
+            else if (reason.Contains("จุดเซฟ") || reason.ToLower().Contains("checkpoint") || reason.ToLower().Contains("save"))
+            {
+                currentReasonKey = "gameover_no_checkpoint";
+            }
             else
             {
                 currentReasonKey = reason;
@@ -122,39 +126,51 @@ public class GameOverUIManager : MonoBehaviour
 
         if (gameOverPanel != null)
         {
-            // Subtitle
-            Transform sub = gameOverPanel.transform.Find("ModalContainer/InnerCard/SubtitleText");
-            if (sub == null) sub = gameOverPanel.transform.Find("ModalContainer/SubtitleText");
-            if (sub != null)
-            {
-                var tmp = sub.GetComponent<TextMeshProUGUI>();
-                if (tmp != null) tmp.text = LocalizationManager.Instance.Get("gameover_subtitle");
-            }
+            Transform innerCard = gameOverPanel.transform.Find("ModalContainer/InnerCard");
+            if (innerCard == null) innerCard = gameOverPanel.transform.Find("ModalContainer");
 
-            // Survival tips heading
-            Transform tips = gameOverPanel.transform.Find("ModalContainer/InnerCard/TipsContainer/TipsHeading");
-            if (tips != null)
+            if (innerCard != null)
             {
-                var tmp = tips.GetComponent<TextMeshProUGUI>();
-                if (tmp != null) tmp.text = LocalizationManager.Instance.Get("gameover_survival_tips");
+                SetTMPText(innerCard, "BadgeText", "gameover_badge");
+                SetTMPText(innerCard, "SubtitleText", "gameover_subtitle");
+
+                Transform tipsHeader = innerCard.Find("TipBox/TipHeader") ?? innerCard.Find("TipsContainer/TipsHeading");
+                if (tipsHeader != null)
+                {
+                    var tmp = tipsHeader.GetComponent<TextMeshProUGUI>();
+                    if (tmp != null) tmp.text = LocalizationManager.Instance.Get("gameover_survival_tips");
+                }
+
+                SetTMPText(innerCard, "TipBox/TipText", "gameover_tips_body");
+                SetTMPText(innerCard, "EncouragementWhisper", "gameover_encouragement");
             }
 
             // Buttons
             if (restartButton != null)
             {
-                var tmp = restartButton.GetComponentInChildren<TextMeshProUGUI>();
+                var tmp = restartButton.GetComponentInChildren<TextMeshProUGUI>(true);
                 if (tmp != null) tmp.text = LocalizationManager.Instance.Get("gameover_btn_retry");
-                var txt = restartButton.GetComponentInChildren<Text>();
+                var txt = restartButton.GetComponentInChildren<Text>(true);
                 if (txt != null) txt.text = LocalizationManager.Instance.Get("gameover_btn_retry");
             }
 
             if (mainMenuButton != null)
             {
-                var tmp = mainMenuButton.GetComponentInChildren<TextMeshProUGUI>();
+                var tmp = mainMenuButton.GetComponentInChildren<TextMeshProUGUI>(true);
                 if (tmp != null) tmp.text = LocalizationManager.Instance.Get("gameover_btn_menu");
-                var txt = mainMenuButton.GetComponentInChildren<Text>();
+                var txt = mainMenuButton.GetComponentInChildren<Text>(true);
                 if (txt != null) txt.text = LocalizationManager.Instance.Get("gameover_btn_menu");
             }
+        }
+    }
+
+    private void SetTMPText(Transform root, string path, string locKey)
+    {
+        Transform t = root.Find(path);
+        if (t != null)
+        {
+            var tmp = t.GetComponent<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = LocalizationManager.Instance.Get(locKey);
         }
     }
 
