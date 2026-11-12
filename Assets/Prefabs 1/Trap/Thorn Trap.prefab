@@ -160,6 +160,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
   damageAmount: 50
   wallHitDelay: 0.05
+  checkTopSmash: 1
   onHitPlayer:
     m_PersistentCalls:
       m_Calls: []
@@ -295,7 +296,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 94c8ea0d4af689f44896740c9c7dd52c, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -303,10 +304,10 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 134
+  Priority: 64
   DopplerLevel: 1
-  MinDistance: 2
-  MaxDistance: 15
+  MinDistance: 3
+  MaxDistance: 25
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
