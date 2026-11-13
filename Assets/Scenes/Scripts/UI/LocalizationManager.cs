@@ -950,7 +950,7 @@ public class LocalizationManager : MonoBehaviour
 
     private void AddKey(string key, string th, string en, string zh)
     {
-        tablesTH[key] = th;
+        tablesTH[key] = ThaiFontAdjuster.Adjust(th);
         tablesEN[key] = en;
         tablesZH[key] = zh;
     }
