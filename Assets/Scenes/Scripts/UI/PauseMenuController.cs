@@ -48,6 +48,10 @@ public class PauseMenuController : MonoBehaviour
 
     private AudioClip proceduralPauseClip;
     private AudioClip proceduralResumeClip;
+    private AudioClip proceduralNavClip;
+
+    private Button[] actionButtons;
+    private int currentButtonIndex = 0;
 
     private void Awake()
     {
@@ -135,9 +139,39 @@ public class PauseMenuController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(pauseKey))
+        if (isPaused)
         {
-            TogglePause();
+            if (Input.GetKeyDown(pauseKey))
+            {
+                Resume();
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+            {
+                Navigate(-1);
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            {
+                Navigate(1);
+            }
+            else if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                int dir = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ? -1 : 1;
+                Navigate(dir);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+            {
+                SubmitSelectedButton();
+            }
+        }
+        else
+        {
+            if (Input.GetKeyDown(pauseKey))
+            {
+                Pause();
+            }
         }
     }
 
@@ -174,6 +208,7 @@ public class PauseMenuController : MonoBehaviour
         LoadAudioPreferences();
         BindButtonEvents();
         UpdateLocalizedTexts();
+        SetupNavigation();
 
         if (pausePanel != null)
         {
@@ -188,7 +223,87 @@ public class PauseMenuController : MonoBehaviour
             pauseCanvasGroup.blocksRaycasts = true;
         }
 
+        SelectButton(0, false);
         PlayAudio(pauseClip != null ? pauseClip : proceduralPauseClip);
+    }
+
+    private void SetupNavigation()
+    {
+        actionButtons = new Button[] { resumeButton, restartButton, mainMenuButton };
+
+        for (int i = 0; i < actionButtons.Length; i++)
+        {
+            Button btn = actionButtons[i];
+            if (btn == null) continue;
+
+            int index = i;
+            var juicy = btn.GetComponent<UIJuicyButton>();
+            if (juicy != null)
+            {
+                juicy.onHoverOrSelect = (jb) =>
+                {
+                    currentButtonIndex = index;
+                };
+            }
+
+            Navigation nav = new Navigation();
+            nav.mode = Navigation.Mode.Explicit;
+            int prev = (i - 1 + actionButtons.Length) % actionButtons.Length;
+            int next = (i + 1) % actionButtons.Length;
+            nav.selectOnLeft = actionButtons[prev];
+            nav.selectOnRight = actionButtons[next];
+            btn.navigation = nav;
+        }
+    }
+
+    private void Navigate(int direction)
+    {
+        if (actionButtons == null || actionButtons.Length == 0) return;
+        currentButtonIndex = (currentButtonIndex + direction + actionButtons.Length) % actionButtons.Length;
+        SelectButton(currentButtonIndex, true);
+    }
+
+    public void SelectButton(int index, bool playSound = true)
+    {
+        if (actionButtons == null || actionButtons.Length == 0) return;
+        currentButtonIndex = Mathf.Clamp(index, 0, actionButtons.Length - 1);
+
+        for (int i = 0; i < actionButtons.Length; i++)
+        {
+            Button btn = actionButtons[i];
+            if (btn == null) continue;
+            var juicy = btn.GetComponent<UIJuicyButton>();
+            if (juicy != null)
+            {
+                juicy.TriggerVisualSelection(i == currentButtonIndex);
+            }
+        }
+
+        if (actionButtons[currentButtonIndex] != null)
+        {
+            if (UnityEngine.EventSystems.EventSystem.current != null)
+            {
+                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(actionButtons[currentButtonIndex].gameObject);
+            }
+        }
+
+        if (playSound)
+        {
+            PlayAudio(proceduralNavClip);
+        }
+    }
+
+    private void SubmitSelectedButton()
+    {
+        if (actionButtons == null || actionButtons.Length == 0) return;
+        if (currentButtonIndex >= 0 && currentButtonIndex < actionButtons.Length)
+        {
+            Button btn = actionButtons[currentButtonIndex];
+            if (btn != null && btn.interactable)
+            {
+                btn.onClick.Invoke();
+            }
+        }
     }
 
     public void Resume()
@@ -435,6 +550,7 @@ public class PauseMenuController : MonoBehaviour
 
         proceduralPauseClip = GenerateChimeClip("PauseChime", 523.25f, 659.25f, 0.15f, 0.35f);
         proceduralResumeClip = GenerateToneClip("ResumeTone", 440f, 0.08f, 0.25f);
+        proceduralNavClip = GenerateToneClip("PauseNavTone", 587.33f, 0.05f, 0.2f);
     }
 
     private void PlayAudio(AudioClip clip)
