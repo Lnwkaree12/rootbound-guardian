@@ -158886,6 +158886,14 @@ PrefabInstance:
       propertyPath: m_Center.z
       value: -0.04
       objectReference: {fileID: 0}
+    - target: {fileID: 211617906607358106, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 0b30567a7428148c4b79796e0f46c11b, type: 2}
+    - target: {fileID: 533721948609364930, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 533721948609364930, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: m_Constraints
       value: 112
@@ -158937,6 +158945,14 @@ PrefabInstance:
     - target: {fileID: 2198398331640359335, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2321890692979421810, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: castRadius
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2321890692979421810, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: fadedAlpha
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2630054112159109434, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: m_Layer
@@ -159098,13 +159114,25 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7734665362711801326, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: m_Volume
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8190967116982443014, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: dashSpeed
       value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 8190967116982443014, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: moveSpeed
-      value: 10
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8190967116982443014, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: castRadius
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8190967116982443014, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: obstacleLayer.m_Bits
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 8768548582112106451, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: m_ClearFlags
@@ -188285,7 +188313,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7693283890582138744, guid: 765f0795eb270704399a5c3633a629ea, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7714788161194155828, guid: 765f0795eb270704399a5c3633a629ea, type: 3}
       propertyPath: m_Enabled
@@ -239077,7 +239105,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4792167140970889422, guid: b3bb253f6abe13a438c48b38009b3376, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4886671444726243878, guid: b3bb253f6abe13a438c48b38009b3376, type: 3}
       propertyPath: m_LocalScale.x
@@ -599147,7 +599175,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 173764867635478399, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 287979162379630830, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_Layer
@@ -599239,11 +599267,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3100008914979723110, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3100008914979723110, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3206703037076994111, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_Enabled
@@ -599255,11 +599283,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3639487126567039207, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3639487126567039207, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3639487126567039207, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_LocalScale.x
@@ -599271,11 +599299,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3888914289347528116, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3888914289347528116, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3992572757725658563, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_Layer
@@ -599467,11 +599495,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9065465392824067815, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9065465392824067815, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9096104248831929433, guid: 067237ffd957d764ab9bf2beb02aab2b, type: 3}
       propertyPath: m_Layer

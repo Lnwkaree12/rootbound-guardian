@@ -8,9 +8,9 @@ public class CameraOcclusionFade : MonoBehaviour
     [SerializeField] private LayerMask obstacleLayer;   // เลเยอร์ของฉาก/สิ่งกีดขวาง
 
     [Header("Fade Settings")]
-    [SerializeField] private float fadedAlpha = 0.3f;   // ความโปร่งใสเวลาโดนบัง (0 = ใส, 1 = ทึบ)
+    [SerializeField] private float fadedAlpha = 0.5f;   // ความโปร่งใสเวลาโดนบัง (0 = ใส, 1 = ทึบ)
     [SerializeField] private float fadeSpeed = 5f;      // ความเร็วในการเปลี่ยนความโปร่งใส
-    [SerializeField] private float castRadius = 0.4f;   // รัศมีลำแสงสำหรับตรวจจับด้านข้าง
+    [SerializeField] private float castRadius = 0.3f;   // รัศมีลำแสงสำหรับตรวจจับด้านข้าง
 
     private List<RendererAndMaterial> currentlyFadedObjects = new List<RendererAndMaterial>();
 

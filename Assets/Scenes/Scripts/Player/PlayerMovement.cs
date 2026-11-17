@@ -1,6 +1,7 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+//[RequireComponent(typeof(Rigidbody))]
+//[RequireComponent(typeof(CapsuleCollider))]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
@@ -15,6 +16,14 @@ public class PlayerMovement : MonoBehaviour
     [Header("Climbing Settings")]
     [SerializeField] private float climbSpeed = 5f;
     [SerializeField] private float forcedExitInputLockDuration = 0.3f;
+
+    [Header("Wall Slide / Predictive Cast Settings")]
+    [Tooltip("รัศมีของ SphereCast ควรใกล้เคียงกับความกว้างของตัวละคร")]
+    [SerializeField] private float castRadius = 0.35f;
+    [Tooltip("ระยะทางล่วงหน้าที่ต้องการเช็คสิ่งกีดขวาง")]
+    [SerializeField] private float castDistance = 0.4f;
+    [Tooltip("Layer ของกำแพงหรือ Props แต่งฉากที่ต้องการให้ไถ")]
+    [SerializeField] private LayerMask obstacleLayer;
 
     private Rigidbody rb;
     private Vector2 currentInput;
@@ -42,7 +51,6 @@ public class PlayerMovement : MonoBehaviour
         {
             float verticalInput = 0f;
 
-            // 🌟 เช็คปุ่ม W เพื่อขึ้น และ S เพื่อลงอย่างเดียวเท่านั้น (ไม่ให้ปุ่ม A/D มาเกี่ยวตอนปีน)
             if (Input.GetKey(KeyCode.W))
             {
                 verticalInput = 1f;
@@ -68,7 +76,6 @@ public class PlayerMovement : MonoBehaviour
                 moveX = 0f;
             }
 
-            // ล็อกความเร็วแนวนอนให้อยู่กับที่ของบันได บังคับให้ขยับได้แค่ขึ้น-ลง (Y) เท่านั้น
             rb.linearVelocity = new Vector3(moveX, verticalInput * climbSpeed, moveZ);
 
             if (playerAnim != null)
@@ -100,18 +107,54 @@ public class PlayerMovement : MonoBehaviour
         // 2. ระบบ Dash
         if (isDashing)
         {
-            rb.linearVelocity = new Vector3(dashDirection.x * dashSpeed, 0f, dashDirection.z * dashSpeed);
+            rb.linearVelocity = new Vector3(dashDirection.x * dashSpeed, rb.linearVelocity.y, dashDirection.z * dashSpeed);
         }
         else
         {
             if (currentInput.sqrMagnitude > 0.01f)
             {
-                Vector3 targetVelocity = new Vector3(currentInput.x * moveSpeed, rb.linearVelocity.y, currentInput.y * moveSpeed);
-                rb.linearVelocity = targetVelocity;
-            }
-            else
-            {
-                rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+                // แปลง Input (Vector2) เป็น Vector3 ในโลก 3D
+                Vector3 inputDir = new Vector3(currentInput.x, 0f, currentInput.y).normalized;
+                Vector3 targetVelocity = inputDir * moveSpeed;
+
+                // 🌟 ระบบ Predictive Wall Slide ตรวจจับสิ่งกีดขวางล่วงหน้า
+                Vector3 castOrigin = transform.position + Vector3.up * -.9f;
+                RaycastHit hit;
+
+                if (Physics.SphereCast(castOrigin, castRadius, inputDir, out hit, castDistance, obstacleLayer))
+                {
+                    Vector3 wallNormal = hit.normal;
+                    wallNormal.y = 0f;
+                    wallNormal.Normalize();
+
+                    Vector3 slideDir = Vector3.ProjectOnPlane(inputDir, wallNormal);
+
+                    if (slideDir.sqrMagnitude < 0.001f)
+                    {
+                        Vector3 wallTangent = Vector3.Cross(wallNormal, Vector3.up);
+                        float dot = Vector3.Dot(inputDir, wallTangent);
+                        slideDir = wallTangent * Mathf.Sign(dot);
+                    }
+
+                    targetVelocity = slideDir * moveSpeed;
+
+                    Debug.Log($"<color=green>SphereCast ชน:</color> {hit.collider.name} | WallNormal: {wallNormal}");
+                }
+                else
+                {
+                    // Debug.Log("ทางโล่ง ไม่ชนอะไร");
+                }
+
+                // =========================================================================
+                // 🌟 [จุดที่แก้ไข]: ใช้ Vector3.Lerp ช่วยหน่วงความเร็วไม่ให้พุ่งพรวดพราดเกินไป
+                // เลข 15f ยิ่งน้อยยิ่งไหลลื่น/หน่วงมาก ยิ่งมากยิ่งเปลี่ยนทิศทางไว
+                // =========================================================================
+                Vector3 currentVelocityXZ = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+                Vector3 smoothedVelocity = Vector3.Lerp(currentVelocityXZ, targetVelocity, Time.fixedDeltaTime * 10f);
+
+                // กำหนดความเร็วแกน X, Z พร้อมรักษาสภาพความเร็วแกน Y (แรงโน้มถ่วง) ไว้
+                rb.linearVelocity = new Vector3(smoothedVelocity.x, rb.linearVelocity.y, smoothedVelocity.z);
+
             }
         }
     }
@@ -182,10 +225,9 @@ public class PlayerMovement : MonoBehaviour
             playerAnim.SetClimbSpeed(0f);
         }
 
-        // 🌟 ล้างค่าอินพุตทั้งหมดและตัดความเร็วเก่าทิ้ง ป้องกันแรงกดค้างส่งผลต่อทิศทางกระเด็น
         currentInput = Vector2.zero;
-        rb.linearVelocity = Vector3.zero; // เคลียร์ความเร็วเก่าให้เป็นศูนย์ก่อน
-        rb.linearVelocity = force;       // ใส่แรงพุ่งตามที่ตั้งค่าไว้ใน Inspector เป๊ะๆ
+        rb.linearVelocity = Vector3.zero;
+        rb.linearVelocity = force;
     }
 
     public void Dash(Vector3 direction)
@@ -219,7 +261,6 @@ public class PlayerMovement : MonoBehaviour
 
     public void Move(Vector2 inputDirection)
     {
-        // ถือกำหนดว่าถ้ากำลังปีนอยู่ ห้ามให้อินพุตภายนอก (A/D/W/S จากคีย์บอร์ดปกติ) มายุ่ง
         if (isClimbing || forcedExitInputLockTimer > 0f) return;
         currentInput = inputDirection;
     }
@@ -232,5 +273,12 @@ public class PlayerMovement : MonoBehaviour
     private void OnCollisionExit(Collision collision)
     {
         IsGrounded = false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Vector3 origin = transform.position + Vector3.up * -.9f;
+        Gizmos.DrawWireSphere(origin, castRadius);
     }
 }
