@@ -54,6 +54,7 @@ public class PlayerOxygen : MonoBehaviour
     private Coroutine oxygenRoutine;
     private bool isInSafeZone;
     private bool gameOverTriggered;
+    private bool oxygenRegenSuppressedUntilSafeZoneExit;
 
     // References สำหรับเก็บ Overrides จาก Volume
     private Vignette vignette;
@@ -151,6 +152,11 @@ public class PlayerOxygen : MonoBehaviour
 
     public void UpdateSafeZoneState(bool safe)
     {
+        if (!safe)
+        {
+            oxygenRegenSuppressedUntilSafeZoneExit = false;
+        }
+
         isInSafeZone = safe;
 
         if (oxygenRoutine != null)
@@ -158,7 +164,7 @@ public class PlayerOxygen : MonoBehaviour
             StopCoroutine(oxygenRoutine);
         }
 
-        if (isInSafeZone)
+        if (isInSafeZone && !oxygenRegenSuppressedUntilSafeZoneExit)
         {
             oxygenRoutine = StartCoroutine(RegenRoutine());
         }
@@ -168,9 +174,20 @@ public class PlayerOxygen : MonoBehaviour
         }
     }
 
+    public void SetOxygenRegenSuppressedUntilSafeZoneExit(bool suppressed)
+    {
+        oxygenRegenSuppressedUntilSafeZoneExit = suppressed;
+
+        if (oxygenRoutine != null)
+        {
+            StopCoroutine(oxygenRoutine);
+            oxygenRoutine = null;
+        }
+    }
+
     private IEnumerator DrainRoutine()
     {
-        while (!isInSafeZone)
+        while (!isInSafeZone || oxygenRegenSuppressedUntilSafeZoneExit)
         {
             yield return new WaitForSeconds(drainTickInterval);
 
@@ -202,13 +219,13 @@ public class PlayerOxygen : MonoBehaviour
         }
     }
 
-    public void ResetOxygen()
-    {
-        currentOxygen = maxOxygen;
-        onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
-        UpdatePostProcessing();
-        UpdateSafeZoneState(true);
-    }
+    //public void ResetOxygen()
+    //{
+    //    currentOxygen = maxOxygen;
+    //    onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
+    //    UpdatePostProcessing();
+    //    UpdateSafeZoneState(true);
+    //}
 
     public void ConsumeOxygen(int amount)
     {
@@ -272,4 +289,23 @@ public class PlayerOxygen : MonoBehaviour
             drainTickInterval = originalDrainInterval;
         }
     }
+
+    // 🌟 เพิ่มฟังก์ชันนี้ใน PlayerOxygen.cs เพื่อใช้ตอน Respawn
+    //public void ResetOxygenOnRespawn(bool healsOxygen)
+    //{
+    //    if (oxygenRoutine != null)
+    //    {
+    //        StopCoroutine(oxygenRoutine);
+    //        oxygenRoutine = null;
+    //    }
+
+    //    // รีเซ็ตค่าออกซิเจนให้เต็ม (หรือปรับตามดีไซน์ที่ต้องการ)
+    //    currentOxygen = maxOxygen;
+    //    onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
+
+    //    // ตั้งค่า Safe Zone ตามจุดเซฟล่าสุดที่ผู้เล่นยืนอยู่
+    //    isInSafeZone = healsOxygen;
+    //    UpdateSafeZoneState(isInSafeZone);
+    //    UpdatePostProcessing();
+    //}
 }

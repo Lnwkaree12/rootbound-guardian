@@ -211,7 +211,11 @@ public class PlayerHealth : MonoBehaviour
 
         onHealthChanged?.Invoke(currentHealth, maxHealth);
         UpdateSafeZoneState(safeZone);
-        Debug.Log($"[ResetHealth] เกิดใหม่แล้ว! รีเซ็ตเลือดเป็น {currentHealth}/{maxHealth}");
+
+        // ❌ (เอาส่วนนี้ออก) ไม่ต้องไปสั่งรีเซ็ตออกซิเจนตรงนี้แล้ว 
+        // เพื่อให้ออกซิเจนยังคงค่าเดิม/ลดต่อตามปกติโดยไม่ถูกบังคับรีเซ็ต
+
+        Debug.Log($"[ResetHealth] เกิดใหม่แล้ว! รีเซ็ตเลือดเป็น {currentHealth}/{maxHealth} (ไม่รีเซ็ตออกซิเจน)");
     }
 
     public void ResetHealthAfterRespawn()
@@ -219,6 +223,12 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
         isInvulnerable = false;
         onHealthChanged?.Invoke(currentHealth, maxHealth);
+
+        PlayerController playerController = GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            playerController.ResetAfterRespawn();
+        }
 
         if (playerAnim != null)
         {

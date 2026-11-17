@@ -209,6 +209,28 @@ public class PlayerController : MonoBehaviour
         inputHandler.ResetDashFlag();
     }
 
+    public void ResetAfterRespawn()
+    {
+        isDashing = false;
+        dashTimer = 0f;
+        dashCooldownTimer = 0f;
+        dashDirection = Vector3.zero;
+
+        if (inputHandler != null)
+        {
+            inputHandler.enabled = true;
+            inputHandler.ResetInputState();
+        }
+
+        if (movement != null)
+        {
+            movement.enabled = true;
+            movement.ResetAfterRespawn();
+        }
+
+        enabled = true;
+    }
+
     private void PlaySound(AudioClip clip)
     {
         if (clip != null && audioSource != null)

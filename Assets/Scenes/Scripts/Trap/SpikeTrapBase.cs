@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class SpikeTrapBase : MonoBehaviour
@@ -26,6 +26,7 @@ public class SpikeTrapBase : MonoBehaviour
 
     private Vector3 hiddenPosition;
     private Vector3 targetPosition;
+    private AudioListener cachedListener;
 
     private void Start()
     {
@@ -53,6 +54,19 @@ public class SpikeTrapBase : MonoBehaviour
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
+        }
+
+        if (audioSource != null)
+        {
+            if (popUpSound == null && audioSource.clip != null)
+            {
+                popUpSound = audioSource.clip;
+            }
+            // Prioritize trap SFX above ambient torches/lava (priority 128) so PlayOneShot is never culled
+            if (audioSource.priority > 64)
+            {
+                audioSource.priority = 64;
+            }
         }
 
         StartCoroutine(SpikeLoop());
@@ -94,15 +108,61 @@ public class SpikeTrapBase : MonoBehaviour
 
     private void PlayPopUpSound()
     {
-        if (popUpSound == null) return;
+        AudioClip clipToPlay = popUpSound != null ? popUpSound : (audioSource != null ? audioSource.clip : null);
+        if (clipToPlay == null) return;
 
-        if (audioSource != null)
+        // Only play when within audible distance of the active AudioListener so distant traps don't exhaust real audio voices
+        Vector3 listenerPos;
+        if (TryGetListenerPosition(out listenerPos))
         {
-            audioSource.PlayOneShot(popUpSound);
+            float maxDist = audioSource != null ? audioSource.maxDistance : 25f;
+            if ((transform.position - listenerPos).sqrMagnitude > maxDist * maxDist)
+            {
+                return;
+            }
+        }
+
+        float sfxScale = PlayerPrefs.GetFloat("SFXVolume", 0.8f);
+
+        if (audioSource != null && audioSource.enabled && audioSource.gameObject.activeInHierarchy)
+        {
+            audioSource.PlayOneShot(clipToPlay, sfxScale);
         }
         else
         {
-            AudioSource.PlayClipAtPoint(popUpSound, transform.position);
+            AudioSource.PlayClipAtPoint(clipToPlay, transform.position, sfxScale);
         }
+    }
+
+    private bool TryGetListenerPosition(out Vector3 pos)
+    {
+        if (cachedListener == null || !cachedListener.enabled || !cachedListener.gameObject.activeInHierarchy)
+        {
+            var listeners = FindObjectsByType<AudioListener>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            cachedListener = null;
+            for (int i = 0; i < listeners.Length; i++)
+            {
+                if (listeners[i] != null && listeners[i].enabled)
+                {
+                    cachedListener = listeners[i];
+                    break;
+                }
+            }
+        }
+
+        if (cachedListener != null)
+        {
+            pos = cachedListener.transform.position;
+            return true;
+        }
+
+        if (Camera.main != null)
+        {
+            pos = Camera.main.transform.position;
+            return true;
+        }
+
+        pos = Vector3.zero;
+        return false;
     }
 }

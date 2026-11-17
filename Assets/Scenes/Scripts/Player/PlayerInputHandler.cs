@@ -9,7 +9,7 @@ public class PlayerInputHandler : MonoBehaviour
     public Vector2 MoveInput { get; private set; }
     public bool DashPressed { get; private set; }
 
-    // ÍèÒ¹¤èÒ WasPressedThisFrame µÃ§æ ¨Ò¡ Action
+    // ï¿½ï¿½Ò¹ï¿½ï¿½ï¿½ WasPressedThisFrame ï¿½Ã§ï¿½ ï¿½Ò¡ Action
     public bool InteractPressed => interactAction != null && interactAction.WasPressedThisFrame();
 
     private InputAction moveAction;
@@ -65,6 +65,12 @@ public class PlayerInputHandler : MonoBehaviour
 
     public void ResetDashFlag()
     {
+        DashPressed = false;
+    }
+
+    public void ResetInputState()
+    {
+        MoveInput = Vector2.zero;
         DashPressed = false;
     }
 }

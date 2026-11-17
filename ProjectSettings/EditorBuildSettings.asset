@@ -9,11 +9,23 @@ EditorBuildSettings:
     path: Assets/Scenes/MainScreen.unity
     guid: ea8878320cfc8d545b2b32e1d106cbd0
   - enabled: 1
+    path: Assets/Scenes/Cutscene.unity
+    guid: 4df8b0502716a47439c1596592414666
+  - enabled: 1
+    path: Assets/Scenes/LoadingScreenNew.unity
+    guid: 66a289fce0fd1654fb0a7e8f4826fc67
+  - enabled: 1
     path: Assets/Scenes/MainGameplay.unity
     guid: 88f31eed63f5988489a8dc3ba9c923e3
   - enabled: 1
-    path: Assets/EndScene.unity
+    path: Assets/Scenes/EndScene.unity
     guid: 84aef336334f43d44b86fb8b9d65e6e8
+  - enabled: 1
+    path: Assets/Scenes/cutscene End.unity
+    guid: 86ebd3e97c1da314eb19cc83e3865b75
+  - enabled: 1
+    path: Assets/Scenes/EndCredit.unity
+    guid: f09a283e2ead8334fa44e085862b51b3
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

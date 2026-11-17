@@ -95,7 +95,6 @@ MonoBehaviour:
   - {fileID: -5884447830239488236}
   - {fileID: 7102344225430407692}
   - {fileID: 6795710655919836366}
-  - {fileID: 0}
 --- !u!114 &6795710655919836366
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -111,13 +110,13 @@ MonoBehaviour:
   active: 1
   shadows:
     m_OverrideState: 1
-    m_Value: {x: 0.85, y: 0.9, z: 1.08, w: 1}
+    m_Value: {x: 0.787037, y: 0.83333325, z: 1, w: 1}
   midtones:
     m_OverrideState: 1
     m_Value: {x: 1, y: 0.98, z: 0.96, w: 1}
   highlights:
     m_OverrideState: 1
-    m_Value: {x: 1.15, y: 1.08, z: 0.92, w: 1}
+    m_Value: {x: 1, y: 0.9391305, z: 0.8, w: 1}
   shadowsStart:
     m_OverrideState: 0
     m_Value: 0

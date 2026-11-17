@@ -5242,6 +5242,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChestController
   lidTransform: {fileID: 8338510976758804355}
   keyTransform: {fileID: 4937215934551928826}
+  rewardItem: {fileID: 0}
   interactPromptUI: {fileID: 5672999108987871749}
   radiantBurstVFX: {fileID: 7151440209418637822}
   keyAuraVFX: {fileID: 5031126965760158923}
@@ -5256,6 +5257,8 @@ MonoBehaviour:
   cinematicDuration: 3.2
   targetCameraFOV: 34
   isOpened: 0
+  camFocus: {x: 0, y: 0, z: 0}
+  chestID: Chest_(223.96, 1.52, 43.10)
 --- !u!1 &3733725124745370483
 GameObject:
   m_ObjectHideFlags: 0
@@ -5485,7 +5488,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: 1999999
   m_SortingOrder: 60
   m_TargetDisplay: 0
 --- !u!114 &1068718009854385449

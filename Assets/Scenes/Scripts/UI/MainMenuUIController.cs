@@ -83,6 +83,87 @@ public class MainMenuUIController : MonoBehaviour
     public GameObject displayModeArrowLeft;
     public GameObject displayModeArrowRight;
 
+    [Header("Settings Category Tabs")]
+    public GameObject categoryTabsRow;
+    public Button audioVideoTabButton;
+    public Button controllerTabButton;
+    public TextMeshProUGUI audioVideoTabText;
+    public TextMeshProUGUI controllerTabText;
+    public UnityEngine.UI.Image audioVideoTabHighlight;
+    public UnityEngine.UI.Image controllerTabHighlight;
+    public GameObject audioVideoContent;
+    public GameObject controllerContent;
+    public Button languageTabButton;
+    public TextMeshProUGUI languageTabText;
+    public UnityEngine.UI.Image languageTabHighlight;
+    public GameObject languageContent;
+
+    [Header("Language Selection UI")]
+    public Button thLanguageButton;
+    public Button enLanguageButton;
+    public Button zhLanguageButton;
+    public TextMeshProUGUI thLanguageStatusText;
+    public TextMeshProUGUI enLanguageStatusText;
+    public TextMeshProUGUI zhLanguageStatusText;
+    public UnityEngine.UI.Image thCardBorder;
+    public UnityEngine.UI.Image enCardBorder;
+    public UnityEngine.UI.Image zhCardBorder;
+    public Button languageBackButton;
+    public TextMeshProUGUI languageBackText;
+    public TextMeshProUGUI languageTitleText;
+    public TextMeshProUGUI languageSubtitleText;
+    public TextMeshProUGUI languageTipText;
+    private int languageNavIndex = 0; // 0=TH, 1=EN, 2=ZH, 3=Back
+    private Vector3 thCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+    private Vector3 enCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+    private Vector3 zhCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+    private bool languageCardScalesCached = false;
+
+    [Header("Controller Configuration UI")]
+    public Button gameplayModeButton;
+    public Button menuModeButton;
+    public UnityEngine.UI.Image gameplayModeHighlight;
+    public UnityEngine.UI.Image menuModeHighlight;
+    public TextMeshProUGUI gameplayModeText;
+    public TextMeshProUGUI menuModeText;
+
+    // Callout labels
+    public TextMeshProUGUI lbCalloutText;
+    public TextMeshProUGUI analogCalloutText;
+    public TextMeshProUGUI ltCalloutText;
+    public TextMeshProUGUI rbCalloutText;
+    public TextMeshProUGUI rtCalloutText;
+    public TextMeshProUGUI viewCalloutText;
+    public TextMeshProUGUI menuCalloutText;
+    public TextMeshProUGUI leftStickCalloutText;
+    public TextMeshProUGUI rightStickCalloutText;
+    public TextMeshProUGUI dpadCalloutText;
+    public TextMeshProUGUI abxyCalloutText;
+
+    // Controller Settings Controls
+    public Button vibrationButton;
+    public TextMeshProUGUI vibrationLabelText;
+    public TextMeshProUGUI vibrationValueText;
+    public Button sensitivityMinusButton;
+    public Button sensitivityPlusButton;
+    public TextMeshProUGUI sensitivityLabelText;
+    public TextMeshProUGUI sensitivityValueText;
+    public Button buttonSwapButton;
+    public TextMeshProUGUI buttonSwapLabelText;
+    public TextMeshProUGUI buttonSwapValueText;
+    public Button resetControllerDefaultsButton;
+    public TextMeshProUGUI resetControllerDefaultsText;
+    public Button controllerBackButton;
+    public TextMeshProUGUI controllerConnectedStatusText;
+
+    // Controller Settings Internal State
+    [HideInInspector] public int currentSettingsCategory = 0; // 0 = Audio & Display, 1 = Controller
+    [HideInInspector] public int controllerModeIndex = 0; // 0 = Game, 1 = Menu
+    private bool controllerVibration = true;
+    private float controllerSensitivity = 1.0f;
+    private bool controllerSwapAB = false;
+    private int controllerNavRowIndex = 0; // 0: SubTabs, 1: Vibration, 2: Sensitivity, 3: Swap, 4: Reset, 5: Back
+
     [Header("Exit Modal Elements")]
     public RectTransform exitModalCardRect;
     public Image exitModalDimImage;
@@ -99,6 +180,10 @@ public class MainMenuUIController : MonoBehaviour
 
     [Header("Scene Transition")]
     public string targetSceneName = "Loading Screen";
+
+    [Header("Language Switcher")]
+    [Tooltip("Assign LanguageSwitcherUI component ที่อยู่ใน Canvas")]
+    public LanguageSwitcherUI languageSwitcher;
 
     [Header("Door & Camera Interaction")]
     public Transform doorLeafRight;
@@ -160,6 +245,7 @@ public class MainMenuUIController : MonoBehaviour
         public RectTransform rightPaw;
         public Vector2 leftPawBasePos;
         public Vector2 rightPawBasePos;
+        public Vector3 baseScale = Vector3.one;
         public float currentScale = 1.0f;
         public float targetScale = 1.0f;
         public float currentAlpha = 0.55f;
@@ -206,6 +292,11 @@ public class MainMenuUIController : MonoBehaviour
 
     private void Awake()
     {
+        if (languageBackText == null && languageBackButton != null)
+        {
+            languageBackText = languageBackButton.GetComponentInChildren<TextMeshProUGUI>();
+        }
+        CacheLanguageCardScales();
         SetupAudio();
         InitResolutions();
         LoadPreferences();
@@ -215,11 +306,87 @@ public class MainMenuUIController : MonoBehaviour
         InitDoorAndCamera();
     }
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChangedHandler;
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChangedHandler;
+    }
+
+    private void OnLanguageChangedHandler(LocalizationManager.Language lang)
+    {
+        RefreshLocalization();
+    }
+
+    /// <summary>อัปเดตข้อความ UI ทั้งหน้าตามภาษาปัจจุบัน</summary>
+    public void RefreshLocalization()
+    {
+        if (LocalizationManager.Instance == null) return;
+        var L = LocalizationManager.Instance;
+
+        // Press Any Key
+        if (pressAnyKeyText != null) pressAnyKeyText.text = L.Get("press_any_key");
+
+        // Main Menu buttons
+        if (startText    != null) startText.text    = L.Get("btn_start");
+        if (settingsText != null) settingsText.text = L.Get("btn_settings");
+        if (exitText     != null) exitText.text     = L.Get("btn_exit");
+
+        // Settings labels
+        if (masterLabel != null) masterLabel.text = L.Get("label_master");
+        if (bgmLabel    != null) bgmLabel.text    = L.Get("label_bgm");
+        if (sfxLabel    != null) sfxLabel.text    = L.Get("label_sfx");
+
+        // Settings tabs
+        if (audioVideoTabText  != null) audioVideoTabText.text  = L.Get("tab_audio_video");
+        if (controllerTabText  != null) controllerTabText.text  = L.Get("tab_controller");
+
+        // Controller sub-tabs
+        if (gameplayModeText != null) gameplayModeText.text = L.Get("ctrl_tab_gameplay");
+        if (menuModeText     != null) menuModeText.text     = L.Get("ctrl_tab_menu");
+
+        // Settings back button
+        if (settingsBackText != null) settingsBackText.text = L.Get("btn_back");
+
+        // Exit modal
+        if (confirmExitText != null) confirmExitText.text = L.Get("exit_confirm");
+        if (cancelExitText  != null) cancelExitText.text  = L.Get("exit_cancel");
+
+        // Language Category Tab & Content
+        if (languageTabText != null) languageTabText.text = L.Get("tab_language");
+        if (languageTitleText != null) languageTitleText.text = L.Get("lang_title_select");
+        if (languageSubtitleText != null) languageSubtitleText.text = L.Get("lang_subtitle_select");
+        if (languageTipText != null) languageTipText.text = L.Get("lang_tip");
+        if (languageBackText != null) languageBackText.text = L.Get("lang_btn_back");
+        else if (languageBackButton != null)
+        {
+            var tmp = languageBackButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = L.Get("lang_btn_back");
+        }
+
+        if (controllerBackButton != null)
+        {
+            var tmp = controllerBackButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = L.Get("ctrl_btn_back");
+        }
+        UpdateLanguageSettingsVisuals();
+        // Controller callouts (rebuild from current mode)
+        UpdateControllerSettingsVisuals();
+        UpdateControllerCalloutsVisuals();
+
+        // Refresh language switcher widget
+        if (languageSwitcher != null) languageSwitcher.RefreshAll();
+    }
+
     private void Start()
     {
         SetupButtonListeners();
         SetupSliderListeners();
         SetMenuState(MenuState.PressAnyKey, false, true);
+        RefreshLocalization();
     }
 
     private void Update()
@@ -279,6 +446,10 @@ public class MainMenuUIController : MonoBehaviour
     {
         AnimatedOption opt = new AnimatedOption();
         opt.rootTransform = root;
+        if (root != null)
+        {
+            opt.baseScale = root.localScale;
+        }
         opt.label = text;
         opt.pawsContainer = paws;
 
@@ -499,8 +670,7 @@ public class MainMenuUIController : MonoBehaviour
         }
         else if (newState == MenuState.Settings)
         {
-            settingsIndex = 0;
-            UpdateSettingsVisuals(true);
+            SwitchSettingsCategory(currentSettingsCategory, false);
             UpdateDoorAndCameraTargets();
         }
         else if (newState == MenuState.ExitConfirm)
@@ -708,7 +878,7 @@ public class MainMenuUIController : MonoBehaviour
         opt.currentScale = Mathf.Lerp(opt.currentScale, opt.targetScale, dt * 15f);
         if (opt.rootTransform != null)
         {
-            opt.rootTransform.localScale = Vector3.one * opt.currentScale;
+            opt.rootTransform.localScale = opt.baseScale * opt.currentScale;
         }
 
         // Smooth Alpha
@@ -884,7 +1054,7 @@ public class MainMenuUIController : MonoBehaviour
         if (opt == null) return;
 
         opt.targetScale = isSelected ? 1.10f : 1.0f;
-        opt.targetAlpha = isSelected ? 1.0f : 0.55f;
+        opt.targetAlpha = 1.0f; // Always full opacity (1.0f), never fade to 0.55f!
         opt.targetPawScale = isSelected ? 1.0f : 0.0f;
 
         if (isSelected && !snap)
@@ -898,6 +1068,10 @@ public class MainMenuUIController : MonoBehaviour
             opt.currentScale = opt.targetScale;
             opt.currentAlpha = opt.targetAlpha;
             opt.pawScale = opt.targetPawScale;
+            if (opt.rootTransform != null)
+            {
+                opt.rootTransform.localScale = opt.baseScale * opt.currentScale;
+            }
         }
     }
 
@@ -1013,6 +1187,34 @@ public class MainMenuUIController : MonoBehaviour
 
     private void UpdateSettingsInput()
     {
+        // Category switching with Q / E, LB / RB, or Tab
+        if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.JoystickButton4))
+        {
+            SwitchSettingsCategory((currentSettingsCategory - 1 + 3) % 3);
+            return;
+        }
+        else if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.JoystickButton5) || Input.GetKeyDown(KeyCode.Tab))
+        {
+            SwitchSettingsCategory((currentSettingsCategory + 1) % 3);
+            return;
+        }
+
+        if (currentSettingsCategory == 0)
+        {
+            UpdateAudioSettingsInput();
+        }
+        else if (currentSettingsCategory == 1)
+        {
+            UpdateControllerSettingsInput();
+        }
+        else if (currentSettingsCategory == 2)
+        {
+            UpdateLanguageSettingsInput();
+        }
+    }
+
+    private void UpdateAudioSettingsInput()
+    {
         // Up / Down
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
@@ -1040,7 +1242,7 @@ public class MainMenuUIController : MonoBehaviour
         }
 
         // Confirm
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
             PunchConfirmBadge();
             if (settingsIndex == 5)
@@ -1059,8 +1261,113 @@ public class MainMenuUIController : MonoBehaviour
             }
         }
 
-        // Back: ESC
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // Back: ESC or Gamepad B
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton1))
+        {
+            PunchBackBadge();
+            OnSettingsBackClicked();
+        }
+    }
+
+    private void UpdateControllerSettingsInput()
+    {
+        // 1 / 2 direct mode switch
+        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+        {
+            SetControllerMode(0);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+        {
+            SetControllerMode(1);
+        }
+
+        // Up / Down navigation among controller settings rows
+        // 0: Mode Tabs, 1: Vibration, 2: Sensitivity, 3: Swap, 4: Reset, 5: Back
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        {
+            controllerNavRowIndex = (controllerNavRowIndex - 1 + 6) % 6;
+            PlaySound(navSound);
+            UpdateControllerNavVisuals();
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        {
+            controllerNavRowIndex = (controllerNavRowIndex + 1) % 6;
+            PlaySound(navSound);
+            UpdateControllerNavVisuals();
+        }
+
+        // Left / Right adjustments
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        {
+            if (controllerNavRowIndex == 0)
+            {
+                SetControllerMode(0);
+            }
+            else if (controllerNavRowIndex == 1)
+            {
+                ToggleVibration();
+            }
+            else if (controllerNavRowIndex == 2)
+            {
+                AdjustSensitivity(-0.1f);
+            }
+            else if (controllerNavRowIndex == 3)
+            {
+                ToggleButtonSwap();
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            if (controllerNavRowIndex == 0)
+            {
+                SetControllerMode(1);
+            }
+            else if (controllerNavRowIndex == 1)
+            {
+                ToggleVibration();
+            }
+            else if (controllerNavRowIndex == 2)
+            {
+                AdjustSensitivity(+0.1f);
+            }
+            else if (controllerNavRowIndex == 3)
+            {
+                ToggleButtonSwap();
+            }
+        }
+
+        // Confirm: Enter, Space, or Gamepad A
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+        {
+            PunchConfirmBadge();
+            if (controllerNavRowIndex == 0)
+            {
+                SetControllerMode(controllerModeIndex == 0 ? 1 : 0);
+            }
+            else if (controllerNavRowIndex == 1)
+            {
+                ToggleVibration();
+            }
+            else if (controllerNavRowIndex == 2)
+            {
+                AdjustSensitivity(+0.1f);
+            }
+            else if (controllerNavRowIndex == 3)
+            {
+                ToggleButtonSwap();
+            }
+            else if (controllerNavRowIndex == 4)
+            {
+                ResetControllerDefaults();
+            }
+            else if (controllerNavRowIndex == 5)
+            {
+                OnSettingsBackClicked();
+            }
+        }
+
+        // Back: ESC or Gamepad B
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton1))
         {
             PunchBackBadge();
             OnSettingsBackClicked();
@@ -1118,6 +1425,7 @@ public class MainMenuUIController : MonoBehaviour
 
     private void UpdateSettingsVisuals(bool snap = false)
     {
+        if (settingsRows == null) return;
         // 1. Update settings rows 0 to 4
         for (int i = 0; i < settingsRows.Length; i++)
         {
@@ -1126,7 +1434,7 @@ public class MainMenuUIController : MonoBehaviour
 
             bool isSelected = (i == settingsIndex);
             row.targetScale = isSelected ? 1.08f : 1.0f;
-            row.targetAlpha = isSelected ? 1.0f : 0.55f;
+            row.targetAlpha = 1.0f; // Always full opacity (1.0f), never fade to 0.55f!
             row.targetArrowScale = isSelected ? 1.0f : 0.0f;
 
             if (isSelected && !snap)
@@ -1316,6 +1624,78 @@ public class MainMenuUIController : MonoBehaviour
             AddHoverTrigger(settingsBackButton.gameObject, () => SelectSettingsItem(5));
         }
 
+        // Category Tabs
+        if (audioVideoTabButton != null)
+        {
+            audioVideoTabButton.onClick.AddListener(() => SwitchSettingsCategory(0));
+        }
+        if (controllerTabButton != null)
+        {
+            controllerTabButton.onClick.AddListener(() => SwitchSettingsCategory(1));
+        }
+        if (languageTabButton != null)
+        {
+            languageTabButton.onClick.AddListener(() => SwitchSettingsCategory(2));
+        }
+
+        // Language Buttons
+        if (thLanguageButton != null)
+        {
+            thLanguageButton.onClick.AddListener(() => SelectLanguageByIndex(0));
+            AddHoverTrigger(thLanguageButton.gameObject, () => SetLanguageNavIndex(0));
+        }
+        if (enLanguageButton != null)
+        {
+            enLanguageButton.onClick.AddListener(() => SelectLanguageByIndex(1));
+            AddHoverTrigger(enLanguageButton.gameObject, () => SetLanguageNavIndex(1));
+        }
+        if (zhLanguageButton != null)
+        {
+            zhLanguageButton.onClick.AddListener(() => SelectLanguageByIndex(2));
+            AddHoverTrigger(zhLanguageButton.gameObject, () => SetLanguageNavIndex(2));
+        }
+        if (languageBackButton != null)
+        {
+            languageBackButton.onClick.AddListener(OnSettingsBackClicked);
+            AddHoverTrigger(languageBackButton.gameObject, () => SetLanguageNavIndex(3));
+        }
+
+        // Controller Mode Sub-Tabs
+        if (gameplayModeButton != null)
+        {
+            gameplayModeButton.onClick.AddListener(() => SetControllerMode(0));
+        }
+        if (menuModeButton != null)
+        {
+            menuModeButton.onClick.AddListener(() => SetControllerMode(1));
+        }
+
+        // Controller Settings Actions
+        if (vibrationButton != null)
+        {
+            vibrationButton.onClick.AddListener(ToggleVibration);
+        }
+        if (sensitivityMinusButton != null)
+        {
+            sensitivityMinusButton.onClick.AddListener(() => AdjustSensitivity(-0.1f));
+        }
+        if (sensitivityPlusButton != null)
+        {
+            sensitivityPlusButton.onClick.AddListener(() => AdjustSensitivity(+0.1f));
+        }
+        if (buttonSwapButton != null)
+        {
+            buttonSwapButton.onClick.AddListener(ToggleButtonSwap);
+        }
+        if (resetControllerDefaultsButton != null)
+        {
+            resetControllerDefaultsButton.onClick.AddListener(ResetControllerDefaults);
+        }
+        if (controllerBackButton != null)
+        {
+            controllerBackButton.onClick.AddListener(OnSettingsBackClicked);
+        }
+
         if (confirmExitButton != null)
         {
             confirmExitButton.onClick.AddListener(OnConfirmExitClicked);
@@ -1451,10 +1831,20 @@ public class MainMenuUIController : MonoBehaviour
         if (sfxVolumeSlider != null) sfxVolumeSlider.value = sfx;
 
         AudioListener.volume = master;
+
+        controllerVibration = PlayerPrefs.GetInt("Controller_Vibration", 1) == 1;
+        controllerSensitivity = PlayerPrefs.GetFloat("Controller_Sensitivity", 1.0f);
+        controllerSwapAB = PlayerPrefs.GetInt("Controller_SwapAB", 0) == 1;
+        UpdateControllerSettingsVisuals();
+        UpdateControllerCalloutsVisuals();
+        UpdateCategoryTabsVisuals();
     }
 
     private void SavePreferences()
     {
+        PlayerPrefs.SetInt("Controller_Vibration", controllerVibration ? 1 : 0);
+        PlayerPrefs.SetFloat("Controller_Sensitivity", controllerSensitivity);
+        PlayerPrefs.SetInt("Controller_SwapAB", controllerSwapAB ? 1 : 0);
         PlayerPrefs.Save();
     }
 
@@ -1524,4 +1914,497 @@ public class MainMenuUIController : MonoBehaviour
     }
 
     #endregion
+
+    #region Controller Category & Settings Implementation
+
+    public void SwitchSettingsCategory(int index, bool playSfx = true)
+    {
+        currentSettingsCategory = Mathf.Clamp(index, 0, 2);
+        if (playSfx) PlaySound(navSound);
+
+        if (audioVideoContent != null)
+        {
+            audioVideoContent.SetActive(currentSettingsCategory == 0);
+        }
+        if (controllerContent != null)
+        {
+            controllerContent.SetActive(currentSettingsCategory == 1);
+        }
+
+        if (languageContent != null)
+        {
+            languageContent.SetActive(currentSettingsCategory == 2);
+        }
+        UpdateCategoryTabsVisuals();
+
+        if (currentSettingsCategory == 0)
+        {
+            settingsIndex = 0;
+            UpdateSettingsVisuals(true);
+        }
+        else
+        {
+            controllerNavRowIndex = 0;
+            UpdateControllerNavVisuals();
+            UpdateControllerCalloutsVisuals();
+            UpdateControllerSettingsVisuals();
+        }
+    }
+
+    public void SetControllerMode(int modeIndex, bool playSfx = true)
+    {
+        controllerModeIndex = Mathf.Clamp(modeIndex, 0, 1);
+        if (playSfx) PlaySound(navSound);
+        UpdateControllerModeTabsVisuals();
+        UpdateControllerCalloutsVisuals();
+    }
+
+    public void ToggleVibration()
+    {
+        controllerVibration = !controllerVibration;
+        PlaySound(nudgeSound);
+        UpdateControllerSettingsVisuals();
+        SavePreferences();
+    }
+
+    public void AdjustSensitivity(float delta)
+    {
+        controllerSensitivity = Mathf.Clamp(controllerSensitivity + delta, 0.5f, 2.0f);
+        PlaySound(nudgeSound);
+        UpdateControllerSettingsVisuals();
+        SavePreferences();
+    }
+
+    public void ToggleButtonSwap()
+    {
+        controllerSwapAB = !controllerSwapAB;
+        PlaySound(nudgeSound);
+        UpdateControllerSettingsVisuals();
+        UpdateControllerCalloutsVisuals();
+        SavePreferences();
+    }
+
+    public void ResetControllerDefaults()
+    {
+        controllerVibration = true;
+        controllerSensitivity = 1.0f;
+        controllerSwapAB = false;
+        controllerModeIndex = 0;
+        PlaySound(confirmSound);
+        UpdateControllerSettingsVisuals();
+        UpdateControllerCalloutsVisuals();
+        UpdateControllerModeTabsVisuals();
+        SavePreferences();
+    }
+
+    private void UpdateCategoryTabsVisuals()
+    {
+        bool isAudio = (currentSettingsCategory == 0);
+        bool isCtrl  = (currentSettingsCategory == 1);
+        bool isLang  = (currentSettingsCategory == 2);
+
+        // สีเข้มคมชัดสำหรับปุ่มแท็บทั้งหมด ไม่จางเวลาไม่เลือก
+        Color tabDarkColor = new Color(0.27f, 0.18f, 0.12f, 1.0f); // #452E1E ทึบ เข้ม
+
+        if (audioVideoTabText != null)
+        {
+            audioVideoTabText.color = tabDarkColor;
+            audioVideoTabText.fontStyle = isAudio ? FontStyles.Bold : FontStyles.Normal;
+        }
+        if (audioVideoTabHighlight != null) audioVideoTabHighlight.gameObject.SetActive(isAudio);
+
+        if (controllerTabText != null)
+        {
+            controllerTabText.color = tabDarkColor;
+            controllerTabText.fontStyle = isCtrl ? FontStyles.Bold : FontStyles.Normal;
+        }
+        if (controllerTabHighlight != null) controllerTabHighlight.gameObject.SetActive(isCtrl);
+
+        if (languageTabText != null)
+        {
+            languageTabText.color = tabDarkColor;
+            languageTabText.fontStyle = isLang ? FontStyles.Bold : FontStyles.Normal;
+        }
+        if (languageTabHighlight != null) languageTabHighlight.gameObject.SetActive(isLang); 
+    }
+    #endregion
+
+    #region Language Selection Category Implementation
+
+    private void UpdateLanguageSettingsInput()
+    {
+        // Direct language hotkeys 1, 2, 3
+        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+        {
+            SelectLanguageByIndex(0);
+            return;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+        {
+            SelectLanguageByIndex(1);
+            return;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
+        {
+            SelectLanguageByIndex(2);
+            return;
+        }
+
+        // Navigation Up/Down/Left/Right
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        {
+            if (languageNavIndex < 3)
+            {
+                languageNavIndex = (languageNavIndex - 1 + 3) % 3;
+                PlaySound(navSound);
+                UpdateLanguageSettingsVisuals();
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            if (languageNavIndex < 3)
+            {
+                languageNavIndex = (languageNavIndex + 1) % 3;
+                PlaySound(navSound);
+                UpdateLanguageSettingsVisuals();
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        {
+            languageNavIndex = 3; // Back button
+            PlaySound(navSound);
+            UpdateLanguageSettingsVisuals();
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        {
+            if (languageNavIndex == 3)
+            {
+                languageNavIndex = LocalizationManager.Instance != null ? (int)LocalizationManager.Instance.CurrentLanguage : 0;
+                PlaySound(navSound);
+                UpdateLanguageSettingsVisuals();
+            }
+        }
+
+        // Confirm
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+        {
+            PunchConfirmBadge();
+            if (languageNavIndex == 3)
+            {
+                OnSettingsBackClicked();
+            }
+            else
+            {
+                SelectLanguageByIndex(languageNavIndex);
+            }
+        }
+
+        // Back
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton1))
+        {
+            PunchBackBadge();
+            OnSettingsBackClicked();
+        }
+    }
+
+    public void SetLanguageNavIndex(int index)
+    {
+        if (languageNavIndex != index)
+        {
+            languageNavIndex = index;
+            PlaySound(navSound);
+            UpdateLanguageSettingsVisuals();
+        }
+    }
+
+    public void SelectLanguageByIndex(int langIndex)
+    {
+        if (LocalizationManager.Instance != null)
+        {
+            LocalizationManager.Instance.SetLanguage((LocalizationManager.Language)langIndex);
+        }
+        languageNavIndex = langIndex;
+        PlaySound(confirmSound);
+        UpdateLanguageSettingsVisuals();
+        RefreshLocalization();
+    }
+
+    private void CacheLanguageCardScales()
+    {
+        if (languageCardScalesCached) return;
+
+        if (thLanguageButton != null)
+        {
+            thCardBaseScale = thLanguageButton.transform.localScale;
+            if (thCardBaseScale.x < 1.01f) thCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+        else
+        {
+            thCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+
+        if (enLanguageButton != null)
+        {
+            enCardBaseScale = enLanguageButton.transform.localScale;
+            if (enCardBaseScale.x < 1.01f) enCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+        else
+        {
+            enCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+
+        if (zhLanguageButton != null)
+        {
+            zhCardBaseScale = zhLanguageButton.transform.localScale;
+            if (zhCardBaseScale.x < 1.01f) zhCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+        else
+        {
+            zhCardBaseScale = new Vector3(1.36f, 1.36f, 1.36f);
+        }
+
+        languageCardScalesCached = true;
+    }
+
+    private void UpdateLanguageSettingsVisuals()
+    {
+        CacheLanguageCardScales();
+
+        int currentLang = LocalizationManager.Instance != null ? (int)LocalizationManager.Instance.CurrentLanguage : 0;
+        string activeBadge = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("lang_active_badge") : "● กำลังใช้งาน";
+        string selectBadge = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("lang_select_badge") : "เลือกภาษานี้";
+
+        // สีแผ่นไม้ของทุกการ์ดเหมือนกันทั้งหมด เป็นสีไม้ธรรมชาติสว่างสม่ำเสมอ ไม่มืด/ดำ แตกต่างจากเพื่อน
+        Color cardWoodColor = new Color(1f, 1f, 1f, 0.95f);
+
+        // Update TH Card
+        bool isTH = (currentLang == 0);          // 0 = ภาษาไทย
+        bool navTH = (languageNavIndex == 0);
+        if (thLanguageStatusText != null)
+        {
+            thLanguageStatusText.text = isTH 
+                ? $"<color=#2ECC71><b>{activeBadge}</b></color>" 
+                : $"<color=#452E1E><b>{selectBadge}</b></color>";
+        }
+        if (thCardBorder != null)
+        {
+            thCardBorder.color = cardWoodColor;
+        }
+        if (thLanguageButton != null)
+        {
+            thLanguageButton.transform.localScale = thCardBaseScale * (navTH ? 1.04f : 1.0f);
+        }
+
+        // Update EN Card
+        bool isEN = (currentLang == 1);          // 1 = ภาษาอังกฤษ
+        bool navEN = (languageNavIndex == 1);
+        if (enLanguageStatusText != null)
+        {
+            enLanguageStatusText.text = isEN 
+                ? $"<color=#2ECC71><b>{activeBadge}</b></color>" 
+                : $"<color=#452E1E><b>{selectBadge}</b></color>";
+        }
+        if (enCardBorder != null)
+        {
+            enCardBorder.color = cardWoodColor;
+        }
+        if (enLanguageButton != null)
+        {
+            enLanguageButton.transform.localScale = enCardBaseScale * (navEN ? 1.04f : 1.0f);
+        }
+
+        // Update ZH Card
+        bool isZH = (currentLang == 2);          // 2 = ภาษาจีน
+        bool navZH = (languageNavIndex == 2);
+        if (zhLanguageStatusText != null)
+        {
+            zhLanguageStatusText.text = isZH 
+                ? $"<color=#2ECC71><b>{activeBadge}</b></color>" 
+                : $"<color=#452E1E><b>{selectBadge}</b></color>";
+        }
+        if (zhCardBorder != null)
+        {
+            zhCardBorder.color = cardWoodColor;
+        }
+        if (zhLanguageButton != null)
+        {
+            zhLanguageButton.transform.localScale = zhCardBaseScale * (navZH ? 1.04f : 1.0f);
+        }
+    }
+
+    private void UpdateControllerModeTabsVisuals()
+    {
+        bool isGame = (controllerModeIndex == 0);
+        Color tabDarkColor = new Color(0.27f, 0.18f, 0.12f, 1.0f); // #452E1E สีเข้ม คมชัด ไม่จาง
+
+        if (gameplayModeText != null)
+        {
+            gameplayModeText.color = isGame ? Color.white : tabDarkColor;
+            gameplayModeText.fontStyle = isGame ? FontStyles.Bold : FontStyles.Normal;
+        }
+        if (gameplayModeHighlight != null)
+        {
+            gameplayModeHighlight.gameObject.SetActive(isGame);
+        }
+
+        if (menuModeText != null)
+        {
+            menuModeText.color = !isGame ? Color.white : tabDarkColor;
+            menuModeText.fontStyle = !isGame ? FontStyles.Bold : FontStyles.Normal;
+        }
+        if (menuModeHighlight != null)
+        {
+            menuModeHighlight.gameObject.SetActive(!isGame);
+        }
+    }
+
+    private void UpdateControllerSettingsVisuals()
+    {
+        var L = LocalizationManager.Instance;
+        if (vibrationLabelText != null && L != null) vibrationLabelText.text = L.Get("ctrl_vibration_label");
+        if (sensitivityLabelText != null && L != null) sensitivityLabelText.text = L.Get("ctrl_sensitivity_label");
+        if (buttonSwapLabelText != null && L != null) buttonSwapLabelText.text = L.Get("ctrl_swap_label");
+        if (resetControllerDefaultsText != null && L != null) resetControllerDefaultsText.text = L.Get("ctrl_reset_btn");
+
+        if (vibrationValueText != null)
+        {
+            if (LocalizationManager.Instance != null)
+                vibrationValueText.text = controllerVibration
+                    ? LocalizationManager.Instance.Get("ctrl_vibration_on")
+                    : LocalizationManager.Instance.Get("ctrl_vibration_off");
+            else
+                vibrationValueText.text = controllerVibration ? "<color=#58D68D>เปิด (ON)</color>" : "<color=#E74C3C>ปิด (OFF)</color>";
+        }
+
+        if (sensitivityValueText != null)
+        {
+            int percent = Mathf.RoundToInt(controllerSensitivity * 100f);
+            sensitivityValueText.text = $"{percent}%";
+        }
+
+        if (buttonSwapValueText != null)
+        {
+            if (LocalizationManager.Instance != null)
+                buttonSwapValueText.text = controllerSwapAB
+                    ? LocalizationManager.Instance.Get("ctrl_swap_swapped")
+                    : LocalizationManager.Instance.Get("ctrl_swap_normal");
+            else
+                buttonSwapValueText.text = controllerSwapAB
+                    ? "<color=#58D68D>B</color> ตกลง / <color=#E74C3C>A</color> ย้อนกลับ"
+                    : "<color=#58D68D>A</color> ตกลง / <color=#E74C3C>B</color> ย้อนกลับ";
+        }
+
+        if (controllerConnectedStatusText != null)
+        {
+            string[] joysticks = Input.GetJoystickNames();
+            bool connected = joysticks != null && joysticks.Length > 0 && !string.IsNullOrEmpty(joysticks[0]);
+            string joyName = connected ? joysticks[0] : "XBOX WIRELESS CONTROLLER";
+            string ctrlLabel = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_connected") : "จอยที่เชื่อมต่อ";
+            string ctrlReady = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_ready") : "พร้อมใช้งาน";
+            controllerConnectedStatusText.text = $"{ctrlLabel}: <color=#58A6FF>{joyName.ToUpper()}</color> ({ctrlReady})";
+        }
+    }
+
+    private void UpdateControllerCalloutsVisuals()
+    {
+        if (analogCalloutText == null && controllerContent != null)
+        {
+            var t = controllerContent.transform.Find("LBCallout (1)") ?? controllerContent.transform.Find("AnalogCallout");
+            if (t != null) analogCalloutText = t.GetComponentInChildren<TextMeshProUGUI>();
+        }
+        if (controllerContent != null)
+        {
+            var tuningBar = controllerContent.transform.Find("TuningBar");
+            if (tuningBar != null)
+            {
+                if (vibrationLabelText == null)
+                {
+                    var t = tuningBar.Find("VibLabel");
+                    if (t != null) vibrationLabelText = t.GetComponent<TextMeshProUGUI>();
+                }
+                if (sensitivityLabelText == null)
+                {
+                    var t = tuningBar.Find("SensLabel");
+                    if (t != null) sensitivityLabelText = t.GetComponent<TextMeshProUGUI>();
+                }
+                if (buttonSwapLabelText == null)
+                {
+                    var t = tuningBar.Find("SwapLabel");
+                    if (t != null) buttonSwapLabelText = t.GetComponent<TextMeshProUGUI>();
+                }
+                if (resetControllerDefaultsText == null)
+                {
+                    var t = tuningBar.Find("ResetDefaultsButton");
+                    if (t != null) resetControllerDefaultsText = t.GetComponentInChildren<TextMeshProUGUI>();
+                }
+            }
+        }
+
+        if (controllerModeIndex == 0) // GAMEPLAY MODE
+        {
+            if (analogCalloutText != null) analogCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_analog_gameplay") : "<b><color=#58A6FF>Analog</color></b> ควบคุมทิศทาง";
+            if (lbCalloutText != null) lbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lb_gameplay") : "<b><color=#58A6FF>LB</color></b>  ก่อนหน้า / สลับไอเทม";
+            if (ltCalloutText != null) ltCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lt_gameplay") : "<b><color=#58A6FF>LT</color></b>  เล็ง / วิ่งเร็ว / ป้องกัน";
+            if (rbCalloutText != null) rbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rb_gameplay") : "<b><color=#58A6FF>RB</color></b>  ถัดไป / แดชหลบหลีก";
+            if (rtCalloutText != null) rtCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rt_gameplay") : "<b><color=#58A6FF>RT</color></b>  โจมตีหลัก / ท่าพิเศษ";
+            if (viewCalloutText != null) viewCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_view_gameplay") : "<b><color=#F1C40F>VIEW</color></b>  ภารกิจ & ข้อมูล";
+            if (menuCalloutText != null) menuCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_menu_gameplay") : "<b><color=#F1C40F>MENU</color></b>  หยุดชั่วคราว";
+
+            if (leftStickCalloutText != null)
+            {
+                leftStickCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lstick_gameplay") : "<b>LEFT JOYSTICK</b>\n<color=#E0E6ED>โยก: เดิน / เคลื่อนที่\nกด L3: วิ่งสปรินต์</color>";
+            }
+            if (rightStickCalloutText != null)
+            {
+                rightStickCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rstick_gameplay") : "<b>RIGHT JOYSTICK</b>\n<color=#E0E6ED>โยก: หมุนมุมกล้องรอบตัว\nกด R3: รีเซ็ตมุมมอง / ล็อกเป้า</color>";
+            }
+            if (dpadCalloutText != null)
+            {
+                dpadCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_dpad_gameplay") : "<b>DIRECTIONAL PAD</b>\n<color=#E0E6ED>[Up] ช่อง 1  [Down] ช่อง 2\n[Left] ก่อนหน้า  [Right] ถัดไป</color>";
+            }
+            if (abxyCalloutText != null)
+            {
+                string aDesc = controllerSwapAB ? "<color=#E74C3C>(B)</color> กลิ้งตัว / ยกเลิก (Roll)" : "<color=#58D68D>(A)</color> กระโดด / ตรวจสอบ (Jump)";
+                string bDesc = controllerSwapAB ? "<color=#58D68D>(A)</color> กระโดด / ตรวจสอบ (Jump)" : "<color=#E74C3C>(B)</color> กลิ้งตัว / ยกเลิก (Roll)";
+                abxyCalloutText.text = "<b>A, B, X, Y</b>\n<color=#E0E6ED>" + aDesc + "\n" + bDesc + "\n<color=#58A6FF>(X)</color> โจมตีเบา (Attack)\n<color=#F1C40F>(Y)</color> โต้ตอบ / สกิล (Interact)</color>";
+            }
+        }
+        else // MENU MODE
+        {
+            if (analogCalloutText != null) analogCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_analog_menu") : "<b><color=#58A6FF>Analog</color></b> เลื่อนเลือกเมนู";
+            if (lbCalloutText != null) lbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lb_menu") : "<b><color=#58A6FF>LB</color></b>  แท็บก่อนหน้า (Prev Tab)";
+            if (ltCalloutText != null) ltCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lt_menu") : "<b><color=#58A6FF>LT</color></b>  เลื่อนหน้าขึ้น (Page Up)";
+            if (rbCalloutText != null) rbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rb_menu") : "<b><color=#58A6FF>RB</color></b>  แท็บถัดไป (Next Tab)";
+            if (rtCalloutText != null) rtCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rt_menu") : "<b><color=#58A6FF>RT</color></b>  เลื่อนหน้าลง (Page Down)";
+            if (viewCalloutText != null) viewCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_view_menu") : "<b><color=#F1C40F>VIEW</color></b>  ข้อมูลเพิ่มเติม (Info)";
+            if (menuCalloutText != null) menuCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_menu_menu") : "<b><color=#F1C40F>MENU</color></b>  ปิดเมนู / ดำเนินการต่อ";
+
+            if (leftStickCalloutText != null)
+            {
+                leftStickCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lstick_menu") : "<b>LEFT JOYSTICK</b>\n<color=#E0E6ED>โยก: เลื่อนเลือกหัวข้อเมนู\nกด L3: คำสั่งด่วน</color>";
+            }
+            if (rightStickCalloutText != null)
+            {
+                rightStickCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rstick_menu") : "<b>RIGHT JOYSTICK</b>\n<color=#E0E6ED>โยก: เลื่อนหน้าต่าง / ซูม\nกด R3: รีเซ็ตตำแหน่ง</color>";
+            }
+            if (dpadCalloutText != null)
+            {
+                dpadCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_dpad_menu") : "<b>DIRECTIONAL PAD</b>\n<color=#E0E6ED>[Up] เลื่อนขึ้น  [Down] เลื่อนลง\n[Left] ปรับลด  [Right] ปรับเพิ่ม</color>";
+            }
+            if (abxyCalloutText != null)
+            {
+                string aDesc = controllerSwapAB ? "<color=#E74C3C>(B)</color> ย้อนกลับ / ปิด (Back)" : "<color=#58D68D>(A)</color> ตกลง / เลือก (Select)";
+                string bDesc = controllerSwapAB ? "<color=#58D68D>(A)</color> ตกลง / เลือก (Select)" : "<color=#E74C3C>(B)</color> ย้อนกลับ / ปิด (Back)";
+                abxyCalloutText.text = "<b>A, B, X, Y</b>\n<color=#E0E6ED>" + aDesc + "\n" + bDesc + "\n<color=#58A6FF>(X)</color> คืนค่าเดิม (Reset)\n<color=#F1C40F>(Y)</color> สลับหมวด (Toggle)</color>";
+            }
+        }
+    }
+
+    private void UpdateControllerNavVisuals()
+    {
+        // Highlight active setting in controller panel if needed
+    }
+
+    #endregion
+
 }
