@@ -255,18 +255,32 @@ public class PlayerOxygen : MonoBehaviour
 
         onOxygenDepleted?.Invoke();
 
-        GameOverUIManager gameOverUI = FindObjectOfType<GameOverUIManager>();
-        if (gameOverUI != null)
+        
+        // 🌟 เพิ่มส่วนนี้: สั่งให้ PlayerController เปลี่ยนสถานะเป็น Dead ทันทีที่ออกซิเจนหมด
+        PlayerController controller = GetComponent<PlayerController>();
+        if (controller != null)
         {
-            gameOverUI.TriggerGameOver("ออกซิเจนหมด! คุณขาดอากาศหายใจ");
+            controller.SetActionState(PlayerActionState.Dead);
         }
-        else if (GameOverUIManager.Instance != null)
+
+
+        GameOverUIManager uiManager = GameOverUIManager.Instance;
+        if (uiManager == null)
         {
-            GameOverUIManager.Instance.TriggerGameOver("ออกซิเจนหมด! คุณขาดอากาศหายใจ");
+
+            
+            uiManager = FindFirstObjectByType<GameOverUIManager>();
+        }
+
+        if (uiManager != null)
+        {
+            
+            uiManager.TriggerGameOver("ออกซิเจนหมด! คุณขาดอากาศหายใจ");
         }
         else
         {
-            Debug.LogWarning("[PlayerOxygen] GameOverUIManager ไม่พบในฉาก");
+            
+            Debug.LogWarning("[PlayerOxygen] ไม่พบ GameOverUIManager ในฉากเลย!");
         }
     }
 

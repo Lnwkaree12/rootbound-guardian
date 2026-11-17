@@ -26,6 +26,12 @@ public class PlayerController : MonoBehaviour
     private bool isFallingSoundPlayed = false;
     private float fallTimer;
 
+    [Header("State Settings")]
+    [SerializeField] private PlayerActionState currentActionState = PlayerActionState.Normal;
+
+    // ทำ Public Property เผื่อให้สคริปต์อื่นเช็คค่าได้ง่ายๆ
+    public PlayerActionState CurrentActionState => currentActionState;
+
     private PlayerInputHandler inputHandler;
     private PlayerMovement movement;
     private PlayerAnimation playerAnim;
@@ -77,15 +83,48 @@ public class PlayerController : MonoBehaviour
         HandleDashState();
         CheckFallingState();
 
-        if (isDashing)
+        // เช็คสถานะหลักของตัวละคร
+        switch (currentActionState)
         {
-            movement.Dash(dashDirection);
-            StopFootstepSound(); // หยุดเสียงเดินทันทีเมื่อกำลังแดช
-        }
-        else
-        {
-            movement.Move(inputHandler.MoveInput);
-            HandleFootstepSounds();
+            case PlayerActionState.Normal:
+                // 1. ถ้าปกติ เช็คว่ากำลังปีนอยู่ไหม (สลับไป Climbing)
+                if (movement != null && movement.IsClimbing)
+                {
+                    currentActionState = PlayerActionState.Climbing;
+                    break;
+                }
+
+                // 2. ขยับปกติ + เสียงเดิน
+                movement.Move(inputHandler.MoveInput);
+                HandleFootstepSounds();
+                break;
+
+            case PlayerActionState.Dashing:
+                // กำลังแดช
+                movement.Dash(dashDirection);
+                StopFootstepSound();
+
+                // ถ้าหมดเวลาแดช ให้กลับมา Normal
+                if (!isDashing)
+                {
+                    currentActionState = PlayerActionState.Normal;
+                }
+                break;
+
+            case PlayerActionState.Climbing:
+                // ถ้าหลุดจากการปีน ให้กลับมา Normal
+                if (movement != null && !movement.IsClimbing)
+                {
+                    currentActionState = PlayerActionState.Normal;
+                    break;
+                }
+                StopFootstepSound();
+                break;
+
+            case PlayerActionState.Dead:
+                // ถ้าตายแล้ว ห้ามทำอะไรทั้งสิ้น
+                StopFootstepSound();
+                return;
         }
     }
 
@@ -161,6 +200,8 @@ public class PlayerController : MonoBehaviour
             {
                 isDashing = false;
                 movement.StopDash();
+
+                currentActionState = PlayerActionState.Normal;
             }
         }
     }
@@ -188,6 +229,11 @@ public class PlayerController : MonoBehaviour
             playerHealth.TakeDamage(dashHealthCost);
         }
 
+        currentActionState = PlayerActionState.Dashing; // 👈 เพิ่มบรรทัดนี้
+        isDashing = true;
+        dashTimer = dashDuration;
+        dashCooldownTimer = dashCooldown;
+
         Vector2 input = inputHandler.MoveInput;
         Vector3 moveDir = new Vector3(input.x, 0, input.y);
 
@@ -202,7 +248,6 @@ public class PlayerController : MonoBehaviour
 
         if (playerAnim != null) playerAnim.TriggerDash();
 
-        isDashing = true;
         dashTimer = dashDuration;
         dashCooldownTimer = dashCooldown;
 
@@ -211,7 +256,9 @@ public class PlayerController : MonoBehaviour
 
     public void ResetAfterRespawn()
     {
+        currentActionState = PlayerActionState.Normal; // 👈 รีเซ็ตกลับมาปกติ
         isDashing = false;
+
         dashTimer = 0f;
         dashCooldownTimer = 0f;
         dashDirection = Vector3.zero;
@@ -237,5 +284,10 @@ public class PlayerController : MonoBehaviour
         {
             audioSource.PlayOneShot(clip);
         }
+    }
+
+    public void SetActionState(PlayerActionState newState)
+    {
+        currentActionState = newState;
     }
 }

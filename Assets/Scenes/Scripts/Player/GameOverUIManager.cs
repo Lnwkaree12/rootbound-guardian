@@ -37,7 +37,7 @@ public class GameOverUIManager : MonoBehaviour
         }
         else if (Instance != this)
         {
-            Destroy(this);
+            Destroy(gameObject); // 👈 เปลี่ยนจาก Destroy(this) เป็นตัวนี้
             return;
         }
 
@@ -94,6 +94,7 @@ public class GameOverUIManager : MonoBehaviour
 
     public void TriggerGameOver(string reason = "")
     {
+        Debug.Log("TriggerGameOver ถูกเรียกใช้งานแล้ว!");
         if (isGameOver) return;
         isGameOver = true;
 

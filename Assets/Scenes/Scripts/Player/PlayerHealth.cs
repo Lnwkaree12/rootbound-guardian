@@ -163,6 +163,12 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log("Player Died!");
 
         StartCoroutine(RespawnRoutine());
+
+        PlayerController controller = GetComponent<PlayerController>();
+        if (controller != null)
+        {
+            controller.SetActionState(PlayerActionState.Dead); // 👈 เพิ่มฟังก์ชันนี้ไปเซ็ตสถานะตาย
+        }
     }
 
     private IEnumerator RespawnRoutine()
