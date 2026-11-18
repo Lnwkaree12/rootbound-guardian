@@ -25,6 +25,9 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Layer ของกำแพงหรือ Props แต่งฉากที่ต้องการให้ไถ")]
     [SerializeField] private LayerMask obstacleLayer;
 
+    [Header("Edge Bumper State")]
+    [SerializeField] private bool canTriggerEdgeBumper = false;
+
     private Rigidbody rb;
     private Vector2 currentInput;
     private bool isDashing;
@@ -156,6 +159,10 @@ public class PlayerMovement : MonoBehaviour
                 rb.linearVelocity = new Vector3(smoothedVelocity.x, rb.linearVelocity.y, smoothedVelocity.z);
 
             }
+            else
+            {
+                rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            }
         }
     }
 
@@ -252,6 +259,8 @@ public class PlayerMovement : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
+        canTriggerEdgeBumper = false;
+
         if (playerAnim != null)
         {
             playerAnim.SetClimbing(false);
@@ -281,4 +290,11 @@ public class PlayerMovement : MonoBehaviour
         Vector3 origin = transform.position + Vector3.up * -.9f;
         Gizmos.DrawWireSphere(origin, castRadius);
     }
+
+    public void SetCanTriggerEdgeBumper(bool state)
+    {
+        canTriggerEdgeBumper = state;
+    }
+
+    public bool CanTriggerEdgeBumper => canTriggerEdgeBumper;
 }

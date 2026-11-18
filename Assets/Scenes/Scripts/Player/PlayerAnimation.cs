@@ -131,4 +131,9 @@ public class PlayerAnimation : MonoBehaviour
         }
         return 1f;
     }
+    public void ForceFaceRight()
+    {
+        HandleFacingDirection(1f); // ส่งค่า 1 (ขวา) ไปบังคับหันหน้า
+    }
+
 }

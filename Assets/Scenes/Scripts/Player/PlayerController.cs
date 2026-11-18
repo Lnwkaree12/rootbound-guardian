@@ -208,18 +208,12 @@ public class PlayerController : MonoBehaviour
 
     private void StartDash()
     {
-        // 🔊 เล่นเสียง Dash ผ่าน AudioSource ของ Dash โดยตรง
+        // 1. เล่นเสียงและตัดเลือด/ออกซิเจนตามปกติ
         if (dashSound != null && dashAudioSource != null)
         {
-            Debug.Log("Dash Sound Played!"); // 👈 ดูใน Console ว่าข้อความนี้ขึ้นไหมเมื่อกด Dash
             dashAudioSource.PlayOneShot(dashSound);
         }
-        else
-        {
-            Debug.LogWarning("Dash Sound หรือ Dash AudioSource ยังไม่ได้ตั้งค่า!");
-        }
 
-        // 🫧 ลด Oxygen เมื่อกด Dash (fallback เป็นหักเลือดถ้าไม่มี PlayerOxygen)
         if (playerOxygen != null)
         {
             playerOxygen.ConsumeOxygen(dashOxygenCost);
@@ -229,7 +223,7 @@ public class PlayerController : MonoBehaviour
             playerHealth.TakeDamage(dashHealthCost);
         }
 
-        currentActionState = PlayerActionState.Dashing; // 👈 เพิ่มบรรทัดนี้
+        currentActionState = PlayerActionState.Dashing;
         isDashing = true;
         dashTimer = dashDuration;
         dashCooldownTimer = dashCooldown;
@@ -237,19 +231,26 @@ public class PlayerController : MonoBehaviour
         Vector2 input = inputHandler.MoveInput;
         Vector3 moveDir = new Vector3(input.x, 0, input.y);
 
+        // 2. เช็คทิศทาง: ถ้าไม่ได้กดปุ่มเดิน ให้กำหนดพุ่งไปทางขวาและบังคับหันหน้าทันที
         if (moveDir.sqrMagnitude < 0.01f)
         {
-            dashDirection = transform.forward;
+            dashDirection = Vector3.right;
+
+            if (playerAnim != null)
+            {
+                playerAnim.ForceFaceRight(); // 👈 บังคับหันหน้าขวาก่อนพุ่ง
+            }
         }
         else
         {
             dashDirection = moveDir.normalized;
         }
 
-        if (playerAnim != null) playerAnim.TriggerDash();
-
-        dashTimer = dashDuration;
-        dashCooldownTimer = dashCooldown;
+        // 3. 🌟 สั่งเล่นแอนิเมชัน Dash ให้ทำงานก่อนบรรทัดใส่แรงพุ่ง
+        if (playerAnim != null)
+        {
+            playerAnim.TriggerDash();
+        }
 
         inputHandler.ResetDashFlag();
     }
