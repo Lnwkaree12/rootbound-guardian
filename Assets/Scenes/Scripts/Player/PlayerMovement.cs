@@ -13,6 +13,14 @@ public class PlayerMovement : MonoBehaviour
     [Header("Gravity Settings")]
     [SerializeField] private float customGravity = -30f;
 
+    [Header("Ground Check (Raycast)")]
+    [Tooltip("Layer ของพื้นหรือ Terrain ที่อนุญาตให้ยืนและเดินได้")]
+    [SerializeField] private LayerMask groundLayer;
+    [Tooltip("จุดเริ่มต้นของ Ray ยิงจาก transform.position ขึ้นด้านบนเล็กน้อย")]
+    [SerializeField] private float groundRayOriginOffset = 0.2f;
+    [Tooltip("ความยาว Ray ที่ยิงลงด้านล่างจากจุด Origin")]
+    [SerializeField] private float groundRayLength = 0.35f;
+
     [Header("Climbing Settings")]
     [SerializeField] private float climbSpeed = 5f;
     [SerializeField] private float forcedExitInputLockDuration = 0.3f;
@@ -48,8 +56,24 @@ public class PlayerMovement : MonoBehaviour
         playerAnim = GetComponent<PlayerAnimation>();
     }
 
+    private void UpdateGroundedState()
+    {
+        Vector3 origin = transform.position + Vector3.up * groundRayOriginOffset;
+        float rayDistance = groundRayOriginOffset + groundRayLength;
+
+        IsGrounded = Physics.Raycast(
+            origin,
+            Vector3.down,
+            rayDistance,
+            groundLayer,
+            QueryTriggerInteraction.Ignore
+        );
+    }
+
     private void FixedUpdate()
     {
+        UpdateGroundedState();
+
         if (isClimbing)
         {
             float verticalInput = 0f;
@@ -114,7 +138,12 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            if (currentInput.sqrMagnitude > 0.01f)
+            // ถ้าไม่อยู่บนพื้น จะไม่ให้เดินปกติ (คงความเร็วแกน Y ไว้สำหรับแรงโน้มถ่วง/การร่วง)
+            if (!IsGrounded)
+            {
+                rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            }
+            else if (currentInput.sqrMagnitude > 0.01f)
             {
                 // แปลง Input (Vector2) เป็น Vector3 ในโลก 3D
                 Vector3 inputDir = new Vector3(currentInput.x, 0f, currentInput.y).normalized;
@@ -157,7 +186,6 @@ public class PlayerMovement : MonoBehaviour
 
                 // กำหนดความเร็วแกน X, Z พร้อมรักษาสภาพความเร็วแกน Y (แรงโน้มถ่วง) ไว้
                 rb.linearVelocity = new Vector3(smoothedVelocity.x, rb.linearVelocity.y, smoothedVelocity.z);
-
             }
             else
             {
@@ -274,21 +302,15 @@ public class PlayerMovement : MonoBehaviour
         currentInput = inputDirection;
     }
 
-    private void OnCollisionStay(Collision collision)
-    {
-        IsGrounded = true;
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        IsGrounded = false;
-    }
-
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Vector3 origin = transform.position + Vector3.up * -.9f;
         Gizmos.DrawWireSphere(origin, castRadius);
+
+        Vector3 groundOrigin = transform.position + Vector3.up * groundRayOriginOffset;
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(groundOrigin, groundOrigin + Vector3.down * (groundRayOriginOffset + groundRayLength));
     }
 
     public void SetCanTriggerEdgeBumper(bool state)

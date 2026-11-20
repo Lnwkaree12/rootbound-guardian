@@ -144,8 +144,8 @@ public class StalactiteTrap : MonoBehaviour
                         target.GetComponentInParent<PlayerHealth>() != null;
 
         // 2. เช็คว่าเป็นพื้นหรือไม่ (เช็คจาก Tag "Ground" หรือ "Floor")
-        bool isGround = target.CompareTag("Ground") ||
-                        target.CompareTag("Floor");
+        bool isGround = target.CompareTag("Ground");
+            //|| target.CompareTag("Floor");
 
         return isPlayer || isGround;
     }
