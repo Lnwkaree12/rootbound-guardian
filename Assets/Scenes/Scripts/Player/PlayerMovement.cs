@@ -20,6 +20,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float groundRayOriginOffset = 0.2f;
     [Tooltip("ความยาว Ray ที่ยิงลงด้านล่างจากจุด Origin")]
     [SerializeField] private float groundRayLength = 0.35f;
+    [Tooltip("โควต้าเวลาสะสมสูงสุด (วินาที) ที่อนุญาตให้กดเดินข้ามช่องว่างตอน Raycast หลุดพื้น")]
+    [SerializeField] private float maxGapWalkTime = 0.2f;
+
+    private float gapWalkTimer;
 
     [Header("Climbing Settings")]
     [SerializeField] private float climbSpeed = 5f;
@@ -54,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         playerAnim = GetComponent<PlayerAnimation>();
+        gapWalkTimer = maxGapWalkTime;
     }
 
     private void UpdateGroundedState()
@@ -61,13 +66,45 @@ public class PlayerMovement : MonoBehaviour
         Vector3 origin = transform.position + Vector3.up * groundRayOriginOffset;
         float rayDistance = groundRayOriginOffset + groundRayLength;
 
-        IsGrounded = Physics.Raycast(
+        bool hitGround = Physics.Raycast(
             origin,
             Vector3.down,
             rayDistance,
             groundLayer,
             QueryTriggerInteraction.Ignore
         );
+
+        // อยู่บนพื้น -> รีเซ็ตโควต้าเวลาเดินบนช่องว่าง
+        if (hitGround)
+        {
+            gapWalkTimer = maxGapWalkTime;
+            IsGrounded = true;
+            return;
+        }
+
+        // ไม่อยู่บนพื้น -> เช็คว่ากำลังกดปุ่มเดินอยู่ไหม
+        bool isMovingInput = currentInput.sqrMagnitude > 0.01f;
+
+        if (isMovingInput)
+        {
+            if (gapWalkTimer > 0f)
+            {
+                gapWalkTimer -= Time.fixedDeltaTime;
+                IsGrounded = gapWalkTimer > 0f;
+            }
+            else
+            {
+                IsGrounded = false;
+            }
+        }
+        else
+        {
+            // ปล่อยปุ่ม -> หยุดนับเวลาไว้ที่เดิม แต่ถ้าโควต้าหมดแล้วให้ถือว่าหลุดพื้น
+            if (gapWalkTimer <= 0f)
+            {
+                IsGrounded = false;
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -282,6 +319,8 @@ public class PlayerMovement : MonoBehaviour
         isClimbing = false;
         isDashing = false;
         forcedExitInputLockTimer = 0f;
+        gapWalkTimer = maxGapWalkTime;
+        IsGrounded = true;
         currentInput = Vector2.zero;
         rb.useGravity = true;
         rb.linearVelocity = Vector3.zero;
