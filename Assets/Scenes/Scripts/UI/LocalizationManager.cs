@@ -610,7 +610,7 @@ public class LocalizationManager : MonoBehaviour
             zh: "重新开始");
 
         AddKey("pause_main_menu",
-            th: "หน้าหลัก",
+            th: "กลับหน้าหลัก",
             en: "MAIN MENU",
             zh: "主菜单");
 

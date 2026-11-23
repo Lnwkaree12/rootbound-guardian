@@ -55,6 +55,7 @@ public class PlayerOxygen : MonoBehaviour
     private bool isInSafeZone;
     private bool gameOverTriggered;
     private bool oxygenRegenSuppressedUntilSafeZoneExit;
+    private bool isOxygenFrozen = false;
 
     // References สำหรับเก็บ Overrides จาก Volume
     private Vignette vignette;
@@ -164,6 +165,8 @@ public class PlayerOxygen : MonoBehaviour
             StopCoroutine(oxygenRoutine);
         }
 
+        if (isOxygenFrozen) return;
+
         if (isInSafeZone && !oxygenRegenSuppressedUntilSafeZoneExit)
         {
             oxygenRoutine = StartCoroutine(RegenRoutine());
@@ -229,7 +232,7 @@ public class PlayerOxygen : MonoBehaviour
 
     public void ConsumeOxygen(int amount)
     {
-        if (amount <= 0) return;
+        if (amount <= 0 || isOxygenFrozen) return;
 
         currentOxygen -= amount;
         currentOxygen = Mathf.Clamp(currentOxygen, 0, maxOxygen);
@@ -263,23 +266,35 @@ public class PlayerOxygen : MonoBehaviour
             controller.SetActionState(PlayerActionState.Dead);
         }
 
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        PlayerAnimation anim = GetComponent<PlayerAnimation>();
+        if (anim != null)
+        {
+            anim.TriggerDeath();
+        }
 
         GameOverUIManager uiManager = GameOverUIManager.Instance;
         if (uiManager == null)
         {
-
-            
-            uiManager = FindFirstObjectByType<GameOverUIManager>();
+            uiManager = FindFirstObjectByType<GameOverUIManager>(FindObjectsInactive.Include);
         }
 
         if (uiManager != null)
         {
-            
+            if (!uiManager.gameObject.activeSelf)
+            {
+                uiManager.gameObject.SetActive(true);
+            }
             uiManager.TriggerGameOver("ออกซิเจนหมด! คุณขาดอากาศหายใจ");
         }
         else
         {
-            
             Debug.LogWarning("[PlayerOxygen] ไม่พบ GameOverUIManager ในฉากเลย!");
         }
     }
@@ -289,6 +304,31 @@ public class PlayerOxygen : MonoBehaviour
         if (originalDrainInterval <= 0)
         {
             originalDrainInterval = drainTickInterval;
+        }
+    }
+
+    public void SetOxygen(int value)
+    {
+        currentOxygen = Mathf.Clamp(value, 0, maxOxygen);
+        onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
+        UpdatePostProcessing();
+    }
+
+    public void SetFreezeOxygen(bool frozen)
+    {
+        isOxygenFrozen = frozen;
+        if (frozen)
+        {
+            if (oxygenRoutine != null)
+            {
+                StopCoroutine(oxygenRoutine);
+                oxygenRoutine = null;
+            }
+            UpdatePostProcessing();
+        }
+        else
+        {
+            UpdateSafeZoneState(isInSafeZone);
         }
     }
 

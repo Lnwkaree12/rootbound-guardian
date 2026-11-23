@@ -1,4 +1,4 @@
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -6,8 +6,8 @@ using TMPro;
 
 /// <summary>
 /// Controller for the in-game Pause Menu (ESC menu) in Rootbound Guardian.
-/// Matches the game's cozy fairytale aesthetic and handles game pause/resume,
-/// cursor state, scene reloading/main menu navigation, and real-time audio settings.
+/// Matches the game's wooden fairytale UI aesthetic and handles game pause/resume,
+/// cursor state, scene reloading/main menu navigation, keyboard navigation, and real-time audio settings.
 /// </summary>
 public class PauseMenuController : MonoBehaviour
 {
@@ -43,6 +43,8 @@ public class PauseMenuController : MonoBehaviour
     [Header("State")]
     public bool isPaused = false;
 
+    private const float SliderStepAmount = 0.05f;
+
     private CursorLockMode previousLockMode = CursorLockMode.None;
     private bool previousCursorVisible = true;
 
@@ -52,6 +54,8 @@ public class PauseMenuController : MonoBehaviour
 
     private Button[] actionButtons;
     private int currentButtonIndex = 0;
+
+    private readonly Dictionary<AudioSource, float> initialSourceVolumes = new Dictionary<AudioSource, float>();
 
     private void Awake()
     {
@@ -364,50 +368,104 @@ public class PauseMenuController : MonoBehaviour
         float bgm = PlayerPrefs.GetFloat("BGMVolume", 0.8f);
         float sfx = PlayerPrefs.GetFloat("SFXVolume", 0.8f);
 
-        if (masterVolumeSlider != null)
-        {
-            masterVolumeSlider.onValueChanged.RemoveAllListeners();
-            masterVolumeSlider.value = master;
-            masterVolumeSlider.onValueChanged.AddListener(OnMasterVolumeChanged);
-        }
-        UpdateSliderLabel(masterVolumeText, master);
+        BindVolumeSlider(masterVolumeSlider, master, masterVolumeText, OnMasterVolumeChanged);
+        BindVolumeSlider(bgmVolumeSlider, bgm, bgmVolumeText, OnBGMVolumeChanged);
+        BindVolumeSlider(sfxVolumeSlider, sfx, sfxVolumeText, OnSFXVolumeChanged);
 
-        if (bgmVolumeSlider != null)
-        {
-            bgmVolumeSlider.onValueChanged.RemoveAllListeners();
-            bgmVolumeSlider.value = bgm;
-            bgmVolumeSlider.onValueChanged.AddListener(OnBGMVolumeChanged);
-        }
-        UpdateSliderLabel(bgmVolumeText, bgm);
+        ApplyVolumesToSceneAudio(master, bgm, sfx);
+    }
 
-        if (sfxVolumeSlider != null)
+    private void BindVolumeSlider(Slider slider, float value, TextMeshProUGUI label, UnityEngine.Events.UnityAction<float> callback)
+    {
+        if (slider != null)
         {
-            sfxVolumeSlider.onValueChanged.RemoveAllListeners();
-            sfxVolumeSlider.value = sfx;
-            sfxVolumeSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
+            slider.onValueChanged.RemoveAllListeners();
+            slider.value = value;
+            slider.onValueChanged.AddListener(callback);
         }
-        UpdateSliderLabel(sfxVolumeText, sfx);
-
-        AudioListener.volume = master;
+        UpdateSliderLabel(label, value);
     }
 
     public void OnMasterVolumeChanged(float val)
     {
-        AudioListener.volume = val;
         PlayerPrefs.SetFloat("MasterVolume", val);
+        PlayerPrefs.Save();
         UpdateSliderLabel(masterVolumeText, val);
+        ApplyVolumesToSceneAudio(val, GetCurrentBgmVolume(), GetCurrentSfxVolume());
     }
 
     public void OnBGMVolumeChanged(float val)
     {
         PlayerPrefs.SetFloat("BGMVolume", val);
+        PlayerPrefs.Save();
         UpdateSliderLabel(bgmVolumeText, val);
+        ApplyVolumesToSceneAudio(GetCurrentMasterVolume(), val, GetCurrentSfxVolume());
     }
 
     public void OnSFXVolumeChanged(float val)
     {
         PlayerPrefs.SetFloat("SFXVolume", val);
+        PlayerPrefs.Save();
         UpdateSliderLabel(sfxVolumeText, val);
+        ApplyVolumesToSceneAudio(GetCurrentMasterVolume(), GetCurrentBgmVolume(), val);
+    }
+
+    private float GetCurrentMasterVolume()
+    {
+        return masterVolumeSlider != null ? masterVolumeSlider.value : PlayerPrefs.GetFloat("MasterVolume", 1.0f);
+    }
+
+    private float GetCurrentBgmVolume()
+    {
+        return bgmVolumeSlider != null ? bgmVolumeSlider.value : PlayerPrefs.GetFloat("BGMVolume", 0.8f);
+    }
+
+    private float GetCurrentSfxVolume()
+    {
+        return sfxVolumeSlider != null ? sfxVolumeSlider.value : PlayerPrefs.GetFloat("SFXVolume", 0.8f);
+    }
+
+    private void ApplyVolumesToSceneAudio(float master, float bgm, float sfx)
+    {
+        AudioListener.volume = master;
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.UpdateBGMVolume(bgm);
+            AudioManager.Instance.UpdateSFXVolume(sfx);
+        }
+
+        AudioSource[] allSources = FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        for (int i = 0; i < allSources.Length; i++)
+        {
+            AudioSource source = allSources[i];
+            if (source == null) continue;
+
+            if (!initialSourceVolumes.TryGetValue(source, out float baseVol))
+            {
+                baseVol = source.volume;
+                initialSourceVolumes[source] = baseVol;
+            }
+
+            if (source == audioSource)
+            {
+                source.volume = baseVol * sfx;
+                continue;
+            }
+
+            string goName = source.gameObject.name;
+            bool isBgm = goName.IndexOf("BGM", System.StringComparison.OrdinalIgnoreCase) >= 0
+                      || goName.IndexOf("Music", System.StringComparison.OrdinalIgnoreCase) >= 0;
+
+            if (isBgm)
+            {
+                source.volume = (baseVol <= 0.001f ? 0.5f : baseVol) * bgm;
+            }
+            else
+            {
+                source.volume = baseVol * sfx;
+            }
+        }
     }
 
     private void UpdateSliderLabel(TextMeshProUGUI label, float val)
@@ -422,6 +480,14 @@ public class PauseMenuController : MonoBehaviour
     #endregion
 
     #region Internal Helpers
+
+    private Transform FindAudioSettingsSection()
+    {
+        if (pausePanel == null) return null;
+        Transform innerCard = pausePanel.transform.Find("ModalContainer/InnerCard");
+        if (innerCard == null) innerCard = pausePanel.transform.Find("ModalContainer");
+        return innerCard != null ? innerCard.Find("AudioSettingsSection") : null;
+    }
 
     private void FindUIReferences()
     {
@@ -526,6 +592,35 @@ public class PauseMenuController : MonoBehaviour
             mainMenuButton.onClick.RemoveAllListeners();
             mainMenuButton.onClick.AddListener(GoToMainMenu);
         }
+
+        Transform audioSection = FindAudioSettingsSection();
+        BindSliderStepButtons(audioSection, "MasterRow", masterVolumeSlider);
+        BindSliderStepButtons(audioSection, "BgmRow", bgmVolumeSlider);
+        BindSliderStepButtons(audioSection, "SfxRow", sfxVolumeSlider);
+    }
+
+    private void BindSliderStepButtons(Transform audioSection, string rowName, Slider targetSlider)
+    {
+        if (audioSection == null || targetSlider == null) return;
+        Transform row = audioSection.Find(rowName);
+        if (row == null) return;
+
+        BindStepButton(row.Find("ArrowLeft"), targetSlider, -SliderStepAmount);
+        BindStepButton(row.Find("ArrowRight"), targetSlider, SliderStepAmount);
+    }
+
+    private void BindStepButton(Transform btnTransform, Slider targetSlider, float delta)
+    {
+        if (btnTransform == null || targetSlider == null) return;
+        Button btn = btnTransform.GetComponent<Button>();
+        if (btn == null) return;
+
+        btn.onClick.RemoveAllListeners();
+        btn.onClick.AddListener(() =>
+        {
+            targetSlider.value = Mathf.Clamp(targetSlider.value + delta, targetSlider.minValue, targetSlider.maxValue);
+            PlayAudio(proceduralNavClip);
+        });
     }
 
     private void EnsureEventSystem()

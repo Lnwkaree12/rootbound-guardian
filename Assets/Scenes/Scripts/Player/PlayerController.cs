@@ -80,6 +80,12 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (currentActionState == PlayerActionState.Dead)
+        {
+            StopFootstepSound();
+            return;
+        }
+
         HandleDashState();
         CheckFallingState();
 
@@ -221,6 +227,14 @@ public class PlayerController : MonoBehaviour
         else if (playerHealth != null)
         {
             playerHealth.TakeDamage(dashHealthCost);
+        }
+
+        if (currentActionState == PlayerActionState.Dead)
+        {
+            isDashing = false;
+            if (movement != null) movement.StopDash();
+            inputHandler.ResetDashFlag();
+            return;
         }
 
         currentActionState = PlayerActionState.Dashing;

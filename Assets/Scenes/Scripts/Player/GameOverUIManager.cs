@@ -94,6 +94,11 @@ public class GameOverUIManager : MonoBehaviour
 
     public void TriggerGameOver(string reason = "")
     {
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+        }
+
         Debug.Log("TriggerGameOver ถูกเรียกใช้งานแล้ว!");
         if (isGameOver) return;
         isGameOver = true;

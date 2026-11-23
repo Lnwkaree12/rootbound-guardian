@@ -34,9 +34,12 @@ public class TreeSavePoint : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
 
     public bool IsRestored => isRestored;
+    public bool IsPlayerInRange => isPlayerInRange;
     public float CurrentTreeHealth => currentTreeHealth;
     public float MaxTreeHealth => maxTreeHealth;
     public float HealthDecreaseRate => healthDecreaseRate;
+    public bool DeferRestorationToExternalController { get; set; } = false;
+    public event System.Action<TreeSavePoint> OnDeferredWateringStarted;
 
     private bool isPlayerInRange = false;
     private bool isProcessing = false; // ตัวแปรล็อกสถานะป้องกันการกดซ้ำซ้อน
@@ -156,7 +159,7 @@ public class TreeSavePoint : MonoBehaviour
                 OxygenSlowZone slowZone = GetComponentInChildren<OxygenSlowZone>();
                 if (slowZone != null && slowZone.IsPlayerInsideSlowZone)
                 {
-                    playerOxygen.SetOxygenSlowDrain(true);
+                    targetOxygen.SetOxygenSlowDrain(true);
                 }
             }
 
@@ -214,6 +217,13 @@ public class TreeSavePoint : MonoBehaviour
 
         if (success)
         {
+            if (DeferRestorationToExternalController)
+            {
+                SetPromptActive(false);
+                OnDeferredWateringStarted?.Invoke(this);
+                yield break;
+            }
+
             isRestored = true;
             ExecuteTreeRestoration();
             Debug.Log("✨ ใช้ Potion ฟื้นฟูต้นไม้สำเร็จ!");
@@ -265,6 +275,18 @@ public class TreeSavePoint : MonoBehaviour
         if (isRestored) return;
         isRestored = true;
         ExecuteTreeRestoration();
+    }
+
+    public void CompleteDeferredRestoration()
+    {
+        DeferRestorationToExternalController = false;
+        isProcessing = false;
+        if (!isRestored)
+        {
+            isRestored = true;
+            ExecuteTreeRestoration();
+            Debug.Log("✨ ใช้ Potion ฟื้นฟูต้นไม้สำเร็จ!");
+        }
     }
 
     private void CollapseTree()

@@ -188,14 +188,18 @@ public class CheckpointManager : MonoBehaviour
 
     private void TriggerGameOverDirectly()
     {
-        GameOverUIManager gameOverUI = FindObjectOfType<GameOverUIManager>();
+        GameOverUIManager gameOverUI = GameOverUIManager.Instance;
+        if (gameOverUI == null)
+        {
+            gameOverUI = FindFirstObjectByType<GameOverUIManager>(FindObjectsInactive.Include);
+        }
         if (gameOverUI != null)
         {
+            if (!gameOverUI.gameObject.activeSelf)
+            {
+                gameOverUI.gameObject.SetActive(true);
+            }
             gameOverUI.TriggerGameOver("ไม่มีจุดเซฟเหลือรอด! เกมโอเวอร์");
-        }
-        else if (GameOverUIManager.Instance != null)
-        {
-            GameOverUIManager.Instance.TriggerGameOver("ไม่มีจุดเซฟเหลือรอด! เกมโอเวอร์");
         }
         else
         {
