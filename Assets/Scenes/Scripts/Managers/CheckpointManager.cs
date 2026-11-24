@@ -1,17 +1,37 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
+/// <summary>
+/// จัดการจุดเซฟ ข้อมูลสำคัญของรอบการเล่น และโหมดการเล่น Tutorial เมื่อโหลดซีนใหม่
+/// บันทึกข้อมูลหลักตอนเซฟ:
+/// 1. ตำแหน่งผู้เล่น
+/// 2. ของในกระเป๋า
+/// 3. เลือดผู้เล่น
+/// 4. ออกซิเจนของผู้เล่น
+/// 5. เลือดต้นไม้ (และสถานะต้นไม้)
+/// </summary>
 public class CheckpointManager : MonoBehaviour
 {
     public static CheckpointManager Instance { get; private set; }
 
+    // 1. ตำแหน่งผู้เล่นและข้อมูลจุดเซฟ
     private Vector3 lastCheckpointPosition;
-    private PlayerDataSave currentSaveData;
     private bool hasCheckpoint = false;
     private bool lastCheckpointHealsOxygen = true;
     private TreeSavePoint lastCheckpointTree;
     private bool lastCheckpointUsesTree;
 
+    // 2. ของในกระเป๋า & 3. เลือดผู้เล่น
+    private PlayerDataSave currentSaveData;
+
+    // 4. ออกซิเจนของผู้เล่น ณ ตอนที่เซฟ
+    private int savedOxygen = 100;
+
+    // 5. เลือดต้นไม้ ณ ตอนที่เซฟ
+    private float savedTreeHealth = 100f;
+
+    // รายการของและกับดักในฉาก
     private HashSet<string> currentPickedItemIDs = new HashSet<string>();
     private HashSet<string> savedPickedItemIDs = new HashSet<string>();
 
@@ -21,20 +41,120 @@ public class CheckpointManager : MonoBehaviour
     private HashSet<string> currentFallenStalactites = new HashSet<string>();
     private HashSet<string> savedFallenStalactites = new HashSet<string>();
 
+    // สถานะเควสต์
     private bool savedHasKey = false;
     private bool savedDoorUnlocked = false;
+
+    // สถานะ Tutorial และโหมดเมื่อเริ่มฉากใหม่ (true = เล่น Tutorial, false = ข้าม Tutorial)
+    private const string TutorialCompletedKey = "OpeningWakeupTutorialCompleted";
+    private bool tutorialCompleted = false;
+    private bool runTutorialOnNextLoad = true;
+
+    // ธงสำหรับสั่งให้คืนค่า Checkpoint อัตโนมัติหลังโหลดฉากใหม่เสร็จ
+    private bool restoreCheckpointOnNextSceneLoad = false;
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+            transform.SetParent(null, true);
             DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += HandleSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= HandleSceneLoaded;
+    }
+
+    /// <summary>
+    /// กดเล่นใหม่จากหน้า Pause: คงค่า Checkpoint ที่เซฟไว้ และตั้งค่าให้เล่น Tutorial เมื่อโหลดซีนใหม่
+    /// </summary>
+    public void RestartFromPauseWithSavedCheckpoint()
+    {
+        bool shouldSkipTutorial = hasCheckpoint;
+        runTutorialOnNextLoad = !shouldSkipTutorial;
+        tutorialCompleted = shouldSkipTutorial;
+        restoreCheckpointOnNextSceneLoad = hasCheckpoint;
+        Debug.Log($"[CheckpointManager] เล่นใหม่จาก Pause -> เล่น Tutorial = {runTutorialOnNextLoad}, คืนค่าเซฟ = {restoreCheckpointOnNextSceneLoad}");
+    }
+
+    /// <summary>
+    /// กดเล่นใหม่จากหน้า Game Over: คงค่า Checkpoint ที่เซฟไว้ และข้าม Tutorial เมื่อโหลดซีนใหม่
+    /// </summary>
+    public void RestartFromGameOverWithSavedCheckpoint()
+    {
+        runTutorialOnNextLoad = false;
+        tutorialCompleted = true;
+        restoreCheckpointOnNextSceneLoad = hasCheckpoint;
+        Debug.Log($"[CheckpointManager] เล่นใหม่จาก Game Over -> เล่น Tutorial = FALSE, คืนค่าเซฟ = {restoreCheckpointOnNextSceneLoad}");
+    }
+
+    /// <summary>
+    /// เมื่อโหลดซีนใหม่เสร็จ หากมีธงคืนค่า Checkpoint ให้ดึงค่าที่เซฟไว้มาใช้กับผู้เล่นและฉากทันที
+    /// </summary>
+    private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (!restoreCheckpointOnNextSceneLoad) return;
+        restoreCheckpointOnNextSceneLoad = false;
+
+        if (!hasCheckpoint) return;
+
+        GameObject player = GameObject.Find("Player Variant") ?? GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            RespawnPlayer(player);
+            Debug.Log("[CheckpointManager] นำค่าที่เซฟไว้กลับมาใช้หลังโหลดซีนใหม่เรียบร้อย");
+        }
+    }
+
+    /// <summary>
+    /// เตรียมเริ่มรอบใหม่จากหน้า Pause: ล้างรอบเก่าและตั้งค่าให้เล่น Tutorial เมื่อโหลดซีนใหม่
+    /// </summary>
+    public void PrepareRestartFromPause()
+    {
+        ResetRunState();
+        runTutorialOnNextLoad = true;
+        tutorialCompleted = false;
+        Debug.Log("[CheckpointManager] เตรียมเริ่มใหม่จาก Pause -> เล่น Tutorial = TRUE");
+    }
+
+    /// <summary>
+    /// เตรียมเริ่มรอบใหม่จากหน้า Game Over: ล้างรอบเก่าและตั้งค่าให้ข้าม Tutorial เมื่อโหลดซีนใหม่
+    /// </summary>
+    public void PrepareRestartFromGameOver()
+    {
+        ResetRunState();
+        runTutorialOnNextLoad = false;
+        tutorialCompleted = true;
+        Debug.Log("[CheckpointManager] เตรียมเริ่มใหม่จาก Game Over -> เล่น Tutorial = FALSE");
+    }
+
+    /// <summary>
+    /// ตั้งค่าว่าเมื่อโหลดซีนถัดไป ให้เล่น Tutorial (true) หรือข้าม Tutorial (false)
+    /// </summary>
+    public void SetForceTutorialOnNextLoad(bool runTutorial)
+    {
+        runTutorialOnNextLoad = runTutorial;
+        tutorialCompleted = !runTutorial;
+    }
+
+    /// <summary>
+    /// ตรวจสอบว่าฉากที่เพิ่งโหลดควรเล่น Tutorial หรือไม่
+    /// </summary>
+    public bool ShouldRunTutorialOnSceneStart()
+    {
+        return runTutorialOnNextLoad;
     }
 
     public void MarkItemAsPicked(string itemID)
@@ -47,7 +167,7 @@ public class CheckpointManager : MonoBehaviour
 
     public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp = null, Inventory inventoryComp = null)
     {
-        SaveCheckpoint(checkpointPos, healthComp, inventoryComp, true);
+        SaveCheckpoint(checkpointPos, healthComp, inventoryComp, true, null);
     }
 
     public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp, Inventory inventoryComp, bool healsOxygen)
@@ -55,43 +175,65 @@ public class CheckpointManager : MonoBehaviour
         SaveCheckpoint(checkpointPos, healthComp, inventoryComp, healsOxygen, null);
     }
 
+    /// <summary>
+    /// บันทึกจุดเซฟทั้งหมด ณ วินาทีที่กดเซฟ / ฟื้นฟูต้นไม้จุดเซฟ / จบ Tutorial Step 9
+    /// </summary>
     public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp, Inventory inventoryComp, bool healsOxygen, TreeSavePoint sourceTree)
     {
+        // 1. บันทึกตำแหน่งผู้เล่นและข้อมูลจุดเซฟ
         lastCheckpointPosition = checkpointPos;
         hasCheckpoint = true;
         lastCheckpointHealsOxygen = healsOxygen;
         lastCheckpointTree = sourceTree;
         lastCheckpointUsesTree = sourceTree != null;
 
-        // 🌟 บันทึกสถานะ Quest ปัจจุบัน
+        // บันทึกสถานะ Quest ปัจจุบัน
         if (QuestManager.Instance != null)
         {
             savedHasKey = QuestManager.Instance.hasKey;
-            // หากต้องการเซฟตัวแปร doorUnlocked ด้วย สามารถเพิ่มเงื่อนไขดึงค่าได้ที่นี่
         }
 
-        if (healthComp != null || inventoryComp != null)
+        // 2. บันทึกของในกระเป๋า และ 3. บันทึกเลือดผู้เล่น
+        currentSaveData = new PlayerDataSave
         {
-            currentSaveData = new PlayerDataSave
-            {
-                savedHealth = healthComp != null ? healthComp.CurrentHealth : 100,
-                savedItems = inventoryComp != null ? new List<ItemData>(inventoryComp.GetItems()) : new List<ItemData>()
-            };
+            savedHealth = healthComp != null ? healthComp.CurrentHealth : 100,
+            savedItems = inventoryComp != null ? new List<ItemData>(inventoryComp.GetItems()) : new List<ItemData>()
+        };
+
+        // 4. บันทึกออกซิเจนของผู้เล่น ณ ตอนเซฟ
+        PlayerOxygen oxygenComp = healthComp != null
+            ? healthComp.GetComponent<PlayerOxygen>()
+            : FindFirstObjectByType<PlayerOxygen>();
+        if (oxygenComp != null)
+        {
+            savedOxygen = oxygenComp.CurrentOxygen;
         }
 
+        // 5. บันทึกเลือดต้นไม้ ณ ตอนเซฟ
+        if (sourceTree != null)
+        {
+            savedTreeHealth = sourceTree.CurrentTreeHealth;
+        }
+
+        // บันทึกสถานะไอเทม หีบ และหินงอกที่เกิดขึ้นจนถึงจุดเซฟนี้
         savedOpenedChestIDs = new HashSet<string>(currentOpenedChestIDs);
         savedFallenStalactites = new HashSet<string>(currentFallenStalactites);
         savedPickedItemIDs = new HashSet<string>(currentPickedItemIDs);
-        Debug.Log($"[CheckpointManager] บันทึกจุดเซฟใหม่ที่ตำแหน่ง: {checkpointPos}");
+
+        Debug.Log($"[CheckpointManager] เซฟสำเร็จ -> Pos:{checkpointPos}, HP:{currentSaveData.savedHealth}, O2:{savedOxygen}, TreeHP:{savedTreeHealth}, Items:{currentSaveData.savedItems.Count}");
     }
 
-    // ลบจุดเซฟทิ้งถ้าตำแหน่งตรงกับต้นไม้ที่เลือดหมด
+    /// <summary>
+    /// ลบจุดเซฟทิ้งหากต้นไม้จุดเซฟเลือดหมดและตำแหน่งตรงกัน
+    /// </summary>
     public void InvalidateCheckpointIfMatch(Vector3 treePos)
     {
         if (hasCheckpoint && Vector3.Distance(lastCheckpointPosition, treePos) < 3f)
         {
             hasCheckpoint = false;
             currentSaveData = null;
+            lastCheckpointTree = null;
+            lastCheckpointUsesTree = false;
             Debug.Log("[CheckpointManager] ⚠️ จุดเซฟปัจจุบันถูกทำลายเพราะต้นไม้หมดอายุ! ลบเซฟทิ้งแล้ว");
         }
     }
@@ -101,29 +243,25 @@ public class CheckpointManager : MonoBehaviour
         return hasCheckpoint;
     }
 
+    /// <summary>
+    /// คืนค่าทุกอย่างกลับไปตามจุดเซฟที่บันทึกไว้
+    /// </summary>
     public void RespawnPlayer(GameObject player)
     {
-        if (!hasCheckpoint)
+        if (!hasCheckpoint || player == null)
         {
             Debug.LogWarning("[CheckpointManager] ❌ ไม่มีจุดเซฟเหลืออยู่! ทำการเรียกหน้า Game Over");
             TriggerGameOverDirectly();
             return;
         }
 
-        // 🌟 โหลดสถานะ Quest กลับคืนมาเมื่อเกิดใหม่
+        // โหลดสถานะ Quest กลับคืนมา
         if (QuestManager.Instance != null)
         {
             QuestManager.Instance.LoadQuestState(savedHasKey, savedDoorUnlocked);
         }
 
-        // ตรวจสอบว่ามีจุดเซฟที่ใช้งานได้อยู่หรือไม่ หากไม่มี -> สั่ง Game Over ทันที
-        if (!hasCheckpoint)
-        {
-            Debug.LogWarning("[CheckpointManager] ❌ ไม่มีจุดเซฟเหลืออยู่! ทำการเรียกหน้า Game Over");
-            TriggerGameOverDirectly();
-            return;
-        }
-
+        // 1. คืนค่าตำแหน่งผู้เล่น
         Rigidbody rb = player.GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -137,27 +275,55 @@ public class CheckpointManager : MonoBehaviour
         }
         Physics.SyncTransforms();
 
+        // 5. คืนค่าเลือดต้นไม้และสถานะต้นไม้จุดเซฟ (ค้นหาในฉากใหม่หากอ้างอิงเดิมถูกทำลาย)
+        if (lastCheckpointTree == null)
+        {
+            GameObject tObj = GameObject.Find("TreeSavePoint2");
+            if (tObj != null) lastCheckpointTree = tObj.GetComponent<TreeSavePoint>();
+        }
+        if (lastCheckpointTree != null)
+        {
+            lastCheckpointTree.RestoreFromSavedState(savedTreeHealth);
+        }
+
         bool shouldHealOxygen = lastCheckpointHealsOxygen &&
             (!lastCheckpointUsesTree || (lastCheckpointTree != null && lastCheckpointTree.IsRestored));
 
+        // 4. คืนค่าออกซิเจนของผู้เล่นตามที่เซฟไว้
         PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
-        oxygen?.SetOxygenRegenSuppressedUntilSafeZoneExit(!shouldHealOxygen);
+        if (oxygen != null)
+        {
+            oxygen.SetOxygenRegenSuppressedUntilSafeZoneExit(!shouldHealOxygen);
+            oxygen.SetOxygen(savedOxygen);
+        }
 
+        // 3. คืนค่าเลือดผู้เล่นตามที่เซฟไว้
         PlayerHealth health = player.GetComponent<PlayerHealth>();
         if (health != null)
         {
             health.ResetHealth(shouldHealOxygen);
+            if (currentSaveData != null)
+            {
+                health.SetHealth(currentSaveData.savedHealth);
+            }
         }
 
-        Inventory inventory = player.GetComponent<Inventory>();
+        // 2. คืนค่าของในกระเป๋าตามที่เซฟไว้
+        Inventory inventory = player.GetComponentInChildren<Inventory>(true);
         if (inventory != null && currentSaveData != null)
         {
             inventory.LoadSavedItems(currentSaveData.savedItems);
         }
 
+        // รีเซ็ตสถานะการเคลื่อนที่ของ PlayerController ให้พร้อมเล่นต่อ
+        PlayerController controller = player.GetComponent<PlayerController>();
+        if (controller != null)
+        {
+            controller.ResetAfterRespawn();
+        }
+
+        // รีเซ็ตไอเทม หีบ และหินงอกให้ตรงกับตอนที่เซฟ
         currentPickedItemIDs = new HashSet<string>(savedPickedItemIDs);
-
-
         ItemObject[] allItems = FindObjectsByType<ItemObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (ItemObject item in allItems)
         {
@@ -166,8 +332,6 @@ public class CheckpointManager : MonoBehaviour
         }
 
         currentOpenedChestIDs = new HashSet<string>(savedOpenedChestIDs);
-
-        // ค้นหาหีบทั้งหมดในฉากแล้วสั่งรีเซ็ตสถานะเปิด/ปิด
         ChestController[] allChests = FindObjectsByType<ChestController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (ChestController chest in allChests)
         {
@@ -176,14 +340,12 @@ public class CheckpointManager : MonoBehaviour
         }
 
         currentFallenStalactites = new HashSet<string>(savedFallenStalactites);
-
         StalactiteTrap[] allStalactites = FindObjectsByType<StalactiteTrap>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (StalactiteTrap trap in allStalactites)
         {
             bool fallenBeforeSave = savedFallenStalactites.Contains(trap.StalactiteID);
             trap.ResetStalactiteState(fallenBeforeSave);
         }
-
     }
 
     private void TriggerGameOverDirectly()
@@ -226,5 +388,48 @@ public class CheckpointManager : MonoBehaviour
         {
             currentFallenStalactites.Add(stalactiteID);
         }
+    }
+
+    public bool IsTutorialCompleted()
+    {
+        return tutorialCompleted;
+    }
+
+    public void MarkTutorialCompleted()
+    {
+        tutorialCompleted = true;
+        runTutorialOnNextLoad = false;
+    }
+
+    /// <summary>
+    /// ล้างข้อมูลรอบการเล่นปัจจุบัน
+    /// </summary>
+    public void ResetRunState()
+    {
+        hasCheckpoint = false;
+        restoreCheckpointOnNextSceneLoad = false;
+        currentSaveData = null;
+        lastCheckpointTree = null;
+        lastCheckpointUsesTree = false;
+        lastCheckpointHealsOxygen = true;
+
+        savedOxygen = 100;
+        savedTreeHealth = 100f;
+
+        currentPickedItemIDs.Clear();
+        savedPickedItemIDs.Clear();
+        currentOpenedChestIDs.Clear();
+        savedOpenedChestIDs.Clear();
+        currentFallenStalactites.Clear();
+        savedFallenStalactites.Clear();
+
+        savedHasKey = false;
+        savedDoorUnlocked = false;
+
+        tutorialCompleted = false;
+        runTutorialOnNextLoad = true;
+        PlayerPrefs.DeleteKey(TutorialCompletedKey);
+
+        Debug.Log("[CheckpointManager] ล้างข้อมูลรอบเก่าทั้งหมดเรียบร้อย");
     }
 }

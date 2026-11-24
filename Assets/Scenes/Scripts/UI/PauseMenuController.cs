@@ -5,16 +5,15 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 /// <summary>
-/// Controller for the in-game Pause Menu (ESC menu) in Rootbound Guardian.
-/// Matches the game's wooden fairytale UI aesthetic and handles game pause/resume,
-/// cursor state, scene reloading/main menu navigation, keyboard navigation, and real-time audio settings.
+/// ควบคุมเมนู Pause (ปุ่ม ESC) ในเกม Rootbound Guardian
+/// จัดการการหยุด/เล่นต่อของเกม สถานะ Cursor การรีสตาร์ทฉาก กลับหน้าเมนู และการตั้งค่าเสียงแบบเรียลไทม์
 /// </summary>
 public class PauseMenuController : MonoBehaviour
 {
     public static PauseMenuController Instance { get; private set; }
 
     [Header("UI Panels")]
-    [Tooltip("The root overlay panel for the pause menu.")]
+    [Tooltip("พาเนลหลักของเมนู Pause")]
     public GameObject pausePanel;
     public CanvasGroup pauseCanvasGroup;
     public RectTransform modalContainer;
@@ -59,13 +58,14 @@ public class PauseMenuController : MonoBehaviour
 
     private void Awake()
     {
+        // ตั้งค่า Singleton และทำลาย GameObject ซ้ำหากมี Instance อยู่แล้ว
         if (Instance == null)
         {
             Instance = this;
         }
         else if (Instance != this)
         {
-            Destroy(this);
+            Destroy(gameObject);
             return;
         }
 
@@ -75,6 +75,7 @@ public class PauseMenuController : MonoBehaviour
         BindButtonEvents();
         EnsureEventSystem();
 
+        // ซ่อนหน้า Pause ตอนเริ่มซีน
         if (pausePanel != null)
         {
             pausePanel.SetActive(false);
@@ -145,12 +146,14 @@ public class PauseMenuController : MonoBehaviour
     {
         if (isPaused)
         {
+            // กด ESC ซ้ำเพื่อปิดเมนู Pause และเล่นต่อ
             if (Input.GetKeyDown(pauseKey))
             {
                 Resume();
                 return;
             }
 
+            // เลื่อนปุ่มเมนูด้วยปุ่มทิศทางหรือ Tab
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
                 Navigate(-1);
@@ -165,6 +168,7 @@ public class PauseMenuController : MonoBehaviour
                 Navigate(dir);
             }
 
+            // กดยืนยันปุ่มที่เลือกอยู่
             if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
             {
                 SubmitSelectedButton();
@@ -181,21 +185,15 @@ public class PauseMenuController : MonoBehaviour
 
     public void TogglePause()
     {
-        if (isPaused)
-        {
-            Resume();
-        }
-        else
-        {
-            Pause();
-        }
+        if (isPaused) Resume();
+        else Pause();
     }
 
     public void Pause()
     {
         if (isPaused) return;
 
-        // Do not pause if game is already won or lost
+        // ไม่เปิด Pause หากชนะไปแล้วหรืออยู่ในหน้า Game Over
         if (WinUIManager.Instance != null && WinUIManager.Instance.isGameWon) return;
         if (GameOverUIManager.Instance != null && GameOverUIManager.Instance.gameOverPanel != null && GameOverUIManager.Instance.gameOverPanel.activeSelf) return;
 
@@ -203,8 +201,8 @@ public class PauseMenuController : MonoBehaviour
         previousLockMode = Cursor.lockState;
         previousCursorVisible = Cursor.visible;
 
+        // หยุดเวลาของเกมและแสดงเมาส์
         Time.timeScale = 0f;
-
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -283,12 +281,9 @@ public class PauseMenuController : MonoBehaviour
             }
         }
 
-        if (actionButtons[currentButtonIndex] != null)
+        if (actionButtons[currentButtonIndex] != null && UnityEngine.EventSystems.EventSystem.current != null)
         {
-            if (UnityEngine.EventSystems.EventSystem.current != null)
-            {
-                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(actionButtons[currentButtonIndex].gameObject);
-            }
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(actionButtons[currentButtonIndex].gameObject);
         }
 
         if (playSound)
@@ -320,11 +315,7 @@ public class PauseMenuController : MonoBehaviour
         Cursor.lockState = previousLockMode;
         Cursor.visible = previousCursorVisible;
 
-        if (pausePanel != null)
-        {
-            pausePanel.SetActive(false);
-        }
-
+        if (pausePanel != null) pausePanel.SetActive(false);
         if (pauseCanvasGroup != null)
         {
             pauseCanvasGroup.alpha = 0f;
@@ -336,11 +327,28 @@ public class PauseMenuController : MonoBehaviour
         PlayAudio(resumeClip != null ? resumeClip : proceduralResumeClip);
     }
 
+    /// <summary>
+    /// กดเล่นใหม่จากหน้า Pause: นำค่าที่เซฟไว้กลับมาใช้และตั้งค่าให้เล่น Tutorial เมื่อโหลดซีนใหม่
+    /// </summary>
     public void RestartLevel()
     {
         Time.timeScale = 1f;
         isPaused = false;
         PlayerPrefs.Save();
+
+        if (pausePanel != null) pausePanel.SetActive(false);
+        if (pauseCanvasGroup != null)
+        {
+            pauseCanvasGroup.alpha = 0f;
+            pauseCanvasGroup.interactable = false;
+            pauseCanvasGroup.blocksRaycasts = false;
+        }
+
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.RestartFromPauseWithSavedCheckpoint();
+        }
+
         Scene currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.buildIndex);
     }
@@ -350,6 +358,12 @@ public class PauseMenuController : MonoBehaviour
         Time.timeScale = 1f;
         isPaused = false;
         PlayerPrefs.Save();
+
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.ResetRunState();
+        }
+
         if (Application.CanStreamedLevelBeLoaded("MainScreen"))
         {
             SceneManager.LoadScene("MainScreen");

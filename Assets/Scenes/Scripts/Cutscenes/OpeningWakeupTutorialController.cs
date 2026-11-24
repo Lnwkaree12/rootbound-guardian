@@ -5,16 +5,9 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// Controls the 9-step Opening Wake-Up & First Save Tree Watering Tutorial sequence in MainGameplay:
-/// 1. Starts lying flat on the floor (Dead0 frame 0008) with black cinematic letterbox bars and 1 starting Blue Potion.
-/// 2. Zooms camera closer to show the lying character clearly.
-/// 3. Shows [SPACE BAR] wooden plank prompt above head; pressing Space plays Dead0 in reverse (0008 -> 0001) to stand up.
-/// 4. Waits 3 seconds after standing animation finishes with movement locked.
-/// 5. Shows permanent [W][A][S][D] wooden key prompts and unlocks movement.
-/// 6. Player walks right toward the first TreeSavePoint (past cleared Thorn Traps) with a right-side blocker collider preventing walking past the tree.
-/// 7. Approaching the tree reveals the Potion HUD slot (x1) and the [E] prompt while still blocking walking further right.
-/// 8. Pressing E consumes the potion (x0), locks movement, keeps camera zoomed, and animates tilting the Blue Potion bottle pouring water onto the tree.
-/// 9. Watering UI disappears, tree blooms with leaves and golden-green light glow, blocker opens, camera zooms out & letterbox slides away, normal gameplay HUD resumes.
+/// ควบคุมลำดับ Tutorial ช่วงเริ่มเกม (9 Step) ใน MainGameplay
+/// เมื่อจบ Step ที่ 9 ก่อนเปิดให้ผู้เล่นเดิน จะทำการเซฟข้อมูลสำคัญ (ต้นไม้, เลือดต้นไม้, เลือดผู้เล่น, ออกซิเจนผู้เล่น, ของในกระเป๋า)
+/// หากถูกสั่งข้าม Tutorial (เช่น กดเล่นใหม่จาก Game Over) จะข้ามเข้าสู่โหมดหลังจบ Tutorial ทันที
 /// </summary>
 public class OpeningWakeupTutorialController : MonoBehaviour
 {
@@ -54,18 +47,28 @@ public class OpeningWakeupTutorialController : MonoBehaviour
     [SerializeField] private float letterboxBarHeight = 120f;
     [SerializeField] private int startingOxygen = 20;
 
-    // Runtime cached player components
+    [Header("Movement Speed Tuning")]
+    [Tooltip("ความเร็วในการเดินช่วง Tutorial (หากตั้งค่า <= 0 จะใช้ความเร็วปกติของ PlayerMovement)")]
+    [SerializeField] private float tutorialMoveSpeed = 5f;
+    [Tooltip("คืนค่าความเร็วเดิมของ PlayerMovement เมื่อจบ Tutorial")]
+    [SerializeField] private bool restoreNormalMoveSpeedAfterTutorial = true;
+
+    // ตัวแปรอ้างอิงคอมโพเนนต์ของผู้เล่นและระบบในฉาก
     private PlayerInputHandler playerInputHandler;
     private PlayerController playerController;
     private PlayerMovement playerMovement;
     private PlayerAnimation playerAnimation;
+    private PlayerHealth playerHealth;
     private PlayerOxygen playerOxygen;
     private Inventory playerInventory;
     private Rigidbody playerRb;
     private LumiCompanion lumi;
     private AudioSource sfxAudioSource;
 
-    // HUD references
+    private float savedNormalMoveSpeed = 7f;
+    private bool hasSavedNormalMoveSpeed = false;
+
+    // ตัวแปรอ้างอิง HUD
     private GameObject hudCanvasObj;
     private CanvasGroup hudCanvasCg;
     private GameObject questPanelObj;
@@ -76,12 +79,12 @@ public class OpeningWakeupTutorialController : MonoBehaviour
     private CanvasGroup potionQuickSlotCg;
     private bool originalQuestPanelActive = true;
 
-    // Original camera state
+    // ค่าเริ่มต้นของกล้องก่อนซูม
     private Vector3 origCamLocalPos;
     private Quaternion origCamLocalRot;
     private float origCamFov;
 
-    // Runtime generated UI
+    // UI ที่สร้างขึ้นขณะรันไทม์
     private GameObject letterboxCanvasObj;
     private CanvasGroup letterboxCg;
     private RectTransform topLetterboxBar;
@@ -101,12 +104,22 @@ public class OpeningWakeupTutorialController : MonoBehaviour
     private RectTransform[] waterDropletRts;
     private UnityEngine.UI.Image[] waterDropletImgs;
 
-    // State flags
+    // สถานะการทำงานของ Tutorial
     private bool holdLyingSprite = false;
     private bool wateringTriggered = false;
     private bool tutorialFinished = false;
     public bool IsTutorialFinished => tutorialFinished;
     private GameObject activeWaterVfxInstance;
+
+    [Header("Skip Tutorial Settings")]
+    // เปิด/ปิด การอนุญาตให้กดปุ่ม Enter เพื่อข้าม Tutorial
+    [SerializeField] private bool allowEnterToSkip = true;
+
+    // ปุ่ม UI บนหน้าจอสำหรับกดข้าม Tutorial
+    [SerializeField] private Button skipTutorialButton;
+
+    // ตัวแปรสถานะว่าถูกสั่งข้ามแล้วหรือยัง
+    private bool skipRequested = false;
 
     private void Awake()
     {
@@ -123,7 +136,26 @@ public class OpeningWakeupTutorialController : MonoBehaviour
     private void Start()
     {
         ResolveReferences();
+
+        bool shouldRunTutorial = CheckpointManager.Instance == null || CheckpointManager.Instance.ShouldRunTutorialOnSceneStart();
+        if (!shouldRunTutorial)
+        {
+            SkipTutorialImmediately();
+            return;
+        }
+
         StartCoroutine(TutorialSequenceRoutine());
+    }
+
+    private void Update()
+    {
+        if (tutorialFinished) return;
+
+        if (skipRequested || WasEnterPressedThisFrame())
+        {
+            skipRequested = false;
+            SkipTutorialToGameplay();
+        }
     }
 
     private void OnDestroy()
@@ -136,6 +168,7 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         {
             playerOxygen.SetFreezeOxygen(false);
         }
+        RestoreNormalMoveSpeedIfNeeded();
     }
 
     private void LateUpdate()
@@ -166,6 +199,43 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (skipTutorialButton != null)
+        {
+            skipTutorialButton.onClick.AddListener(RequestSkipTutorial);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (skipTutorialButton != null)
+        {
+            skipTutorialButton.onClick.RemoveListener(RequestSkipTutorial);
+        }
+    }
+
+    private bool WasEnterPressedThisFrame()
+    {
+        if (!allowEnterToSkip) return false;
+
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            return true;
+        }
+
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.enterKey.wasPressedThisFrame ||
+                Keyboard.current.numpadEnterKey.wasPressedThisFrame)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void ResolveReferences()
     {
         if (playerObj == null)
@@ -183,9 +253,16 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             playerController = playerObj.GetComponent<PlayerController>();
             playerMovement = playerObj.GetComponent<PlayerMovement>();
             playerAnimation = playerObj.GetComponent<PlayerAnimation>();
+            playerHealth = playerObj.GetComponent<PlayerHealth>();
             playerOxygen = playerObj.GetComponent<PlayerOxygen>();
             playerInventory = playerObj.GetComponentInChildren<Inventory>(true);
             playerRb = playerObj.GetComponent<Rigidbody>();
+
+            if (playerMovement != null && !hasSavedNormalMoveSpeed)
+            {
+                savedNormalMoveSpeed = playerMovement.MoveSpeed;
+                hasSavedNormalMoveSpeed = true;
+            }
         }
 
         if (playerCamera == null) playerCamera = Camera.main;
@@ -214,6 +291,14 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         }
 
         CacheHudReferences();
+    }
+
+    private void RestoreNormalMoveSpeedIfNeeded()
+    {
+        if (restoreNormalMoveSpeedAfterTutorial && hasSavedNormalMoveSpeed && playerMovement != null)
+        {
+            playerMovement.SetMoveSpeed(savedNormalMoveSpeed);
+        }
     }
 
     private void CacheHudReferences()
@@ -266,7 +351,14 @@ public class OpeningWakeupTutorialController : MonoBehaviour
 
     private IEnumerator TutorialSequenceRoutine()
     {
-        // Step 1 Setup: Ensure 1 Blue Potion in inventory from start, safe oxygen, lock movement, lie flat on frame 0008
+        if (CheckpointManager.Instance != null &&
+            (!CheckpointManager.Instance.ShouldRunTutorialOnSceneStart() || CheckpointManager.Instance.IsTutorialCompleted()))
+        {
+            SkipTutorialImmediately();
+            yield break;
+        }
+
+        // Step 1-2: เตรียมไอเทมเริ่มต้นและสถานะช่วงต้น Tutorial
         if (playerInventory != null && playerInventory.GetPotionCount() == 0 && startingPotionItem != null)
         {
             playerInventory.AddItem(startingPotionItem);
@@ -309,7 +401,7 @@ public class OpeningWakeupTutorialController : MonoBehaviour
 
         BuildRuntimeUI();
 
-        // Step 1 HUD state: hide all gameplay HUD cleanly via CanvasGroup (keeps UI listeners active) until watering completes
+        // ซ่อน HUD เกมเพลย์ระหว่าง Tutorial
         SetObjectActive(hudCanvasObj, true);
         SetObjectActive(dashCooldownObj, true);
         SetObjectActive(potionQuickSlotObj, true);
@@ -319,16 +411,24 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         SetCanvasGroupAlpha(potionQuickSlotCg, 0f, false);
         SetObjectActive(letterboxCanvasObj, true);
 
-        // Hold briefly on Step 1 wide framing, then proceed to Step 2
+        if (playerController != null)
+        {
+            playerController.SetDashUnlocked(false);
+        }
+        if (playerMovement != null)
+        {
+            playerMovement.SetDashEnabled(false);
+        }
+
         yield return new WaitForSeconds(initialHoldBeforeZoom);
 
-        // Step 2: Smoothly zoom camera closer to see lying player
+        // Step 3: ซูมกล้องเข้าหาตัวละคร
         yield return StartCoroutine(LerpCameraRoutine(
             origCamLocalPos, origCamLocalRot, origCamFov,
             zoomedCamLocalPos, Quaternion.Euler(zoomedCamLocalEuler), zoomedCamFov,
             zoomInDuration));
 
-        // Step 3: Show [SPACE BAR] prompt above head; wait for Space key; play Dead0 reverse 0008 -> 0001
+        // Step 4: แสดงปุ่ม [SPACE BAR] และรอผู้เล่นกดลุกขึ้น
         if (playerObj != null)
         {
             spacePromptBasePos = playerObj.transform.position + new Vector3(1.45f, 1.35f, 0f);
@@ -346,7 +446,7 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             yield return StartCoroutine(FadeCanvasGroupRoutine(spacePromptObj, spacePromptCg, false, 0.12f));
         }
 
-        // Play Dead0 frames in reverse: index 7 (0008) down to index 0 (0001)
+        // Step 5: เล่นแอนิเมชันลุกขึ้นย้อนกลับ (เฟรม 7 -> 0)
         holdLyingSprite = false;
         if (playerSpriteRenderer != null && deadFramesOrdered != null && deadFramesOrdered.Length >= 8)
         {
@@ -361,7 +461,7 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             }
         }
 
-        // Step 4: Stand idle with controls locked for 3 seconds
+        // รอหลังลุกขึ้นก่อนเปิดให้เดิน
         if (playerAnimator != null)
         {
             playerAnimator.enabled = true;
@@ -375,7 +475,7 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         SetGameplayControlsEnabled(false, false);
         yield return new WaitForSeconds(waitAfterStandUp);
 
-        // Step 5: Show permanent [W][A][S][D] prompt and unlock movement
+        // Step 6: แสดงปุ่ม [WASD] และเปิดให้เดิน
         if (playerObj != null)
         {
             wasdPromptBasePos = playerObj.transform.position + new Vector3(1.55f, 1.85f, 0f);
@@ -386,9 +486,19 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             yield return StartCoroutine(FadeCanvasGroupRoutine(wasdPromptObj, wasdPromptCg, true, 0.25f));
         }
 
+        if (playerMovement != null && tutorialMoveSpeed > 0f)
+        {
+            if (!hasSavedNormalMoveSpeed)
+            {
+                savedNormalMoveSpeed = playerMovement.MoveSpeed;
+                hasSavedNormalMoveSpeed = true;
+            }
+            playerMovement.SetMoveSpeed(tutorialMoveSpeed);
+        }
+
         SetGameplayControlsEnabled(true, false);
 
-        // Step 6 & Step 7: Walk right toward the first save tree; reveal Potion HUD (x1) when approaching tree
+        // Step 7: เดินเข้าใกล้ต้นไม้เซฟแรกแล้วแสดง Potion HUD
         yield return new WaitUntil(() =>
         {
             if (firstSaveTree == null || playerObj == null) return true;
@@ -398,7 +508,6 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             return horizDist <= treeApproachRadius;
         });
 
-        // Reveal PotionQuickSlotUI (now showing x1 starting potion!)
         if (potionQuickSlotObj != null)
         {
             potionQuickSlotObj.SetActive(true);
@@ -410,10 +519,9 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             }
         }
 
-        // Wait for player to press E at the tree (consumes potion to x0 and fires OnDeferredWateringStarted)
+        // Step 8: รอจนผู้เล่นกดรดน้ำต้นไม้ด้วย Potion
         yield return new WaitUntil(() => wateringTriggered);
 
-        // Step 8: Lock movement (camera stays zoomed!), display pouring Blue Potion UI + water VFX
         SetGameplayControlsEnabled(false, false);
 
         var potionHud = potionQuickSlotObj != null ? potionQuickSlotObj.GetComponent<PotionHUDUI>() : null;
@@ -455,7 +563,7 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             activeWaterVfxInstance = null;
         }
 
-        // Step 9: Complete tree bloom + bright glowing aura light, smoothly fade out low-oxygen dark vignette, then open blocker & fade HUD back in
+        // Step 9: ฟื้นฟูต้นไม้ เติมออกซิเจน และเปิดทางเดินต่อ (ก่อนเปิดให้ผู้เล่นเดินเล่นต่อเต็มรูปแบบ)
         if (firstSaveTree != null)
         {
             firstSaveTree.CompleteDeferredRestoration();
@@ -488,6 +596,11 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             rightSideBlocker.SetActive(false);
         }
 
+        // ✅ เซฟข้อมูลครบถ้วน ณ จุดจบ Tutorial Step 9 (ก่อนเปิดให้ผู้เล่นเดิน)
+        // เก็บทั้ง ตำแหน่งผู้เล่น, สถานะ/เลือดต้นไม้, เลือดผู้เล่น, ออกซิเจนผู้เล่น และของในกระเป๋า
+        SaveTutorialCompletionCheckpoint();
+
+        RestoreNormalMoveSpeedIfNeeded();
         SetGameplayControlsEnabled(true, false);
 
         if (playerOxygen != null && (firstSaveTree == null || !firstSaveTree.IsRestored))
@@ -495,7 +608,18 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             playerOxygen.UpdateSafeZoneState(firstSaveTree != null && firstSaveTree.IsPlayerInRange);
         }
 
-        // Simultaneously zoom camera back out, fade letterbox bars away, and fade gameplay HUD in
+        if (playerController != null)
+        {
+            playerController.SetDashUnlocked(true);
+        }
+        if (playerMovement != null)
+        {
+            playerMovement.SetDashEnabled(true);
+        }
+
+        tutorialFinished = true;
+
+        // คืนกล้อง ซ่อน letterbox และแสดง HUD กลับมา
         Coroutine camOut = StartCoroutine(LerpCameraRoutine(
             zoomedCamLocalPos, Quaternion.Euler(zoomedCamLocalEuler), zoomedCamFov,
             origCamLocalPos, origCamLocalRot, origCamFov,
@@ -513,6 +637,33 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         }
 
         tutorialFinished = true;
+
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.MarkTutorialCompleted();
+        }
+    }
+
+    /// <summary>
+    /// บันทึกข้อมูลจุดเซฟ ณ จุดจบ Tutorial Step 9 (ก่อนเปิดให้ผู้เล่นเดิน)
+    /// </summary>
+    private void SaveTutorialCompletionCheckpoint()
+    {
+        if (CheckpointManager.Instance == null || playerObj == null) return;
+
+        PlayerHealth health = playerHealth != null ? playerHealth : playerObj.GetComponent<PlayerHealth>();
+        Inventory inventory = playerInventory != null ? playerInventory : playerObj.GetComponentInChildren<Inventory>(true);
+        Vector3 checkpointPos = playerObj.transform.root.position;
+
+        CheckpointManager.Instance.SaveCheckpoint(
+            checkpointPos,
+            health,
+            inventory,
+            true,
+            firstSaveTree
+        );
+
+        Debug.Log("[OpeningWakeupTutorialController] เซฟข้อมูลจุดจบ Tutorial Step 9 เรียบร้อย (ต้นไม้, เลือดต้นไม้, เลือดผู้เล่น, ออกซิเจน, ของในกระเป๋า)");
     }
 
     private void HandleDeferredWateringStarted(TreeSavePoint tree)
@@ -882,7 +1033,6 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         tileRt.anchoredPosition = anchoredPos;
         tileRt.sizeDelta = new Vector2(82f, 82f);
 
-        // UI_language.png is 1920x1080 with centered square wood frame; scale slightly larger inside tile
         GameObject bgObj = new GameObject("Bg");
         bgObj.transform.SetParent(tileObj.transform, false);
         RectTransform bgRt = bgObj.AddComponent<RectTransform>();
@@ -924,7 +1074,6 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         wateringUiCg = wateringUiObj.AddComponent<CanvasGroup>();
         wateringUiCg.alpha = 0f;
 
-        // Water stream droplets underneath bottle
         GameObject streamRoot = new GameObject("WaterStreamRoot");
         streamRoot.transform.SetParent(wateringUiObj.transform, false);
         RectTransform streamRt = streamRoot.AddComponent<RectTransform>();
@@ -950,7 +1099,6 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             waterDropletImgs[i] = dImg;
         }
 
-        // Bottle pivot
         GameObject bottleObj = new GameObject("BottlePivot");
         bottleObj.transform.SetParent(wateringUiObj.transform, false);
         bottlePivotRt = bottleObj.AddComponent<RectTransform>();
@@ -970,6 +1118,180 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         if (obj != null && obj.activeSelf != active)
         {
             obj.SetActive(active);
+        }
+    }
+
+    /// <summary>
+    /// ข้ามลำดับ Tutorial และเซฟข้อมูลจุดจบ Tutorial (ก่อนเปิดให้เดิน)
+    /// </summary>
+    private void SkipTutorialToGameplay()
+    {
+        if (tutorialFinished) return;
+
+        StopAllCoroutines();
+
+        holdLyingSprite = false;
+        wateringTriggered = false;
+
+        if (activeWaterVfxInstance != null)
+        {
+            Destroy(activeWaterVfxInstance);
+            activeWaterVfxInstance = null;
+        }
+
+        if (spacePromptObj != null) spacePromptObj.SetActive(false);
+        if (wasdPromptObj != null) wasdPromptObj.SetActive(false);
+        if (wateringUiObj != null) wateringUiObj.SetActive(false);
+        if (letterboxCanvasObj != null) letterboxCanvasObj.SetActive(false);
+
+        if (firstSaveTree != null && !firstSaveTree.IsRestored)
+        {
+            firstSaveTree.CompleteDeferredRestoration();
+        }
+
+        if (rightSideBlocker != null)
+        {
+            rightSideBlocker.SetActive(false);
+        }
+
+        if (playerCamera != null)
+        {
+            playerCamera.transform.localPosition = origCamLocalPos;
+            playerCamera.transform.localRotation = origCamLocalRot;
+            playerCamera.fieldOfView = origCamFov;
+        }
+
+        if (playerAnimator != null) playerAnimator.enabled = true;
+        if (playerAnimation != null) playerAnimation.enabled = true;
+
+        if (playerOxygen != null)
+        {
+            playerOxygen.SetFreezeOxygen(false);
+            playerOxygen.SetOxygen(playerOxygen.MaxOxygen);
+            playerOxygen.UpdateSafeZoneState(firstSaveTree != null && firstSaveTree.IsPlayerInRange);
+        }
+
+        SaveTutorialCompletionCheckpoint();
+
+        RestoreNormalMoveSpeedIfNeeded();
+        SetGameplayControlsEnabled(true, false);
+
+        if (playerController != null)
+        {
+            playerController.SetDashUnlocked(true);
+        }
+        if (playerMovement != null)
+        {
+            playerMovement.SetDashEnabled(true);
+        }
+
+        SetObjectActive(hudCanvasObj, true);
+        SetObjectActive(questPanelObj, originalQuestPanelActive);
+        SetObjectActive(dashCooldownObj, true);
+        SetObjectActive(potionQuickSlotObj, true);
+
+        SetCanvasGroupAlpha(hudCanvasCg, 1f, true);
+        if (originalQuestPanelActive) SetCanvasGroupAlpha(questPanelCg, 1f, true);
+        SetCanvasGroupAlpha(dashCooldownCg, 1f, true);
+        SetCanvasGroupAlpha(potionQuickSlotCg, 1f, true);
+
+        if (lumi != null)
+        {
+            lumi.disableAutoDialogue = false;
+        }
+
+        tutorialFinished = true;
+
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.MarkTutorialCompleted();
+        }
+    }
+
+    /// <summary>
+    /// ข้าม Tutorial ทันทีเมื่อเริ่มฉากใหม่ในโหมดไม่เล่น Tutorial (เช่น กดเล่นใหม่จาก Game Over หรือมีจุดเซฟแล้ว)
+    /// </summary>
+    public void SkipTutorialImmediately()
+    {
+        if (tutorialFinished) return;
+
+        StopAllCoroutines();
+
+        holdLyingSprite = false;
+        wateringTriggered = false;
+
+        if (activeWaterVfxInstance != null)
+        {
+            Destroy(activeWaterVfxInstance);
+            activeWaterVfxInstance = null;
+        }
+
+        if (spacePromptObj != null) spacePromptObj.SetActive(false);
+        if (wasdPromptObj != null) wasdPromptObj.SetActive(false);
+        if (wateringUiObj != null) wateringUiObj.SetActive(false);
+        if (letterboxCanvasObj != null) letterboxCanvasObj.SetActive(false);
+
+        if (firstSaveTree != null && !firstSaveTree.IsRestored)
+        {
+            firstSaveTree.CompleteDeferredRestoration();
+        }
+
+        if (rightSideBlocker != null)
+        {
+            rightSideBlocker.SetActive(false);
+        }
+
+        if (playerCamera != null)
+        {
+            playerCamera.transform.localPosition = origCamLocalPos;
+            playerCamera.transform.localRotation = origCamLocalRot;
+            playerCamera.fieldOfView = origCamFov;
+        }
+
+        if (playerAnimator != null) playerAnimator.enabled = true;
+        if (playerAnimation != null) playerAnimation.enabled = true;
+
+        if (playerOxygen != null)
+        {
+            playerOxygen.SetFreezeOxygen(false);
+            playerOxygen.UpdateSafeZoneState(firstSaveTree != null && firstSaveTree.IsPlayerInRange);
+        }
+
+        RestoreNormalMoveSpeedIfNeeded();
+        SetGameplayControlsEnabled(true, false);
+
+        if (playerController != null)
+        {
+            playerController.SetDashUnlocked(true);
+        }
+        if (playerMovement != null)
+        {
+            playerMovement.SetDashEnabled(true);
+        }
+
+        SetObjectActive(hudCanvasObj, true);
+        SetObjectActive(questPanelObj, originalQuestPanelActive);
+        SetObjectActive(dashCooldownObj, true);
+        SetObjectActive(potionQuickSlotObj, true);
+
+        SetCanvasGroupAlpha(hudCanvasCg, 1f, true);
+        if (originalQuestPanelActive) SetCanvasGroupAlpha(questPanelCg, 1f, true);
+        SetCanvasGroupAlpha(dashCooldownCg, 1f, true);
+        SetCanvasGroupAlpha(potionQuickSlotCg, 1f, true);
+
+        if (lumi != null)
+        {
+            lumi.disableAutoDialogue = false;
+        }
+
+        tutorialFinished = true;
+    }
+
+    public void RequestSkipTutorial()
+    {
+        if (!tutorialFinished)
+        {
+            skipRequested = true;
         }
     }
 }

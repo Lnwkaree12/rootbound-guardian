@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Dash Settings")]
     [SerializeField] private float dashSpeed = 25f;
+    [SerializeField] private bool canDash = true;
 
     [Header("Gravity Settings")]
     [SerializeField] private float customGravity = -30f;
@@ -39,6 +40,9 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Edge Bumper State")]
     [SerializeField] private bool canTriggerEdgeBumper = false;
+
+    public bool CanTriggerEdgeBumper => canTriggerEdgeBumper;
+    public float MoveSpeed => moveSpeed;
 
     private Rigidbody rb;
     private Vector2 currentInput;
@@ -304,6 +308,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void Dash(Vector3 direction)
     {
+        if (!canDash) return;
+
         dashDirection = direction.normalized;
         isDashing = true;
     }
@@ -357,5 +363,19 @@ public class PlayerMovement : MonoBehaviour
         canTriggerEdgeBumper = state;
     }
 
-    public bool CanTriggerEdgeBumper => canTriggerEdgeBumper;
+   
+
+    public void SetMoveSpeed(float newSpeed)
+    {
+        moveSpeed = Mathf.Max(0f, newSpeed);
+    }
+
+    public void SetDashEnabled(bool enabled)
+    {
+        canDash = enabled;
+        if (!canDash && isDashing)
+        {
+            StopDash();
+        }
+    }
 }

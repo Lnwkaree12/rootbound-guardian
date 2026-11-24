@@ -143094,7 +143094,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6516659407432570624, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -26.69
+      value: -20.56
       objectReference: {fileID: 0}
     - target: {fileID: 6516659407432570624, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: m_LocalRotation.w
@@ -367276,8 +367276,8 @@ MonoBehaviour:
   waterPourSound: {fileID: 8300000, guid: 52ac4812dc7ab894e9748300b59c8d05, type: 3}
   initialHoldBeforeZoom: 0.5
   zoomInDuration: 1.4
-  zoomOutDuration: 1
-  zoomedCamLocalPos: {x: 0, y: 0.78, z: -1.82}
+  zoomOutDuration: 5
+  zoomedCamLocalPos: {x: 0, y: 0.52, z: -1.82}
   zoomedCamLocalEuler: {x: 11.5, y: 0, z: 0}
   zoomedCamFov: 48
   standUpFrameDuration: 0.1
@@ -367287,6 +367287,10 @@ MonoBehaviour:
   bloomShowcaseDuration: 1.2
   letterboxBarHeight: 120
   startingOxygen: 20
+  tutorialMoveSpeed: 10
+  restoreNormalMoveSpeedAfterTutorial: 1
+  allowEnterToSkip: 1
+  skipTutorialButton: {fileID: 0}
 --- !u!4 &1305852166
 Transform:
   m_ObjectHideFlags: 0

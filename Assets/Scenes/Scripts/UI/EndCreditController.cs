@@ -267,6 +267,12 @@ public class EndCreditController : MonoBehaviour
     {
         if (isTransitioning) return;
         PlayButtonSFX();
+
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.ResetRunState();
+        }
+
         StartCoroutine(TransitionToSceneRoutine(gameplaySceneName));
     }
 

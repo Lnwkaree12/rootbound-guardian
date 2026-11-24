@@ -51,7 +51,7 @@ public class OpeningCutsceneManager : MonoBehaviour
     [SerializeField] private AudioSource bgmSource;
     [SerializeField] private AudioClip bgmClip;
     [SerializeField] private AudioClip transitionSFX;
-    [SerializeField] [Range(0f, 1f)] private float maxBgmVolume = 0.65f;
+    [SerializeField][Range(0f, 1f)] private float maxBgmVolume = 0.65f;
 
     [Header("Particles")]
     [SerializeField] private GameObject dustmotesObj;
@@ -135,7 +135,7 @@ public class OpeningCutsceneManager : MonoBehaviour
         }
 
         // Advance or skip typing: Space, Enter, E, or Left Mouse Click
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || 
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) ||
             Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0))
         {
             if (isTyping)
@@ -202,8 +202,8 @@ public class OpeningCutsceneManager : MonoBehaviour
         }
 
         // Run Typewriter Effect for narrative text
-        string textToType = LocalizationManager.Instance != null 
-            ? LocalizationManager.Instance.GetOpeningCutsceneSlide(index) 
+        string textToType = LocalizationManager.Instance != null
+            ? LocalizationManager.Instance.GetOpeningCutsceneSlide(index)
             : slide.subtitleText;
         yield return StartCoroutine(TypewriterRoutine(textToType));
 

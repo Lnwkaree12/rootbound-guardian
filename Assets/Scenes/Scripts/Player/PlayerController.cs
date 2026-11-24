@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashCooldown = 0.8f;
     [SerializeField] private int dashHealthCost = 10;
     [SerializeField] private int dashOxygenCost = 15;
+    [SerializeField] private bool dashUnlocked = true;
 
     [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;         // สำหรับเสียงเอฟเฟกต์ทั่วไป (Fall)
@@ -194,7 +195,7 @@ public class PlayerController : MonoBehaviour
             dashCooldownTimer -= Time.deltaTime;
         }
 
-        if (inputHandler.DashPressed && !isDashing && dashCooldownTimer <= 0f)
+        if (dashUnlocked && inputHandler.DashPressed && !isDashing && dashCooldownTimer <= 0f)
         {
             StartDash();
         }
@@ -304,5 +305,28 @@ public class PlayerController : MonoBehaviour
     public void SetActionState(PlayerActionState newState)
     {
         currentActionState = newState;
+    }
+
+    public void SetDashUnlocked(bool unlocked)
+    {
+        dashUnlocked = unlocked;
+
+        if (!dashUnlocked)
+        {
+            if (inputHandler != null)
+            {
+                inputHandler.ResetDashFlag();
+            }
+
+            if (isDashing)
+            {
+                isDashing = false;
+                if (movement != null) movement.StopDash();
+                if (currentActionState == PlayerActionState.Dashing)
+                {
+                    currentActionState = PlayerActionState.Normal;
+                }
+            }
+        }
     }
 }

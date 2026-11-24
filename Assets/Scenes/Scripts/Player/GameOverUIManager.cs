@@ -3,6 +3,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// จัดการหน้าจอ Game Over เมื่อผู้เล่นพลังชีวิตหรือออกซิเจนหมด
+/// </summary>
 public class GameOverUIManager : MonoBehaviour
 {
     public static GameOverUIManager Instance { get; private set; }
@@ -37,7 +40,7 @@ public class GameOverUIManager : MonoBehaviour
         }
         else if (Instance != this)
         {
-            Destroy(gameObject); // 👈 เปลี่ยนจาก Destroy(this) เป็นตัวนี้
+            Destroy(gameObject);
             return;
         }
 
@@ -46,6 +49,7 @@ public class GameOverUIManager : MonoBehaviour
         EnsureAudio();
         EnsureEventSystem();
 
+        // ซ่อนพาเนล Game Over ตอนเริ่มฉาก
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(false);
@@ -56,6 +60,7 @@ public class GameOverUIManager : MonoBehaviour
     {
         if (!isGameOver) return;
 
+        // เลื่อนปุ่มด้วยปุ่มทิศทางหรือ Tab
         if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
         {
             Navigate(-1);
@@ -70,6 +75,7 @@ public class GameOverUIManager : MonoBehaviour
             Navigate(dir);
         }
 
+        // ยืนยันการกดปุ่ม
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
             SubmitSelectedButton();
@@ -106,7 +112,7 @@ public class GameOverUIManager : MonoBehaviour
         FindUIReferences();
         BindButtonEvents();
 
-        // Detect appropriate localization key
+        // เลือกคีย์ข้อความให้ตรงกับสาเหตุที่ Game Over
         if (!string.IsNullOrEmpty(reason))
         {
             if (reason.Contains("ออกซิเจน") || reason.ToLower().Contains("oxygen"))
@@ -145,6 +151,7 @@ public class GameOverUIManager : MonoBehaviour
         SetupNavigation();
         SelectButton(0, false);
 
+        // เปิดเมาส์และหยุดเวลาเกม
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         Time.timeScale = 0f;
@@ -202,12 +209,9 @@ public class GameOverUIManager : MonoBehaviour
             }
         }
 
-        if (actionButtons[currentButtonIndex] != null)
+        if (actionButtons[currentButtonIndex] != null && UnityEngine.EventSystems.EventSystem.current != null)
         {
-            if (UnityEngine.EventSystems.EventSystem.current != null)
-            {
-                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(actionButtons[currentButtonIndex].gameObject);
-            }
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(actionButtons[currentButtonIndex].gameObject);
         }
 
         if (playSound && audioSource != null && navClip != null)
@@ -308,7 +312,6 @@ public class GameOverUIManager : MonoBehaviour
                 SetTMPText(innerCard, "EncouragementWhisper", "gameover_encouragement");
             }
 
-            // Buttons
             if (restartButton != null)
             {
                 var tmp = restartButton.GetComponentInChildren<TextMeshProUGUI>(true);
@@ -430,9 +433,19 @@ public class GameOverUIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// กดเล่นใหม่จากหน้า Game Over: นำค่าที่เซฟไว้กลับมาใช้และเปิดซีนใหม่แบบข้าม Tutorial
+    /// </summary>
     public void RestartLevel()
     {
         Time.timeScale = 1f;
+        ResetGameOverState();
+
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.RestartFromGameOverWithSavedCheckpoint();
+        }
+
         Scene currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.buildIndex);
     }
@@ -440,6 +453,13 @@ public class GameOverUIManager : MonoBehaviour
     public void GoToMainMenu()
     {
         Time.timeScale = 1f;
+        ResetGameOverState();
+
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.ResetRunState();
+        }
+
         if (Application.CanStreamedLevelBeLoaded("MainScreen"))
         {
             SceneManager.LoadScene("MainScreen");

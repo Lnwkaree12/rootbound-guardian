@@ -2,6 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// จัดการพลังชีวิต (HP) ของผู้เล่น สถานะ Safe Zone การอมตะชั่วคราว (i-Frame) และลำดับการตาย/เกิดใหม่
+/// </summary>
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Health Settings")]
@@ -52,6 +55,9 @@ public class PlayerHealth : MonoBehaviour
         UpdateSafeZoneState(isInSafeZone);
     }
 
+    /// <summary>
+    /// รับความเสียหายจากศัตรูหรือกับดัก
+    /// </summary>
     public void TakeDamage(int damageAmount)
     {
         if (isInvulnerable || currentHealth <= 0) return;
@@ -154,6 +160,13 @@ public class PlayerHealth : MonoBehaviour
     {
         if (healthRoutine != null) StopCoroutine(healthRoutine);
 
+        // หยุด Bleed ค้างหากกำลังเดินเลือดอยู่ตอนตาย
+        if (bleedRoutine != null)
+        {
+            StopCoroutine(bleedRoutine);
+            bleedRoutine = null;
+        }
+
         isInvulnerable = true;
         PlaySound(deathSound);
 
@@ -162,32 +175,30 @@ public class PlayerHealth : MonoBehaviour
         onDeath?.Invoke();
         Debug.Log("Player Died!");
 
-        StartCoroutine(RespawnRoutine());
-
         PlayerController controller = GetComponent<PlayerController>();
         if (controller != null)
         {
-            controller.SetActionState(PlayerActionState.Dead); // 👈 เพิ่มฟังก์ชันนี้ไปเซ็ตสถานะตาย
+            controller.SetActionState(PlayerActionState.Dead);
         }
+
+        StartCoroutine(RespawnRoutine());
     }
 
     private IEnumerator RespawnRoutine()
     {
-        // 1. ดึงระยะเวลาของ Animation ตายจาก PlayerAnimation
+        // รอให้ Animation ตายเล่นจบ + เวลาหน่วงที่ตั้งไว้
         float animLength = playerAnim != null ? playerAnim.GetDeadAnimationLength() : 0f;
-
-        // 2. รอจนกว่า Animation ตายจะเล่นเสร็จ + Delay ที่ตั้งค่าไว้
         yield return new WaitForSeconds(animLength + respawnDelay);
 
         if (CheckpointManager.Instance != null)
         {
-            // ถ้าไม่มีจุดเซฟเหลือ CheckpointManager จะสลับไปเรียก GameOver ภายในตัวทันที
+            // เรียก RespawnPlayer (หากไม่มีจุดเซฟ CheckpointManager จะเรียก GameOver ให้อัตโนมัติ)
             CheckpointManager.Instance.RespawnPlayer(gameObject);
 
-            // ถ้ายังมีเซฟอยู่ ค่อยสั่งรีเซ็ตเลือดปกติ
+            // หากยังมีจุดเซฟ ให้คืนค่า Animator กลับสู่สถานะปกติหลังเกิดใหม่
             if (CheckpointManager.Instance.HasValidCheckpoint())
             {
-                ResetHealthAfterRespawn();
+                ResetAnimatorAfterRespawn();
             }
         }
         else
@@ -205,6 +216,17 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log($"[PlayerHealth] ฟื้นฟูเลือด {amount} | เลือดคงเหลือ: {currentHealth}/{maxHealth}");
     }
 
+    /// <summary>
+    /// ตั้งค่าพลังชีวิตโดยตรง ใช้สำหรับโหลดค่าเลือดที่บันทึกไว้ตอนกดเซฟ
+    /// </summary>
+    public void SetHealth(int amount)
+    {
+        currentHealth = Mathf.Clamp(amount, 1, maxHealth);
+        isInvulnerable = false;
+        onHealthChanged?.Invoke(currentHealth, maxHealth);
+        Debug.Log($"[PlayerHealth] ตั้งค่าเลือดตามเซฟเป็น {currentHealth}/{maxHealth}");
+    }
+
     public void ResetHealth()
     {
         ResetHealth(true);
@@ -218,17 +240,15 @@ public class PlayerHealth : MonoBehaviour
         onHealthChanged?.Invoke(currentHealth, maxHealth);
         UpdateSafeZoneState(safeZone);
 
-        // ❌ (เอาส่วนนี้ออก) ไม่ต้องไปสั่งรีเซ็ตออกซิเจนตรงนี้แล้ว 
-        // เพื่อให้ออกซิเจนยังคงค่าเดิม/ลดต่อตามปกติโดยไม่ถูกบังคับรีเซ็ต
-
-        Debug.Log($"[ResetHealth] เกิดใหม่แล้ว! รีเซ็ตเลือดเป็น {currentHealth}/{maxHealth} (ไม่รีเซ็ตออกซิเจน)");
+        Debug.Log($"[ResetHealth] เกิดใหม่แล้ว! ตั้งต้นเลือดเป็น {currentHealth}/{maxHealth} (ไม่รีเซ็ตออกซิเจน)");
     }
 
-    public void ResetHealthAfterRespawn()
+    /// <summary>
+    /// คืนค่า Animator และสถานะตัวละครหลังเกิดใหม่โดยไม่ทับค่าเลือดที่โหลดมาจากจุดเซฟ
+    /// </summary>
+    private void ResetAnimatorAfterRespawn()
     {
-        currentHealth = maxHealth;
         isInvulnerable = false;
-        onHealthChanged?.Invoke(currentHealth, maxHealth);
 
         PlayerController playerController = GetComponent<PlayerController>();
         if (playerController != null)
@@ -241,15 +261,18 @@ public class PlayerHealth : MonoBehaviour
             Animator anim = playerAnim.GetComponentInChildren<Animator>();
             if (anim != null)
             {
-                // สั่ง Rebind เพื่อล้างค่า Trigger ทั้งหมดที่ค้างอยู่ (เช่น Dead / Injured)
                 anim.Rebind();
                 anim.Update(0f);
-
-                // สั่งให้บังคับเข้า State "Idle" ทันที
                 anim.Play("Idle");
             }
         }
+    }
 
+    public void ResetHealthAfterRespawn()
+    {
+        currentHealth = maxHealth;
+        onHealthChanged?.Invoke(currentHealth, maxHealth);
+        ResetAnimatorAfterRespawn();
         Debug.Log($"[ResetHealthAfterRespawn] เกิดใหม่แล้ว รีเซ็ตเลือดเต็มเป็น {currentHealth}/{maxHealth}");
     }
 

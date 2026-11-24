@@ -1110,6 +1110,16 @@ public class MainMenuUIController : MonoBehaviour
 
     private IEnumerator StartGameRoutine()
     {
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.MarkTutorialCompleted();
+        }
+
+        if (CheckpointManager.Instance != null)
+        {
+            CheckpointManager.Instance.ResetRunState();
+        }
+
         // Ensure door target is fully open
         targetDoorAngleY = doorOpenAngleY;
 

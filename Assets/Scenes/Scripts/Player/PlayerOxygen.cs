@@ -4,6 +4,9 @@ using UnityEngine.Events;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal; // ใช้สำหรับ URP
 
+/// <summary>
+/// จัดการค่าออกซิเจนของผู้เล่น การลด/ฟื้นฟูออกซิเจนตาม Safe Zone และเอฟเฟกต์มืด/ขอบดำบน Global Volume
+/// </summary>
 public class PlayerOxygen : MonoBehaviour
 {
     [Header("Oxygen Settings")]
@@ -27,7 +30,7 @@ public class PlayerOxygen : MonoBehaviour
     private Volume globalVolume;
     [Range(0f, 1f)]
     [SerializeField]
-    private float dangerThreshold = 0.4f; // จะเริ่มแสดงผลเมื่อออกซิเจนต่ำกว่า 40%
+    private float dangerThreshold = 0.4f; // เริ่มแสดงเอฟเฟกต์เมื่อออกซิเจนต่ำกว่า 40%
 
     [SerializeField]
     private float slowDrainTickInterval = 2.5f;
@@ -35,20 +38,20 @@ public class PlayerOxygen : MonoBehaviour
 
     [Header("Vignette Settings")]
     [SerializeField]
-    private Color vignetteColor = Color.black;   // บังคับเปลี่ยนสี Vignette เป็นสีดำสนิท
+    private Color vignetteColor = Color.black;   // สีขอบมืด Vignette
     [SerializeField]
-    private float vignetteSmoothness = 1f;       // ตั้งค่า Smoothness เป็น 1
+    private float vignetteSmoothness = 1f;       // ความฟุ้งของขอบ Vignette
     [SerializeField]
-    private float minVignetteIntensity = 0.2f;   // ค่าขอบมืดตอนออกซิเจนเต็ม
+    private float minVignetteIntensity = 0.2f;   // ความเข้มขอบมืดตอนออกซิเจนเต็ม
     [SerializeField]
-    private float maxVignetteIntensity = 0.4f;  // ค่าขอบมืดตอนออกซิเจนหมด (จำกัดไม่เกิน 0.4f)
+    private float maxVignetteIntensity = 0.4f;  // ความเข้มขอบมืดสูงสุดตอนออกซิเจนหมด
 
     [Header("Color Adjustments Settings")]
     [SerializeField]
-    private float minExposure = -2.5f;           // ความมืดมิดของภาพตอนออกซิเจนหมด
+    private float minExposure = -2.5f;           // ความมืดของภาพตอนออกซิเจนหมด
 
     [Header("Events")]
-    public UnityEvent<int, int> onOxygenChanged; // current, max
+    public UnityEvent<int, int> onOxygenChanged; // (current, max)
     public UnityEvent onOxygenDepleted;
 
     private Coroutine oxygenRoutine;
@@ -57,7 +60,7 @@ public class PlayerOxygen : MonoBehaviour
     private bool oxygenRegenSuppressedUntilSafeZoneExit;
     private bool isOxygenFrozen = false;
 
-    // References สำหรับเก็บ Overrides จาก Volume
+    // อ้างอิงถึง Override บน Volume Profile
     private Vignette vignette;
     private ColorAdjustments colorAdjustments;
 
@@ -84,26 +87,23 @@ public class PlayerOxygen : MonoBehaviour
     {
         onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
         UpdateSafeZoneState(isInSafeZone);
-        UpdatePostProcessing(); // อัปเดตเอฟเฟกต์เริ่มต้น
+        UpdatePostProcessing();
     }
 
     private void InitPostProcessing()
     {
         if (globalVolume != null && globalVolume.profile != null)
         {
-            // ดึง Override Vignette มาใช้งาน
             if (!globalVolume.profile.TryGet(out vignette))
             {
                 vignette = globalVolume.profile.Add<Vignette>();
             }
 
-            // ดึง Override ColorAdjustments มาใช้งาน
             if (!globalVolume.profile.TryGet(out colorAdjustments))
             {
                 colorAdjustments = globalVolume.profile.Add<ColorAdjustments>();
             }
 
-            // เปิดใช้งาน overrideState (ติ๊กถูก)
             vignette.color.overrideState = true;
             vignette.color.value = vignetteColor;
 
@@ -111,7 +111,7 @@ public class PlayerOxygen : MonoBehaviour
             vignette.smoothness.value = vignetteSmoothness;
 
             vignette.intensity.overrideState = true;
-            vignette.intensity.value = minVignetteIntensity; // บังคับคืนค่าเริ่มต้นทันทีที่เริ่มเกม
+            vignette.intensity.value = minVignetteIntensity;
 
             colorAdjustments.postExposure.overrideState = true;
 
@@ -127,24 +127,18 @@ public class PlayerOxygen : MonoBehaviour
     {
         if (globalVolume == null) return;
 
-        // คำนวณอัตราส่วนออกซิเจน (1 = เต็ม, 0 = หมด)
         float oxygenRatio = (float)currentOxygen / maxOxygen;
-
-        // คำนวณค่าความรุนแรงของเอฟเฟกต์
         float dangerFactor = 1f - Mathf.InverseLerp(0f, dangerThreshold, oxygenRatio);
 
-        // ปรับขอบดำ (Vignette)
         if (vignette != null)
         {
             vignette.color.value = vignetteColor;
             vignette.smoothness.value = vignetteSmoothness;
 
-            // ล็อกไม่ให้ค่าทะลุ maxVignetteIntensity (0.4f)
             float targetIntensity = Mathf.Lerp(minVignetteIntensity, maxVignetteIntensity, dangerFactor);
             vignette.intensity.value = Mathf.Clamp(targetIntensity, minVignetteIntensity, maxVignetteIntensity);
         }
 
-        // ปรับความมืด (Exposure)
         if (colorAdjustments != null)
         {
             colorAdjustments.postExposure.value = Mathf.Lerp(0f, minExposure, dangerFactor);
@@ -222,14 +216,9 @@ public class PlayerOxygen : MonoBehaviour
         }
     }
 
-    //public void ResetOxygen()
-    //{
-    //    currentOxygen = maxOxygen;
-    //    onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
-    //    UpdatePostProcessing();
-    //    UpdateSafeZoneState(true);
-    //}
-
+    /// <summary>
+    /// ใช้ออกซิเจน เช่น ตอนกด Dash
+    /// </summary>
     public void ConsumeOxygen(int amount)
     {
         if (amount <= 0 || isOxygenFrozen) return;
@@ -258,8 +247,7 @@ public class PlayerOxygen : MonoBehaviour
 
         onOxygenDepleted?.Invoke();
 
-        
-        // 🌟 เพิ่มส่วนนี้: สั่งให้ PlayerController เปลี่ยนสถานะเป็น Dead ทันทีที่ออกซิเจนหมด
+        // เปลี่ยนสถานะตัวละครเป็น Dead และหยุดแรงเคลื่อนที่ทันที
         PlayerController controller = GetComponent<PlayerController>();
         if (controller != null)
         {
@@ -307,9 +295,16 @@ public class PlayerOxygen : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// ตั้งค่าออกซิเจนโดยตรง และปลดล็อกแฟล็ก Game Over หากค่าออกซิเจนมากกว่า 0
+    /// </summary>
     public void SetOxygen(int value)
     {
         currentOxygen = Mathf.Clamp(value, 0, maxOxygen);
+        if (currentOxygen > 0)
+        {
+            gameOverTriggered = false;
+        }
         onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
         UpdatePostProcessing();
     }
@@ -343,23 +338,4 @@ public class PlayerOxygen : MonoBehaviour
             drainTickInterval = originalDrainInterval;
         }
     }
-
-    // 🌟 เพิ่มฟังก์ชันนี้ใน PlayerOxygen.cs เพื่อใช้ตอน Respawn
-    //public void ResetOxygenOnRespawn(bool healsOxygen)
-    //{
-    //    if (oxygenRoutine != null)
-    //    {
-    //        StopCoroutine(oxygenRoutine);
-    //        oxygenRoutine = null;
-    //    }
-
-    //    // รีเซ็ตค่าออกซิเจนให้เต็ม (หรือปรับตามดีไซน์ที่ต้องการ)
-    //    currentOxygen = maxOxygen;
-    //    onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
-
-    //    // ตั้งค่า Safe Zone ตามจุดเซฟล่าสุดที่ผู้เล่นยืนอยู่
-    //    isInSafeZone = healsOxygen;
-    //    UpdateSafeZoneState(isInSafeZone);
-    //    UpdatePostProcessing();
-    //}
 }
