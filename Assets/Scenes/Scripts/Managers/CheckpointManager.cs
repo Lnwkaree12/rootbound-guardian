@@ -7,9 +7,8 @@ using UnityEngine.SceneManagement;
 /// บันทึกข้อมูลหลักตอนเซฟ:
 /// 1. ตำแหน่งผู้เล่น
 /// 2. ของในกระเป๋า
-/// 3. เลือดผู้เล่น
-/// 4. ออกซิเจนของผู้เล่น
-/// 5. เลือดต้นไม้ (และสถานะต้นไม้)
+/// 3. ออกซิเจนของผู้เล่น
+/// 4. เลือดต้นไม้ (และสถานะต้นไม้)
 /// </summary>
 public class CheckpointManager : MonoBehaviour
 {
@@ -21,14 +20,15 @@ public class CheckpointManager : MonoBehaviour
     private bool lastCheckpointHealsOxygen = true;
     private TreeSavePoint lastCheckpointTree;
     private bool lastCheckpointUsesTree;
+    private Vector3 lastCheckpointTreePosition;
 
-    // 2. ของในกระเป๋า & 3. เลือดผู้เล่น
+    // 2. ของในกระเป๋า
     private PlayerDataSave currentSaveData;
 
-    // 4. ออกซิเจนของผู้เล่น ณ ตอนที่เซฟ
+    // 3. ออกซิเจนของผู้เล่น ณ ตอนที่เซฟ
     private int savedOxygen = 100;
 
-    // 5. เลือดต้นไม้ ณ ตอนที่เซฟ
+    // 4. เลือดต้นไม้ ณ ตอนที่เซฟ
     private float savedTreeHealth = 100f;
 
     // รายการของและกับดักในฉาก
@@ -113,7 +113,7 @@ public class CheckpointManager : MonoBehaviour
         GameObject player = GameObject.Find("Player Variant") ?? GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
-            RespawnPlayer(player);
+            RespawnPlayer(player, true);
             Debug.Log("[CheckpointManager] นำค่าที่เซฟไว้กลับมาใช้หลังโหลดซีนใหม่เรียบร้อย");
         }
     }
@@ -176,7 +176,7 @@ public class CheckpointManager : MonoBehaviour
     }
 
     /// <summary>
-    /// บันทึกจุดเซฟทั้งหมด ณ วินาทีที่กดเซฟ / ฟื้นฟูต้นไม้จุดเซฟ / จบ Tutorial Step 9
+    /// บันทึกจุดเซฟ ณ วินาทีที่กดเซฟ / ฟื้นฟูต้นไม้จุดเซฟ / จบ Tutorial Step 9
     /// </summary>
     public void SaveCheckpoint(Vector3 checkpointPos, PlayerHealth healthComp, Inventory inventoryComp, bool healsOxygen, TreeSavePoint sourceTree)
     {
@@ -186,6 +186,10 @@ public class CheckpointManager : MonoBehaviour
         lastCheckpointHealsOxygen = healsOxygen;
         lastCheckpointTree = sourceTree;
         lastCheckpointUsesTree = sourceTree != null;
+        if (sourceTree != null)
+        {
+            lastCheckpointTreePosition = sourceTree.transform.position;
+        }
 
         // บันทึกสถานะ Quest ปัจจุบัน
         if (QuestManager.Instance != null)
@@ -193,14 +197,13 @@ public class CheckpointManager : MonoBehaviour
             savedHasKey = QuestManager.Instance.hasKey;
         }
 
-        // 2. บันทึกของในกระเป๋า และ 3. บันทึกเลือดผู้เล่น
+        // 2. บันทึกของในกระเป๋า
         currentSaveData = new PlayerDataSave
         {
-            savedHealth = healthComp != null ? healthComp.CurrentHealth : 100,
             savedItems = inventoryComp != null ? new List<ItemData>(inventoryComp.GetItems()) : new List<ItemData>()
         };
 
-        // 4. บันทึกออกซิเจนของผู้เล่น ณ ตอนเซฟ
+        // 3. บันทึกออกซิเจนของผู้เล่น ณ ตอนเซฟ
         PlayerOxygen oxygenComp = healthComp != null
             ? healthComp.GetComponent<PlayerOxygen>()
             : FindFirstObjectByType<PlayerOxygen>();
@@ -209,7 +212,7 @@ public class CheckpointManager : MonoBehaviour
             savedOxygen = oxygenComp.CurrentOxygen;
         }
 
-        // 5. บันทึกเลือดต้นไม้ ณ ตอนเซฟ
+        // 4. บันทึกเลือดต้นไม้ ณ ตอนเซฟ
         if (sourceTree != null)
         {
             savedTreeHealth = sourceTree.CurrentTreeHealth;
@@ -220,7 +223,7 @@ public class CheckpointManager : MonoBehaviour
         savedFallenStalactites = new HashSet<string>(currentFallenStalactites);
         savedPickedItemIDs = new HashSet<string>(currentPickedItemIDs);
 
-        Debug.Log($"[CheckpointManager] เซฟสำเร็จ -> Pos:{checkpointPos}, HP:{currentSaveData.savedHealth}, O2:{savedOxygen}, TreeHP:{savedTreeHealth}, Items:{currentSaveData.savedItems.Count}");
+        Debug.Log($"[CheckpointManager] เซฟสำเร็จ -> Pos:{checkpointPos}, O2:{savedOxygen}, TreeHP:{savedTreeHealth}, Items:{currentSaveData.savedItems.Count}");
     }
 
     /// <summary>
@@ -246,7 +249,7 @@ public class CheckpointManager : MonoBehaviour
     /// <summary>
     /// คืนค่าทุกอย่างกลับไปตามจุดเซฟที่บันทึกไว้
     /// </summary>
-    public void RespawnPlayer(GameObject player)
+    public void RespawnPlayer(GameObject player, bool restoreTreeFromCheckpoint = true)
     {
         if (!hasCheckpoint || player == null)
         {
@@ -275,13 +278,22 @@ public class CheckpointManager : MonoBehaviour
         }
         Physics.SyncTransforms();
 
-        // 5. คืนค่าเลือดต้นไม้และสถานะต้นไม้จุดเซฟ (ค้นหาในฉากใหม่หากอ้างอิงเดิมถูกทำลาย)
-        if (lastCheckpointTree == null)
+        // คืนต้นไม้ที่ผูกกับ checkpoint เท่านั้น ไม่ใช้ต้นไม้ Tutorial เป็น fallback
+        if (restoreTreeFromCheckpoint && lastCheckpointUsesTree && lastCheckpointTree == null)
         {
-            GameObject tObj = GameObject.Find("TreeSavePoint2");
-            if (tObj != null) lastCheckpointTree = tObj.GetComponent<TreeSavePoint>();
+            TreeSavePoint[] trees = FindObjectsByType<TreeSavePoint>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            float closestDistanceSqr = 1f;
+            foreach (TreeSavePoint tree in trees)
+            {
+                float distanceSqr = (tree.transform.position - lastCheckpointTreePosition).sqrMagnitude;
+                if (distanceSqr <= closestDistanceSqr)
+                {
+                    closestDistanceSqr = distanceSqr;
+                    lastCheckpointTree = tree;
+                }
+            }
         }
-        if (lastCheckpointTree != null)
+        if (restoreTreeFromCheckpoint && lastCheckpointUsesTree && lastCheckpointTree != null)
         {
             lastCheckpointTree.RestoreFromSavedState(savedTreeHealth);
         }
@@ -302,10 +314,7 @@ public class CheckpointManager : MonoBehaviour
         if (health != null)
         {
             health.ResetHealth(shouldHealOxygen);
-            if (currentSaveData != null)
-            {
-                health.SetHealth(currentSaveData.savedHealth);
-            }
+            health.ResetHealthAfterRespawn();
         }
 
         // 2. คืนค่าของในกระเป๋าตามที่เซฟไว้
@@ -411,6 +420,7 @@ public class CheckpointManager : MonoBehaviour
         currentSaveData = null;
         lastCheckpointTree = null;
         lastCheckpointUsesTree = false;
+        lastCheckpointTreePosition = Vector3.zero;
         lastCheckpointHealsOxygen = true;
 
         savedOxygen = 100;

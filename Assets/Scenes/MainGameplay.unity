@@ -143343,6 +143343,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
+      propertyPath: lowOxygenPantingClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 3304167ed8956eb49b67db43131d5248, type: 3}
+    - target: {fileID: 7424525292643747143, guid: 0cf3a34530b63dd4fb7041e140f4a871, type: 3}
       propertyPath: maxVignetteIntensity
       value: 0.35
       objectReference: {fileID: 0}
@@ -482323,7 +482327,7 @@ GameObject:
   - component: {fileID: 1734902065}
   m_Layer: 7
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -569543,6 +569547,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 899547635}
     m_Modifications:
+    - target: {fileID: 2592925846094268306, guid: a2583b79872ea924fa7f30dfe17e6a54, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2592925846094268306, guid: a2583b79872ea924fa7f30dfe17e6a54, type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6082413021554271059, guid: a2583b79872ea924fa7f30dfe17e6a54, type: 3}
       propertyPath: m_Name
       value: Stalactites

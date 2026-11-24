@@ -233,6 +233,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
   damageAmount: 100
   wallHitDelay: 0.05
+  checkTopSmash: 1
   onHitPlayer:
     m_PersistentCalls:
       m_Calls: []
@@ -282,7 +283,7 @@ MeshCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -7285105324213025805, guid: bf1217dca47c01543a36a6ecc63c8f6d, type: 3}
 --- !u!82 &2592925846094268306

@@ -193,7 +193,7 @@ public class PlayerHealth : MonoBehaviour
         if (CheckpointManager.Instance != null)
         {
             // เรียก RespawnPlayer (หากไม่มีจุดเซฟ CheckpointManager จะเรียก GameOver ให้อัตโนมัติ)
-            CheckpointManager.Instance.RespawnPlayer(gameObject);
+            CheckpointManager.Instance.RespawnPlayer(gameObject, false);
 
             // หากยังมีจุดเซฟ ให้คืนค่า Animator กลับสู่สถานะปกติหลังเกิดใหม่
             if (CheckpointManager.Instance.HasValidCheckpoint())

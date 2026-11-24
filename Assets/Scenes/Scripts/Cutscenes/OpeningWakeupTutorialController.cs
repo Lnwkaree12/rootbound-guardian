@@ -366,6 +366,7 @@ public class OpeningWakeupTutorialController : MonoBehaviour
 
         if (playerOxygen != null)
         {
+            playerOxygen.SetLowOxygenAudioEnabled(false);
             playerOxygen.SetFreezeOxygen(true);
             playerOxygen.SetOxygen(startingOxygen);
         }
@@ -470,6 +471,11 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         if (playerAnimation != null)
         {
             playerAnimation.enabled = true;
+        }
+
+        if (playerOxygen != null)
+        {
+            playerOxygen.SetLowOxygenAudioEnabled(true);
         }
 
         SetGameplayControlsEnabled(false, false);
@@ -1128,6 +1134,11 @@ public class OpeningWakeupTutorialController : MonoBehaviour
     {
         if (tutorialFinished) return;
 
+        if (playerOxygen != null)
+        {
+            playerOxygen.SetLowOxygenAudioEnabled(true);
+        }
+
         StopAllCoroutines();
 
         holdLyingSprite = false;
@@ -1214,6 +1225,11 @@ public class OpeningWakeupTutorialController : MonoBehaviour
     public void SkipTutorialImmediately()
     {
         if (tutorialFinished) return;
+
+        if (playerOxygen != null)
+        {
+            playerOxygen.SetLowOxygenAudioEnabled(true);
+        }
 
         StopAllCoroutines();
 

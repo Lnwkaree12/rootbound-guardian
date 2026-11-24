@@ -25,6 +25,15 @@ public class PlayerOxygen : MonoBehaviour
     [SerializeField]
     private float regenTickInterval = 0.5f;
 
+    [Header("Low Oxygen Audio")]
+    [SerializeField]
+    private AudioClip lowOxygenPantingClip;
+    [SerializeField, Min(0)]
+    private int lowOxygenPantingThreshold = 50;
+    private AudioSource lowOxygenAudioSource;
+    private bool hasPlayedLowOxygenPanting;
+    private bool lowOxygenAudioEnabled = true;
+
     [Header("Post Processing / Global Volume Settings")]
     [SerializeField]
     private Volume globalVolume;
@@ -75,6 +84,7 @@ public class PlayerOxygen : MonoBehaviour
 
         InitPostProcessing();
         SaveOriginalInterval();
+        lowOxygenAudioSource = GetComponent<AudioSource>();
     }
 
     private void OnValidate()
@@ -86,6 +96,7 @@ public class PlayerOxygen : MonoBehaviour
     private void Start()
     {
         onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
+        UpdateLowOxygenAudio();
         UpdateSafeZoneState(isInSafeZone);
         UpdatePostProcessing();
     }
@@ -191,6 +202,7 @@ public class PlayerOxygen : MonoBehaviour
             currentOxygen -= drainPerTick;
             currentOxygen = Mathf.Clamp(currentOxygen, 0, maxOxygen);
             onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
+            UpdateLowOxygenAudio();
             UpdatePostProcessing();
 
             if (currentOxygen <= 0)
@@ -210,6 +222,7 @@ public class PlayerOxygen : MonoBehaviour
                 currentOxygen += regenPerTick;
                 currentOxygen = Mathf.Clamp(currentOxygen, 0, maxOxygen);
                 onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
+                UpdateLowOxygenAudio();
                 UpdatePostProcessing();
             }
             yield return new WaitForSeconds(regenTickInterval);
@@ -226,6 +239,7 @@ public class PlayerOxygen : MonoBehaviour
         currentOxygen -= amount;
         currentOxygen = Mathf.Clamp(currentOxygen, 0, maxOxygen);
         onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
+        UpdateLowOxygenAudio();
         UpdatePostProcessing();
 
         if (currentOxygen <= 0)
@@ -306,7 +320,57 @@ public class PlayerOxygen : MonoBehaviour
             gameOverTriggered = false;
         }
         onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
+        UpdateLowOxygenAudio();
         UpdatePostProcessing();
+    }
+
+    private void UpdateLowOxygenAudio()
+    {
+        if (currentOxygen > lowOxygenPantingThreshold)
+        {
+            StopLowOxygenPanting();
+            hasPlayedLowOxygenPanting = false;
+            return;
+        }
+
+        if (!lowOxygenAudioEnabled) return;
+        if (hasPlayedLowOxygenPanting) return;
+        hasPlayedLowOxygenPanting = true;
+
+        if (lowOxygenPantingClip == null) return;
+
+        if (lowOxygenAudioSource == null)
+        {
+            Debug.LogWarning("[PlayerOxygen] ใส่เสียงหอบแล้ว แต่ไม่พบ AudioSource บนผู้เล่น");
+            return;
+        }
+
+        lowOxygenAudioSource.clip = lowOxygenPantingClip;
+        lowOxygenAudioSource.loop = true;
+        lowOxygenAudioSource.Play();
+    }
+
+    private void StopLowOxygenPanting()
+    {
+        if (lowOxygenAudioSource == null || lowOxygenAudioSource.clip != lowOxygenPantingClip) return;
+
+        lowOxygenAudioSource.Stop();
+        lowOxygenAudioSource.loop = false;
+        lowOxygenAudioSource.clip = null;
+    }
+
+    public void SetLowOxygenAudioEnabled(bool enabled)
+    {
+        lowOxygenAudioEnabled = enabled;
+        if (enabled)
+        {
+            UpdateLowOxygenAudio();
+        }
+        else
+        {
+            StopLowOxygenPanting();
+            hasPlayedLowOxygenPanting = false;
+        }
     }
 
     public void SetFreezeOxygen(bool frozen)
