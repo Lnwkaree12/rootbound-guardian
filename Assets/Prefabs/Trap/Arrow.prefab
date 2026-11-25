@@ -64,6 +64,14 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -5617017044375592838, guid: c224be65ba58de347a2e7188a31d06bd, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 909151f0b86fe634a8fa10b92a1c6fcb, type: 2}
+    - target: {fileID: -3518304218168505135, guid: c224be65ba58de347a2e7188a31d06bd, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 909151f0b86fe634a8fa10b92a1c6fcb, type: 2}
     - target: {fileID: -3256477391515123359, guid: c224be65ba58de347a2e7188a31d06bd, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.92387956
@@ -92,6 +100,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Arrow
       objectReference: {fileID: 0}
+    - target: {fileID: 2054649400150598611, guid: c224be65ba58de347a2e7188a31d06bd, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 909151f0b86fe634a8fa10b92a1c6fcb, type: 2}
     - target: {fileID: 2088068783449127906, guid: c224be65ba58de347a2e7188a31d06bd, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
@@ -208,6 +220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
   damageAmount: 20
   wallHitDelay: 0.05
+  checkTopSmash: 1
   onHitPlayer:
     m_PersistentCalls:
       m_Calls: []

@@ -33,7 +33,7 @@ Material:
   stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
-  m_LockedProperties: 
+  m_LockedProperties: _Shadows_Color
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -63,7 +63,7 @@ Material:
     m_Colors:
     - _Base_Color: {r: 0.28, g: 0.2, b: 0.15, a: 1}
     - _Highlight_Color: {r: 0, g: 0, b: 0, a: 1}
-    - _Outline_Color: {r: 0.06, g: 0.04, b: 0.03, a: 1}
-    - _Shadows_Color: {r: 0.14, g: 0.1, b: 0.08, a: 1}
+    - _Outline_Color: {r: 1, g: 0.8431373, b: 0, a: 1}
+    - _Shadows_Color: {r: 0.854902, g: 0.6470588, b: 0.1254902, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

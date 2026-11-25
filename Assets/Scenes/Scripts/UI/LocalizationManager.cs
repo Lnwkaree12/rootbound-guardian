@@ -156,7 +156,7 @@ public class LocalizationManager : MonoBehaviour
         return Get("cutscene_end_narrative");
     }
 
-    /// <summary>ดึงคำบรรยาย Opening Cutscene ตามลำดับสไลด์ (0-4)</summary>
+    /// <summary>ดึงคำบรรยาย Opening Cutscene ตามลำดับสไลด์ (0-based)</summary>
     public string GetOpeningCutsceneSlide(int slideIndex)
     {
         return Get($"cutscene_opening_{slideIndex + 1}");
@@ -338,8 +338,7 @@ public class LocalizationManager : MonoBehaviour
             en: "BACK TO MAIN MENU (ESC)",
             zh: "返回主菜单 (ESC)");
 
-        AddKey("label_master",       th: "เสียงรวม",      en: "MASTER ", zh: "总音量");
-        AddKey("label_master",       th: "เสียงรวม",      en: "MASTER ", zh: "总音量");
+        AddKey("label_master",       th: "เสียงรวม",      en: "MASTER",        zh: "总音量");
         AddKey("label_bgm",          th: "เสียงเพลง",     en: "MUSIC",         zh: "背景音乐");
         AddKey("label_sfx",          th: "เสียงเอฟเฟกต์", en: "SFX",           zh: "音效");
         AddKey("label_resolution",   th: "ความละเอียด",   en: "RESOLUTION",    zh: "分辨率");
@@ -903,6 +902,11 @@ public class LocalizationManager : MonoBehaviour
             th: "การเดินทางเต็มไปด้วยอันตราย... ผู้พิทักษ์ต้องมุ่งหน้าสู่ดันเจี้ยนโบราณใต้พิภพ และฝ่าฟันกับดัก เพื่อค้นหาหนทางสู่รากไม้ศักดิ์สิทธิ์",
             en: "A perilous journey awaits... The guardian must venture deep beneath the subterranean dungeon, braving deadly traps to reach the sacred root.",
             zh: "此行荆棘遍布、凶险重重... 守护者必须深入幽邃的地下遗迹，穿越重重机关陷阱，探寻通往神圣灵根的道路。");
+
+        AddKey("cutscene_opening_6",
+            th: "แต่แล้วเมื่อเริ่มต้น เอลฟ์ตัวน้อยกลับพลัดตกหลุมลงสู่โบราณสถานใต้ดิน ผู้พิทักษ์รุ่นเยาว์จึงต้องหาเส้นทางไปยังรากต้นไม้โลกให้ได้",
+            en: "Yet just as the journey began, the little elf tumbled down into the underground ruins—leaving the young guardian to find a way to the World Tree's roots.",
+            zh: "然而旅程刚一开始，小精灵便失足坠入了地下遗迹，年轻的守护者必须设法找到通往世界树根的路。");
 
         AddKey("endscene_lumi_speech",
             th: "นี้คือต้นไม้โลกแห่งโบราณกาล\nที่เจ้าได้รักษาปกป้องมันเอาไว้...\nข้าขอบคุณเจ้ามากนะ!",

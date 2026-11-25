@@ -70,7 +70,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 0f27e276823a1f541ae70cc2dca20964, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -127,12 +127,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d34bb6272259026478a73910563be77e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StalactiteTrap
+  stalactiteID: Sphere_(0.00, 0.00, 0.00)
   useRandomDelay: 0
   minDelay: 0
   maxDelay: 1.5
   initialFallVelocity: 20
   extraGravityForce: 30
   destroyDelay: 3
+  audioSource: {fileID: 0}
+  fallSound: {fileID: 0}
+  impactSound: {fileID: 0}
   rb: {fileID: 4924089077219582751}
 --- !u!114 &7545920557068514316
 MonoBehaviour:
@@ -148,6 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DamageDealer
   damageAmount: 20
   wallHitDelay: 0.05
+  checkTopSmash: 1
   onHitPlayer:
     m_PersistentCalls:
       m_Calls: []

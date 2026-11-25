@@ -680,6 +680,7 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             true,
             firstSaveTree
         );
+        CheckpointManager.Instance.MarkCurrentCheckpointAsTutorialCompletion();
 
         Debug.Log("[OpeningWakeupTutorialController] เซฟข้อมูลจุดจบ Tutorial Step 9 เรียบร้อย (ต้นไม้, เลือดต้นไม้, เลือดผู้เล่น, ออกซิเจน, ของในกระเป๋า)");
     }

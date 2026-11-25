@@ -139,7 +139,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 87c8e29aae66e3340be409dc4a550580, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 341fc55f33f923f469c38ce86f7c4c4e, type: 2}
+      objectReference: {fileID: 2100000, guid: 0f27e276823a1f541ae70cc2dca20964, type: 2}
     - target: {fileID: 919132149155446097, guid: 87c8e29aae66e3340be409dc4a550580, type: 3}
       propertyPath: m_Name
       value: crushed stone
@@ -216,6 +216,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32c3358e704b9af489f95c16da312124, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutomaticSmashTrap
+  smashDistance: 5
+  smashSpeed: 20
+  riseSpeed: 2
+  waitTimeAtBottom: 1
+  waitTimeAtTop: 2
+  audioSource: {fileID: 0}
+  smashSound: {fileID: 0}
 --- !u!65 &6656022286622306614
 BoxCollider:
   m_ObjectHideFlags: 0

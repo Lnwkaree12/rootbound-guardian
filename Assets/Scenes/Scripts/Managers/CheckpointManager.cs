@@ -12,11 +12,29 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class CheckpointManager : MonoBehaviour
 {
+    private sealed class CheckpointSnapshot
+    {
+        public Vector3 position;
+        public bool healsOxygen;
+        public TreeSavePoint tree;
+        public bool usesTree;
+        public Vector3 treePosition;
+        public PlayerDataSave playerData;
+        public int oxygen;
+        public float treeHealth;
+        public HashSet<string> pickedItemIDs;
+        public HashSet<string> openedChestIDs;
+        public HashSet<string> fallenStalactiteIDs;
+        public bool hasKey;
+        public bool doorUnlocked;
+    }
+
     public static CheckpointManager Instance { get; private set; }
 
     // 1. ตำแหน่งผู้เล่นและข้อมูลจุดเซฟ
     private Vector3 lastCheckpointPosition;
     private bool hasCheckpoint = false;
+    private CheckpointSnapshot tutorialCompletionCheckpoint;
     private bool lastCheckpointHealsOxygen = true;
     private TreeSavePoint lastCheckpointTree;
     private bool lastCheckpointUsesTree;
@@ -82,6 +100,7 @@ public class CheckpointManager : MonoBehaviour
     /// </summary>
     public void RestartFromPauseWithSavedCheckpoint()
     {
+        RestoreTutorialCompletionCheckpointForRestart();
         bool shouldSkipTutorial = hasCheckpoint;
         runTutorialOnNextLoad = !shouldSkipTutorial;
         tutorialCompleted = shouldSkipTutorial;
@@ -94,6 +113,7 @@ public class CheckpointManager : MonoBehaviour
     /// </summary>
     public void RestartFromGameOverWithSavedCheckpoint()
     {
+        RestoreTutorialCompletionCheckpointForRestart();
         runTutorialOnNextLoad = false;
         tutorialCompleted = true;
         restoreCheckpointOnNextSceneLoad = hasCheckpoint;
@@ -225,6 +245,55 @@ public class CheckpointManager : MonoBehaviour
         savedPickedItemIDs = new HashSet<string>(currentPickedItemIDs);
 
         Debug.Log($"[CheckpointManager] เซฟสำเร็จ -> Pos:{checkpointPos}, O2:{savedOxygen}, TreeHP:{savedTreeHealth}, Items:{currentSaveData.savedItems.Count}");
+    }
+
+    public void MarkCurrentCheckpointAsTutorialCompletion()
+    {
+        if (!hasCheckpoint) return;
+
+        tutorialCompletionCheckpoint = new CheckpointSnapshot
+        {
+            position = lastCheckpointPosition,
+            healsOxygen = lastCheckpointHealsOxygen,
+            tree = lastCheckpointTree,
+            usesTree = lastCheckpointUsesTree,
+            treePosition = lastCheckpointTreePosition,
+            playerData = currentSaveData == null
+                ? null
+                : new PlayerDataSave { savedItems = new List<ItemData>(currentSaveData.savedItems) },
+            oxygen = savedOxygen,
+            treeHealth = savedTreeHealth,
+            pickedItemIDs = new HashSet<string>(savedPickedItemIDs),
+            openedChestIDs = new HashSet<string>(savedOpenedChestIDs),
+            fallenStalactiteIDs = new HashSet<string>(savedFallenStalactites),
+            hasKey = savedHasKey,
+            doorUnlocked = savedDoorUnlocked
+        };
+    }
+
+    private void RestoreTutorialCompletionCheckpointForRestart()
+    {
+        if (tutorialCompletionCheckpoint == null) return;
+
+        lastCheckpointPosition = tutorialCompletionCheckpoint.position;
+        hasCheckpoint = true;
+        lastCheckpointHealsOxygen = tutorialCompletionCheckpoint.healsOxygen;
+        lastCheckpointTree = tutorialCompletionCheckpoint.tree;
+        lastCheckpointUsesTree = tutorialCompletionCheckpoint.usesTree;
+        lastCheckpointTreePosition = tutorialCompletionCheckpoint.treePosition;
+        currentSaveData = tutorialCompletionCheckpoint.playerData == null
+            ? null
+            : new PlayerDataSave
+            {
+                savedItems = new List<ItemData>(tutorialCompletionCheckpoint.playerData.savedItems)
+            };
+        savedOxygen = tutorialCompletionCheckpoint.oxygen;
+        savedTreeHealth = tutorialCompletionCheckpoint.treeHealth;
+        savedPickedItemIDs = new HashSet<string>(tutorialCompletionCheckpoint.pickedItemIDs);
+        savedOpenedChestIDs = new HashSet<string>(tutorialCompletionCheckpoint.openedChestIDs);
+        savedFallenStalactites = new HashSet<string>(tutorialCompletionCheckpoint.fallenStalactiteIDs);
+        savedHasKey = tutorialCompletionCheckpoint.hasKey;
+        savedDoorUnlocked = tutorialCompletionCheckpoint.doorUnlocked;
     }
 
     /// <summary>
@@ -417,6 +486,7 @@ public class CheckpointManager : MonoBehaviour
     public void ResetRunState()
     {
         hasCheckpoint = false;
+        tutorialCompletionCheckpoint = null;
         restoreCheckpointOnNextSceneLoad = false;
         currentSaveData = null;
         lastCheckpointTree = null;

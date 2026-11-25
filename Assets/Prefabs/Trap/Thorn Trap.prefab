@@ -228,6 +228,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -8307474790147020254, guid: 989990f10c5915d44b56464b391efdf1, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 909151f0b86fe634a8fa10b92a1c6fcb, type: 2}
     - target: {fileID: -5218005196742987060, guid: 989990f10c5915d44b56464b391efdf1, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -236,6 +240,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Thorn Trap
       objectReference: {fileID: 0}
+    - target: {fileID: 6398902889415626652, guid: 989990f10c5915d44b56464b391efdf1, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0f27e276823a1f541ae70cc2dca20964, type: 2}
     - target: {fileID: 6783464644124936822, guid: 989990f10c5915d44b56464b391efdf1, type: 3}
       propertyPath: m_IsActive
       value: 1
