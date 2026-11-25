@@ -65,6 +65,10 @@ public class MainMenuUIController : MonoBehaviour
     public TextMeshProUGUI masterLabel;
     public TextMeshProUGUI bgmLabel;
     public TextMeshProUGUI sfxLabel;
+    [Header("Settings Volume % Texts")]
+    public TextMeshProUGUI masterVolumeText;
+    public TextMeshProUGUI bgmVolumeText;
+    public TextMeshProUGUI sfxVolumeText;
     public TextMeshProUGUI resolutionValueText;
     public TextMeshProUGUI displayModeValueText;
     public Button settingsBackButton;
@@ -211,6 +215,10 @@ public class MainMenuUIController : MonoBehaviour
     private int mainMenuIndex = 0; // 0: Start, 1: Settings, 2: Exit
     private int settingsIndex = 0; // 0: Master, 1: BGM, 2: SFX, 3: Resolution, 4: DisplayMode, 5: Back
     private int exitModalIndex = 0; // 0: Confirm, 1: Cancel
+    private int audioHeldDir = 0;
+    private float audioRepeatTimer = 0f;
+    private const float AudioRepeatDelay = 0.32f;
+    private const float AudioRepeatInterval = 0.06f;
 
     // Settings Data
     private List<Resolution> availableResolutions = new List<Resolution>();
@@ -304,6 +312,26 @@ public class MainMenuUIController : MonoBehaviour
         InitAnimatedOptions();
         InitSettingsRows();
         InitDoorAndCamera();
+        DisableUnityNavOnControls();
+    }
+
+    private void DisableUnityNavOnControls()
+    {
+        Navigation noNav = new Navigation { mode = Navigation.Mode.None };
+        Slider[] sliders = { masterVolumeSlider, bgmVolumeSlider, sfxVolumeSlider };
+        foreach (var s in sliders) if (s != null) s.navigation = noNav;
+
+        Button[] buttons =
+        {
+            startButton, settingsButton, exitButton, settingsBackButton,
+            audioVideoTabButton, controllerTabButton, languageTabButton,
+            thLanguageButton, enLanguageButton, zhLanguageButton, languageBackButton,
+            gameplayModeButton, menuModeButton, vibrationButton,
+            sensitivityMinusButton, sensitivityPlusButton, buttonSwapButton,
+            resetControllerDefaultsButton, controllerBackButton,
+            confirmExitButton, cancelExitButton
+        };
+        foreach (var b in buttons) if (b != null) b.navigation = noNav;
     }
 
     private void OnEnable()
@@ -881,11 +909,11 @@ public class MainMenuUIController : MonoBehaviour
             opt.rootTransform.localScale = opt.baseScale * opt.currentScale;
         }
 
-        // Smooth Alpha
+        // Smooth Alpha (preserve label ink RGB color)
         opt.currentAlpha = Mathf.Lerp(opt.currentAlpha, opt.targetAlpha, dt * 15f);
         if (opt.label != null)
         {
-            Color c = Color.white;
+            Color c = opt.label.color;
             c.a = opt.currentAlpha;
             opt.label.color = c;
         }
@@ -939,7 +967,7 @@ public class MainMenuUIController : MonoBehaviour
             if (row.label != null)
             {
                 row.label.transform.localScale = Vector3.one * row.currentScale;
-                Color c = Color.white;
+                Color c = row.label.color;
                 c.a = row.currentAlpha;
                 row.label.color = c;
             }
@@ -1239,16 +1267,50 @@ public class MainMenuUIController : MonoBehaviour
             UpdateSettingsVisuals();
         }
 
-        // Left / Right adjustments with tactile arrow punch
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        // Left / Right adjustments with tactile arrow punch + hold-to-repeat on sliders
+        int pressDir = 0;
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) pressDir = -1;
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) pressDir = 1;
+
+        if (pressDir != 0)
         {
-            PunchCurrentRowArrow(-1);
-            AdjustSettingsValue(-1);
+            PunchCurrentRowArrow(pressDir);
+            AdjustSettingsValue(pressDir);
+            if (settingsIndex <= 2)
+            {
+                audioHeldDir = pressDir;
+                audioRepeatTimer = AudioRepeatDelay;
+            }
+            else
+            {
+                audioHeldDir = 0;
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        else if (settingsIndex <= 2)
         {
-            PunchCurrentRowArrow(1);
-            AdjustSettingsValue(1);
+            bool leftHeld = Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A);
+            bool rightHeld = Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D);
+            int holdDir = (leftHeld && !rightHeld) ? -1 : ((rightHeld && !leftHeld) ? 1 : 0);
+
+            if (holdDir != 0 && holdDir == audioHeldDir)
+            {
+                audioRepeatTimer -= Time.unscaledDeltaTime;
+                if (audioRepeatTimer <= 0f)
+                {
+                    PunchCurrentRowArrow(holdDir);
+                    AdjustSettingsValue(holdDir);
+                    audioRepeatTimer = AudioRepeatInterval;
+                }
+            }
+            else
+            {
+                audioHeldDir = holdDir;
+                audioRepeatTimer = AudioRepeatDelay;
+            }
+        }
+        else
+        {
+            audioHeldDir = 0;
         }
 
         // Confirm
@@ -1747,6 +1809,7 @@ public class MainMenuUIController : MonoBehaviour
             {
                 AudioListener.volume = val;
                 PlayerPrefs.SetFloat("MasterVolume", val);
+                UpdateVolumePercentText(masterVolumeText, val);
             });
             AddHoverTrigger(masterVolumeSlider.gameObject, () => SelectSettingsItem(0));
         }
@@ -1756,6 +1819,8 @@ public class MainMenuUIController : MonoBehaviour
             bgmVolumeSlider.onValueChanged.AddListener(val =>
             {
                 PlayerPrefs.SetFloat("BGMVolume", val);
+                if (AudioManager.Instance != null) AudioManager.Instance.UpdateBGMVolume(val);
+                UpdateVolumePercentText(bgmVolumeText, val);
             });
             AddHoverTrigger(bgmVolumeSlider.gameObject, () => SelectSettingsItem(1));
         }
@@ -1765,8 +1830,18 @@ public class MainMenuUIController : MonoBehaviour
             sfxVolumeSlider.onValueChanged.AddListener(val =>
             {
                 PlayerPrefs.SetFloat("SFXVolume", val);
+                if (AudioManager.Instance != null) AudioManager.Instance.UpdateSFXVolume(val);
+                UpdateVolumePercentText(sfxVolumeText, val);
             });
             AddHoverTrigger(sfxVolumeSlider.gameObject, () => SelectSettingsItem(2));
+        }
+    }
+
+    private void UpdateVolumePercentText(TextMeshProUGUI label, float val)
+    {
+        if (label != null)
+        {
+            label.text = $"{Mathf.RoundToInt(val * 100f)}%";
         }
     }
 
@@ -1840,7 +1915,16 @@ public class MainMenuUIController : MonoBehaviour
         if (bgmVolumeSlider != null) bgmVolumeSlider.value = bgm;
         if (sfxVolumeSlider != null) sfxVolumeSlider.value = sfx;
 
+        UpdateVolumePercentText(masterVolumeText, master);
+        UpdateVolumePercentText(bgmVolumeText, bgm);
+        UpdateVolumePercentText(sfxVolumeText, sfx);
+
         AudioListener.volume = master;
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.UpdateBGMVolume(bgm);
+            AudioManager.Instance.UpdateSFXVolume(sfx);
+        }
 
         controllerVibration = PlayerPrefs.GetInt("Controller_Vibration", 1) == 1;
         controllerSensitivity = PlayerPrefs.GetFloat("Controller_Sensitivity", 1.0f);
@@ -1947,17 +2031,23 @@ public class MainMenuUIController : MonoBehaviour
         }
         UpdateCategoryTabsVisuals();
 
+        audioHeldDir = 0;
         if (currentSettingsCategory == 0)
         {
             settingsIndex = 0;
             UpdateSettingsVisuals(true);
         }
-        else
+        else if (currentSettingsCategory == 1)
         {
             controllerNavRowIndex = 0;
             UpdateControllerNavVisuals();
             UpdateControllerCalloutsVisuals();
             UpdateControllerSettingsVisuals();
+        }
+        else if (currentSettingsCategory == 2)
+        {
+            languageNavIndex = LocalizationManager.Instance != null ? (int)LocalizationManager.Instance.CurrentLanguage : 0;
+            UpdateLanguageSettingsVisuals();
         }
     }
 

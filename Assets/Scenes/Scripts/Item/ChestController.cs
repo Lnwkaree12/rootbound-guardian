@@ -190,7 +190,7 @@ public class ChestController : MonoBehaviour
 
     private IEnumerator ChestOpeningCinematicRoutine()
     {
-        // 1. Lock Player Movement for cinematic
+        // 1. Lock Player Movement briefly while opening the chest (no camera zoom)
         if (playerObject == null) playerObject = GameObject.FindGameObjectWithTag("Player") ?? GameObject.Find("Player");
         if (playerController == null && playerObject != null) playerController = playerObject.GetComponentInParent<PlayerController>() ?? playerObject.GetComponentInChildren<PlayerController>();
         if (playerMovement == null && playerObject != null) playerMovement = playerObject.GetComponentInParent<PlayerMovement>() ?? playerObject.GetComponentInChildren<PlayerMovement>();
@@ -199,39 +199,13 @@ public class ChestController : MonoBehaviour
         if (playerController != null) playerController.enabled = false;
         if (playerMovement != null) playerMovement.Move(Vector2.zero);
 
-        // 2. Hide player mesh/renderers during cinematic so player's back doesn't obstruct camera/key
-        Renderer[] playerRenderers = null;
-        if (playerObject != null)
-        {
-            playerRenderers = playerObject.GetComponentsInChildren<Renderer>();
-            foreach (var r in playerRenderers)
-            {
-                if (r != null) r.enabled = false;
-            }
-        }
-
-        // 3. Play Open Sound
+        // 2. Play Open Sound
         if (openSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(openSound);
         }
 
-        // 4. Cache Camera info
-        Camera mainCam = Camera.main ?? FindFirstObjectByType<Camera>();
-        float originalFOV = 60f;
-        Vector3 originalCamLocalPos = new Vector3(0f, 1.13f, -2.36f);
-        Quaternion originalCamLocalRot = Quaternion.Euler(17.36f, 0f, 0f);
-        Transform camTransform = null;
-
-        if (mainCam != null)
-        {
-            originalFOV = mainCam.fieldOfView;
-            camTransform = mainCam.transform;
-            originalCamLocalPos = camTransform.localPosition;
-            originalCamLocalRot = camTransform.localRotation;
-        }
-
-        // 5. Animate Lid Opening
+        // 3. Animate Lid Opening
         float lidDuration = 0.2f;
         float lidElapsed = 0f;
         Quaternion lidTargetRot = lidInitialRot * Quaternion.Euler(lidOpenAngle, 0f, 0f);
@@ -248,7 +222,7 @@ public class ChestController : MonoBehaviour
         }
         if (lidTransform != null) lidTransform.localRotation = lidTargetRot;
 
-        // 6. Activate Key & Radiant Light Burst (แสงจ้าออกมา)
+        // 4. Activate Key / Reward & Radiant Light Burst
         Vector3 keyTargetScale = new Vector3(0.24f, 0.24f, 0.24f);
         Vector3 keyStartScale = new Vector3(0.12f, 0.12f, 0.12f);
         float currentSpinAngle = 0f;
@@ -286,26 +260,16 @@ public class ChestController : MonoBehaviour
             audioSource.PlayOneShot(fanfareSound);
         }
 
-        // 7. Cinematic Close-up Zoom & Key Rising
-        float riseDuration = 1.6f;
+        // 5. Reward Rising & Spinning (keep gameplay camera unchanged)
+        float riseDuration = 0.85f;
         float riseElapsed = 0f;
         Vector3 keyTargetLocalPos = keyInitialLocalPos + Vector3.up * keyRiseHeight;
-
-        Vector3 camStartWorldPos = camTransform != null ? camTransform.position : Vector3.zero;
-        Quaternion camStartWorldRot = camTransform != null ? camTransform.rotation : Quaternion.identity;
-
-        // Calculate close-up world position focusing directly on the rising key hovering above chest
-        Vector3 keyFocusWorldPos = transform.position + Vector3.up * (keyInitialLocalPos.y + keyRiseHeight + 0.1f);
-        Vector3 camCloseUpWorldPos = keyFocusWorldPos + new Vector3(0.7f, 4.5f, -2.5f);
-        Quaternion camCloseUpWorldRot = Quaternion.LookRotation((keyFocusWorldPos - Vector3.up * 0.1f) - camCloseUpWorldPos);
-        float closeUpFOV = 48f;
 
         while (riseElapsed < riseDuration)
         {
             riseElapsed += Time.deltaTime;
             float t = Mathf.SmoothStep(0f, 1f, riseElapsed / riseDuration);
 
-            // Key rises up, scales into full view and spins upright
             if (keyTransform != null)
             {
                 currentSpinAngle += keySpinSpeed * Time.deltaTime;
@@ -314,49 +278,16 @@ public class ChestController : MonoBehaviour
                 keyTransform.localRotation = Quaternion.Euler(0f, currentSpinAngle, keyZRot);
             }
 
-            // Camera smoothly glides into dramatic Close-Up
-            if (mainCam != null)
-            {
-                mainCam.fieldOfView = Mathf.Lerp(originalFOV, closeUpFOV, t);
-                camTransform.position = Vector3.Lerp(camStartWorldPos, camCloseUpWorldPos, t);
-                camTransform.rotation = Quaternion.Slerp(camStartWorldRot, camCloseUpWorldRot, t);
-            }
-
-            // Light flares up brightly (แสงจ้าออกมา)
             if (radiantLight != null)
             {
                 float lightCurve = Mathf.Sin(t * Mathf.PI);
-                radiantLight.intensity = Mathf.Lerp(0f, 6.0f, lightCurve);
+                radiantLight.intensity = Mathf.Lerp(0f, 5.0f, lightCurve);
             }
 
             yield return null;
         }
 
-        // 8. Majestic Hover Pause while Key Shines in Close-up
-        float hoverDuration = 1.2f;
-        float hoverElapsed = 0f;
-
-        while (hoverElapsed < hoverDuration)
-        {
-            hoverElapsed += Time.deltaTime;
-
-            if (keyTransform != null)
-            {
-                currentSpinAngle += keySpinSpeed * 1.2f * Time.deltaTime;
-                float bob = Mathf.Sin(Time.time * 4f) * 0.02f;
-                keyTransform.localPosition = keyTargetLocalPos + new Vector3(0f, bob, 0f);
-                keyTransform.localRotation = Quaternion.Euler(0f, currentSpinAngle, keyZRot);
-            }
-
-            if (radiantLight != null)
-            {
-                radiantLight.intensity = 4.0f + Mathf.Sin(Time.time * 8f) * 1.2f;
-            }
-
-            yield return null;
-        }
-
-        // 9. Award the configured item; fall back to the legacy quest key when unset.
+        // 6. Award the configured item; fall back to the legacy quest key when unset.
         if (rewardItem != null && playerInventory != null)
         {
             if (!playerInventory.AddItem(rewardItem))
@@ -373,8 +304,8 @@ public class ChestController : MonoBehaviour
             Debug.LogWarning("[ChestController] Player Inventory was not found; chest reward was not added.");
         }
 
-        // 10. Camera Return & Key Disperse
-        float returnDuration = 0.9f;
+        // 7. Reward Scales Down & Disperse
+        float returnDuration = 0.35f;
         float returnElapsed = 0f;
 
         while (returnElapsed < returnDuration)
@@ -382,39 +313,19 @@ public class ChestController : MonoBehaviour
             returnElapsed += Time.deltaTime;
             float t = Mathf.SmoothStep(0f, 1f, returnElapsed / returnDuration);
 
-            // Camera smoothly returns back to original gameplay view
-            if (mainCam != null)
-            {
-                mainCam.fieldOfView = Mathf.Lerp(closeUpFOV, originalFOV, t);
-                Vector3 targetOrigWorldPos = camTransform.parent != null ? camTransform.parent.TransformPoint(originalCamLocalPos) : camStartWorldPos;
-                Quaternion targetOrigWorldRot = camTransform.parent != null ? camTransform.parent.rotation * originalCamLocalRot : camStartWorldRot;
-                camTransform.position = Vector3.Lerp(camCloseUpWorldPos, targetOrigWorldPos, t);
-                camTransform.rotation = Quaternion.Slerp(camCloseUpWorldRot, targetOrigWorldRot, t);
-            }
-
-            // Key scales down into player/inventory
             if (keyTransform != null)
             {
                 currentSpinAngle += keySpinSpeed * 1.5f * Time.deltaTime;
                 keyTransform.localScale = Vector3.Lerp(keyTargetScale, Vector3.zero, t);
-                keyTransform.localRotation = Quaternion.Euler(0f, currentSpinAngle, -90f);
+                keyTransform.localRotation = Quaternion.Euler(0f, currentSpinAngle, keyZRot);
             }
 
-            // Light dims down
             if (radiantLight != null)
             {
-                radiantLight.intensity = Mathf.Lerp(4.0f, 0f, t);
+                radiantLight.intensity = Mathf.Lerp(3.5f, 0f, t);
             }
 
             yield return null;
-        }
-
-        // Finalize camera and restore exact original local transform
-        if (mainCam != null)
-        {
-            mainCam.fieldOfView = originalFOV;
-            camTransform.localPosition = originalCamLocalPos;
-            camTransform.localRotation = originalCamLocalRot;
         }
 
         if (radiantLight != null) radiantLight.enabled = false;
@@ -424,18 +335,10 @@ public class ChestController : MonoBehaviour
             keyTransform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
         }
 
-        // 11. Restore Player Visibility & Unlock Movement
-        if (playerRenderers != null)
-        {
-            foreach (var r in playerRenderers)
-            {
-                if (r != null) r.enabled = true;
-            }
-        }
-
+        // 8. Unlock Player Movement
         if (playerController != null) playerController.enabled = true;
 
-        Debug.Log("[ChestController] Chest opening cinematic complete! Camera returned to original angle.");
+        Debug.Log("[ChestController] Chest opening complete (no camera zoom).");
     }
 
     private void OnValidate()

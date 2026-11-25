@@ -176,12 +176,7 @@ public class GameOverUIManager : MonoBehaviour
                 };
             }
 
-            Navigation nav = new Navigation();
-            nav.mode = Navigation.Mode.Explicit;
-            int prev = (i - 1 + actionButtons.Length) % actionButtons.Length;
-            int next = (i + 1) % actionButtons.Length;
-            nav.selectOnLeft = actionButtons[prev];
-            nav.selectOnRight = actionButtons[next];
+            Navigation nav = new Navigation { mode = Navigation.Mode.None };
             btn.navigation = nav;
         }
     }
@@ -228,7 +223,11 @@ public class GameOverUIManager : MonoBehaviour
             Button btn = actionButtons[currentButtonIndex];
             if (btn != null && btn.interactable)
             {
-                btn.onClick.Invoke();
+                if (UnityEngine.EventSystems.EventSystem.current == null ||
+                    UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject != btn.gameObject)
+                {
+                    btn.onClick.Invoke();
+                }
             }
         }
     }

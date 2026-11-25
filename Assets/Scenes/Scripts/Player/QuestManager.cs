@@ -13,6 +13,7 @@ public class QuestManager : MonoBehaviour
     [Header("Quest Progress")]
     public bool hasKey = false;
     private bool doorUnlocked = false;
+    private bool questHiddenAfterSave = false;
 
     private static QuestManager instance;
     public static QuestManager Instance => instance;
@@ -96,10 +97,28 @@ public class QuestManager : MonoBehaviour
         Debug.Log("[QuestManager] Key collected! Quest Completed.");
     }
 
+    /// <summary>
+    /// ซ่อน Quest UI ทันทีเมื่อผู้เล่นเก็บกุญแจแล้วทำการเซฟที่ต้นไม้จุดเซฟเรียบร้อยแล้ว
+    /// </summary>
+    public void OnCheckpointSaved()
+    {
+        if (hasKey)
+        {
+            questHiddenAfterSave = true;
+            UpdateQuestUI();
+            Debug.Log("[QuestManager] Key collected + Checkpoint saved -> Quest panel hidden.");
+        }
+    }
+
     public void UpdateQuestUI()
     {
         // Ensure references are set
         if (questDescText == null) FindQuestUIReferences();
+
+        if (questPanel != null)
+        {
+            questPanel.SetActive(!(questHiddenAfterSave || doorUnlocked));
+        }
 
         if (questCategoryText != null && LocalizationManager.Instance != null)
         {
@@ -147,6 +166,7 @@ public class QuestManager : MonoBehaviour
     {
         hasKey = keyStatus;
         doorUnlocked = doorStatus;
+        questHiddenAfterSave = keyStatus || doorStatus;
         UpdateQuestUI();
         Debug.Log($"[QuestManager] โหลดสถานะเควสจาก Checkpoint สำเร็จ (HasKey: {hasKey})");
     }

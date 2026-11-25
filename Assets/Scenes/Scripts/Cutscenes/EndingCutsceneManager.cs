@@ -92,12 +92,7 @@ public class EndingCutsceneManager : MonoBehaviour
 
         if (skipButton != null)
         {
-            skipButton.onClick.AddListener(OnSkipClicked);
-            var tmp = skipButton.GetComponentInChildren<TextMeshProUGUI>();
-            if (tmp != null && LocalizationManager.Instance != null)
-            {
-                tmp.text = LocalizationManager.Instance.Get("hint_skip");
-            }
+            skipButton.gameObject.SetActive(false);
         }
 
         if (continuePrompt != null && LocalizationManager.Instance != null)

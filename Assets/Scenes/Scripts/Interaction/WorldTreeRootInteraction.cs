@@ -41,6 +41,13 @@ public class WorldTreeRootInteraction : MonoBehaviour
     [SerializeField] private Color targetShadowColor = new Color(0.23921569f, 0.11764706f, 0.08627451f, 0f); // #3D1E16
     [SerializeField] private float shadowTransitionDuration = 2.4f;
 
+    [Header("Sacred Spring Root Pulse Settings")]
+    [SerializeField] private Color targetBaseColor = new Color(0.36f, 0.21f, 0.13f, 1f);
+    [SerializeField] private Color pulseHighlightColor = new Color(0.54f, 1.0f, 0.62f, 1f);
+    [SerializeField] private Color settledHighlightColor = new Color(0.90f, 0.88f, 0.46f, 1f);
+    [SerializeField] private int lifePulseCount = 3;
+    [SerializeField] private Vector3 rootPulseWorldOffset = new Vector3(10.5f, 4.5f, 0.5f);
+
     [Header("Ascension & Warp Settings")]
     [SerializeField] private float ascendHeight = 18f;
     [SerializeField] private float ascendDuration = 3.8f;
@@ -54,6 +61,7 @@ public class WorldTreeRootInteraction : MonoBehaviour
     [SerializeField] private AudioClip warpWhooshSFX;
     [SerializeField] private GameObject warpVFXPrefab;
     [SerializeField] private GameObject waterSplashVFXPrefab;
+    [SerializeField] private GameObject rootLifePulseVFXPrefab;
     [SerializeField] private Transform waterSplashSpawnPoint;
 
     [Header("Animation")]
@@ -61,6 +69,17 @@ public class WorldTreeRootInteraction : MonoBehaviour
     [SerializeField] private float floatHeight = 0.14f;
     [SerializeField] private float pulseSpeed = 3.5f;
     [SerializeField] private float pulseScale = 0.04f;
+
+    private struct RootMatState
+    {
+        public Material material;
+        public Color shadowColor;
+        public Color baseColor;
+        public Color highlightColor;
+        public float highlightIntensity;
+        public float highlightSize;
+        public float glowSize;
+    }
 
     private Transform playerTransform;
     private GameObject playerRootObject;
@@ -71,6 +90,8 @@ public class WorldTreeRootInteraction : MonoBehaviour
     private bool playerInRange = false;
     private bool isWatered = false;
     private List<Material> dynamicRootMaterials = new List<Material>();
+    private List<RootMatState> initialRootStates = new List<RootMatState>();
+    private Vector3 lastWaterGroundPos;
 
     private void Awake()
     {
@@ -142,6 +163,7 @@ public class WorldTreeRootInteraction : MonoBehaviour
     private void SetupRootMaterials()
     {
         dynamicRootMaterials.Clear();
+        initialRootStates.Clear();
 
         if (rootRenderer == null)
         {
@@ -158,9 +180,19 @@ public class WorldTreeRootInteraction : MonoBehaviour
         {
             foreach (var mat in rootRenderer.materials)
             {
-                if (mat != null && mat.HasProperty(shadowColorProperty))
+                if (mat != null && (mat.HasProperty(shadowColorProperty) || mat.HasProperty("_Base_Color")))
                 {
                     dynamicRootMaterials.Add(mat);
+                    initialRootStates.Add(new RootMatState
+                    {
+                        material = mat,
+                        shadowColor = mat.HasProperty(shadowColorProperty) ? mat.GetColor(shadowColorProperty) : startShadowColor,
+                        baseColor = mat.HasProperty("_Base_Color") ? mat.GetColor("_Base_Color") : Color.black,
+                        highlightColor = mat.HasProperty("_Highlight_Color") ? mat.GetColor("_Highlight_Color") : Color.white,
+                        highlightIntensity = mat.HasProperty("_Highlight_Intensity") ? mat.GetFloat("_Highlight_Intensity") : 1f,
+                        highlightSize = mat.HasProperty("_Highlight_Size") ? mat.GetFloat("_Highlight_Size") : 0.45f,
+                        glowSize = mat.HasProperty("_Glow_Size") ? mat.GetFloat("_Glow_Size") : 0.1f
+                    });
                 }
             }
         }
@@ -172,11 +204,40 @@ public class WorldTreeRootInteraction : MonoBehaviour
 
         foreach (var mat in dynamicRootMaterials)
         {
-            if (mat != null)
+            if (mat != null && mat.HasProperty(shadowColorProperty))
             {
                 mat.SetColor(shadowColorProperty, color);
             }
         }
+    }
+
+    private void RestoreInitialRootMaterials()
+    {
+        foreach (var state in initialRootStates)
+        {
+            Material mat = state.material;
+            if (mat == null) continue;
+            if (mat.HasProperty(shadowColorProperty)) mat.SetColor(shadowColorProperty, startShadowColor);
+            if (mat.HasProperty("_Base_Color")) mat.SetColor("_Base_Color", state.baseColor);
+            if (mat.HasProperty("_Highlight_Color")) mat.SetColor("_Highlight_Color", state.highlightColor);
+            if (mat.HasProperty("_Highlight_Intensity")) mat.SetFloat("_Highlight_Intensity", state.highlightIntensity);
+            if (mat.HasProperty("_Highlight_Size")) mat.SetFloat("_Highlight_Size", state.highlightSize);
+            if (mat.HasProperty("_Glow_Size")) mat.SetFloat("_Glow_Size", state.glowSize);
+        }
+    }
+
+    private Vector3 GetGroundPosition(Vector3 worldPos)
+    {
+        Vector3 rayStart = worldPos + Vector3.up * 4f;
+        RaycastHit[] hits = Physics.RaycastAll(rayStart, Vector3.down, 16f, ~0, QueryTriggerInteraction.Ignore);
+        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        foreach (var hit in hits)
+        {
+            if (hit.collider == null || hit.collider.isTrigger) continue;
+            if (playerRootObject != null && hit.collider.transform.IsChildOf(playerRootObject.transform)) continue;
+            return hit.point + Vector3.up * 0.16f;
+        }
+        return new Vector3(worldPos.x, transform.position.y + 0.16f, worldPos.z);
     }
 
     private void FindPlayer()
@@ -301,15 +362,18 @@ public class WorldTreeRootInteraction : MonoBehaviour
             audioSource.PlayOneShot(waterSFX);
         }
 
-        // Spawn Water VFX on the Root if assigned
+        // Beat 1: Spawn Sacred Spring water pour & expanding floor ripples between player and root base
+        Vector3 waterTargetPos = (waterSplashSpawnPoint != null) ? waterSplashSpawnPoint.position : (transform.position + Vector3.right * 3f);
+        Vector3 playerPos = (playerTransform != null) ? playerTransform.position : transform.position;
+        lastWaterGroundPos = GetGroundPosition(Vector3.Lerp(playerPos, waterTargetPos, 0.40f));
+
         if (waterSplashVFXPrefab != null)
         {
-            Vector3 spawnPos = (waterSplashSpawnPoint != null) ? waterSplashSpawnPoint.position : (transform.position + Vector3.up * 1.5f);
-            GameObject vfx = Instantiate(waterSplashVFXPrefab, spawnPos, Quaternion.identity);
-            Destroy(vfx, 6.0f);
+            GameObject vfx = Instantiate(waterSplashVFXPrefab, lastWaterGroundPos, Quaternion.identity);
+            Destroy(vfx, 7.5f);
         }
 
-        // Start the Sequence: 1. Transition Shadow Color, THEN 2. Trigger Warp & Ascension
+        // Start the Sequence: Beat 2 (Root Life Pulse), THEN Beat 3 (Sacred Spring Ascension)
         StartCoroutine(RootRevivalAndAscensionSequence());
     }
 
@@ -364,10 +428,36 @@ public class WorldTreeRootInteraction : MonoBehaviour
     private IEnumerator RootRevivalAndAscensionSequence()
     {
         // -------------------------------------------------------------
-        // STEP 1: Gradually change Shadow Color from 1B0E0A to 3D1E16
+        // BEAT 2: Sacred Spring Pool Light + 3 Heartbeat Life Pulses + Traveling Root Light
         // -------------------------------------------------------------
-        Debug.Log("[WorldTreeRootInteraction] Step 1: Smoothly transitioning Shadow Color from #1B0E0A to #3D1E16...");
+        Debug.Log("[WorldTreeRootInteraction] Beat 2: Playing Sacred Spring Life Pulse along Coral_Giant_Roots...");
+
+        GameObject poolLightObj = new GameObject("SacredSpringPoolLight");
+        poolLightObj.transform.position = lastWaterGroundPos + Vector3.up * 1.4f;
+        Light poolLight = poolLightObj.AddComponent<Light>();
+        poolLight.type = LightType.Point;
+        poolLight.color = new Color(0.37f, 0.92f, 1.0f);
+        poolLight.range = 18f;
+        poolLight.intensity = 0f;
+
+        if (rootLifePulseVFXPrefab != null)
+        {
+            GameObject pulseVfx = Instantiate(rootLifePulseVFXPrefab, transform.position + rootPulseWorldOffset, Quaternion.identity);
+            Destroy(pulseVfx, 10.0f);
+        }
+
+        GameObject rootLightObj = new GameObject("RootPulseTravelLight");
+        Vector3 lightStart = transform.position + new Vector3(1.5f, 1.5f, -1.5f);
+        Vector3 lightEnd = transform.position + new Vector3(23f, 13.5f, 2.0f);
+        rootLightObj.transform.position = lightStart;
+        Light rootLight = rootLightObj.AddComponent<Light>();
+        rootLight.type = LightType.Point;
+        rootLight.color = new Color(0.41f, 1.0f, 0.61f);
+        rootLight.range = 28f;
+        rootLight.intensity = 2.0f;
+
         float shadowElapsed = 0f;
+        int pulses = Mathf.Max(1, lifePulseCount);
 
         while (shadowElapsed < shadowTransitionDuration)
         {
@@ -375,22 +465,89 @@ public class WorldTreeRootInteraction : MonoBehaviour
             float t = Mathf.Clamp01(shadowElapsed / shadowTransitionDuration);
             float smoothT = Mathf.SmoothStep(0f, 1f, t);
 
-            Color currentShadowColor = Color.Lerp(startShadowColor, targetShadowColor, smoothT);
-            ApplyShadowColor(currentShadowColor);
+            float pulsePhase = t * pulses;
+            float localPulse = pulsePhase - Mathf.Floor(pulsePhase);
+            float pulseBell = Mathf.Sin(localPulse * Mathf.PI);
+            pulseBell = pulseBell * pulseBell;
+            float weightedBell = pulseBell * (0.65f + 0.35f * t);
+
+            if (poolLight != null)
+            {
+                poolLight.color = Color.Lerp(new Color(0.37f, 0.92f, 1.0f), new Color(0.49f, 1.0f, 0.66f), smoothT);
+                poolLight.intensity = (t < 0.45f)
+                    ? Mathf.Lerp(0f, 5.5f, Mathf.Clamp01(t / 0.45f))
+                    : Mathf.Lerp(5.5f, 3.2f, Mathf.Clamp01((t - 0.45f) / 0.55f));
+            }
+
+            if (rootLight != null)
+            {
+                float travelT = Mathf.SmoothStep(0f, 1f, localPulse);
+                rootLightObj.transform.position = Vector3.Lerp(lightStart, lightEnd, travelT);
+                rootLight.intensity = Mathf.Lerp(2.0f, 9.5f, pulseBell * (0.7f + 0.3f * t));
+            }
+
+            for (int i = 0; i < initialRootStates.Count; i++)
+            {
+                RootMatState st = initialRootStates[i];
+                Material mat = st.material;
+                if (mat == null) continue;
+
+                if (mat.HasProperty(shadowColorProperty))
+                {
+                    mat.SetColor(shadowColorProperty, Color.Lerp(startShadowColor, targetShadowColor, smoothT));
+                }
+                if (mat.HasProperty("_Base_Color"))
+                {
+                    mat.SetColor("_Base_Color", Color.Lerp(st.baseColor, targetBaseColor, smoothT));
+                }
+                if (mat.HasProperty("_Highlight_Color"))
+                {
+                    Color baseHighlight = Color.Lerp(st.highlightColor, settledHighlightColor, smoothT);
+                    mat.SetColor("_Highlight_Color", Color.Lerp(baseHighlight, pulseHighlightColor, weightedBell * 0.72f));
+                }
+                if (mat.HasProperty("_Glow_Size"))
+                {
+                    mat.SetFloat("_Glow_Size", Mathf.Lerp(st.glowSize, 0.30f, smoothT) + weightedBell * 0.12f);
+                }
+                if (mat.HasProperty("_Highlight_Size"))
+                {
+                    mat.SetFloat("_Highlight_Size", Mathf.Lerp(st.highlightSize, 0.52f, smoothT) + weightedBell * 0.08f);
+                }
+                if (mat.HasProperty("_Highlight_Intensity"))
+                {
+                    mat.SetFloat("_Highlight_Intensity", Mathf.Lerp(st.highlightIntensity, 1.08f, smoothT) + weightedBell * 0.22f);
+                }
+            }
 
             yield return null;
         }
 
-        ApplyShadowColor(targetShadowColor);
-        Debug.Log("[WorldTreeRootInteraction] Step 1 Complete: Shadow Color is now #3D1E16!");
+        for (int i = 0; i < initialRootStates.Count; i++)
+        {
+            Material mat = initialRootStates[i].material;
+            if (mat == null) continue;
+            if (mat.HasProperty(shadowColorProperty)) mat.SetColor(shadowColorProperty, targetShadowColor);
+            if (mat.HasProperty("_Base_Color")) mat.SetColor("_Base_Color", targetBaseColor);
+            if (mat.HasProperty("_Highlight_Color")) mat.SetColor("_Highlight_Color", settledHighlightColor);
+            if (mat.HasProperty("_Glow_Size")) mat.SetFloat("_Glow_Size", 0.36f);
+            if (mat.HasProperty("_Highlight_Size")) mat.SetFloat("_Highlight_Size", 0.56f);
+            if (mat.HasProperty("_Highlight_Intensity")) mat.SetFloat("_Highlight_Intensity", 1.18f);
+        }
+
+        if (rootLight != null)
+        {
+            rootLightObj.transform.position = Vector3.Lerp(lightStart, lightEnd, 0.5f);
+            rootLight.intensity = 5.5f;
+        }
+        Debug.Log("[WorldTreeRootInteraction] Beat 2 Complete: Giant root awakened!");
 
         // Brief dramatic pause (0.25s) before ascension begins
         yield return new WaitForSeconds(0.25f);
 
         // -------------------------------------------------------------
-        // STEP 2: Play Warp VFX & Pull Player Upwards ("หลังจากเปลี่ยนเสร็จค่อยเล่น vfx ให้ player ลอยขึ้นไป")
+        // BEAT 3: Sacred Spring Ascension VFX & Pull Player Upwards
         // -------------------------------------------------------------
-        Debug.Log("[WorldTreeRootInteraction] Step 2: Triggering Warp VFX and pulling Player upwards...");
+        Debug.Log("[WorldTreeRootInteraction] Beat 3: Triggering Sacred Spring Ascension VFX and pulling Player upwards...");
 
         // Play SFX
         if (audioSource != null)
@@ -399,10 +556,10 @@ public class WorldTreeRootInteraction : MonoBehaviour
             if (warpWhooshSFX != null) audioSource.PlayOneShot(warpWhooshSFX);
         }
 
-        // Spawn Warp VFX at player position
+        // Spawn Ascension VFX at true ground beneath player's feet
         if (warpVFXPrefab != null && playerTransform != null)
         {
-            Vector3 groundVFXPos = playerTransform.position;
+            Vector3 groundVFXPos = GetGroundPosition(playerTransform.position);
             GameObject warpInstance = Instantiate(warpVFXPrefab, groundVFXPos, Quaternion.identity);
             Destroy(warpInstance, 10.0f);
         }
@@ -432,15 +589,15 @@ public class WorldTreeRootInteraction : MonoBehaviour
             mainCamera.transform.SetParent(null, true);
         }
 
-        // Attach dynamic ascending celestial point light on player
+        // Attach dynamic ascending soft mint-gold point light on player
         GameObject ascendLightObj = new GameObject("AscensionGlowLight");
         ascendLightObj.transform.SetParent(playerTransform);
         ascendLightObj.transform.localPosition = new Vector3(0f, 1f, 0f);
         Light ascendLight = ascendLightObj.AddComponent<Light>();
         ascendLight.type = LightType.Point;
-        ascendLight.color = new Color(0.48f, 1.0f, 0.78f);
-        ascendLight.range = 14f;
-        ascendLight.intensity = 2f;
+        ascendLight.color = new Color(0.66f, 1.0f, 0.78f);
+        ascendLight.range = 12f;
+        ascendLight.intensity = 2.0f;
 
         // Screen fade overlay Canvas
         GameObject fadeCanvasObj = new GameObject("Ascension_ScreenFade_Canvas");
@@ -454,7 +611,7 @@ public class WorldTreeRootInteraction : MonoBehaviour
         GameObject fadeImageObj = new GameObject("FadeImage");
         fadeImageObj.transform.SetParent(fadeCanvasObj.transform, false);
         Image fadeImage = fadeImageObj.AddComponent<Image>();
-        fadeImage.color = new Color(0.95f, 1.0f, 0.96f, 1.0f);
+        fadeImage.color = new Color(0.97f, 1.0f, 0.94f, 1.0f);
         RectTransform rt = fadeImage.rectTransform;
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;
@@ -482,8 +639,8 @@ public class WorldTreeRootInteraction : MonoBehaviour
 
             if (ascendLight != null)
             {
-                ascendLight.intensity = Mathf.Lerp(2.5f, 11f, t);
-                ascendLight.range = Mathf.Lerp(12f, 22f, t);
+                ascendLight.intensity = Mathf.Lerp(2.0f, 7.5f, t);
+                ascendLight.range = Mathf.Lerp(12f, 20f, t);
             }
 
             if (mainCamera != null && playerTransform != null)
@@ -510,7 +667,7 @@ public class WorldTreeRootInteraction : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         // -------------------------------------------------------------
-        // STEP 3: Transition to EndScene ("พร้อมไปที่ฉาก Endscene")
+        // Transition to EndScene ("พร้อมไปที่ฉาก Endscene")
         // -------------------------------------------------------------
         if (transitionToEndScene && !string.IsNullOrEmpty(endSceneName))
         {
@@ -521,13 +678,13 @@ public class WorldTreeRootInteraction : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Reset Shadow Color to 1B0E0A when exiting/destroying
-        ApplyShadowColor(startShadowColor);
+        // Restore all initial root material properties when exiting/destroying
+        RestoreInitialRootMaterials();
     }
 
     private void OnApplicationQuit()
     {
-        ApplyShadowColor(startShadowColor);
+        RestoreInitialRootMaterials();
     }
 
     private void OnDrawGizmosSelected()

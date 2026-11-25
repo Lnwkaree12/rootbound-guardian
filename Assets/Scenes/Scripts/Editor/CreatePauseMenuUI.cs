@@ -119,7 +119,7 @@ public static class CreatePauseMenuUI
         // 5. Header Texts
         TextMeshProUGUI badgeTMP = CreateTMP("BadgeText", innerCardGO.transform,
             new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
-            new Vector2(0f, -18f), new Vector2(560f, 28f),
+            new Vector2(0f, -54f), new Vector2(560f, 28f),
             titleFont, "P A U S E D", 20f, FontStyles.Bold, SectionHeaderGold, TextAlignmentOptions.Center);
         Shadow badgeShadow = badgeTMP.gameObject.AddComponent<Shadow>();
         badgeShadow.effectColor = new Color(0.14f, 0.08f, 0.04f, 0.9f);

@@ -53,6 +53,14 @@ public class PauseMenuController : MonoBehaviour
 
     private Button[] actionButtons;
     private int currentButtonIndex = 0;
+    private int selectedRow = 3; // 0=Master, 1=BGM, 2=SFX, 3=Bottom Buttons
+    private int heldHorizDir = 0;
+    private float horizRepeatTimer = 0f;
+    private const float RepeatInitialDelay = 0.32f;
+    private const float RepeatInterval = 0.06f;
+
+    private static readonly Color DefaultInkColor = new Color(0.259f, 0.165f, 0.106f, 1f);
+    private static readonly Color HighlightInkColor = new Color(0.68f, 0.28f, 0.04f, 1f);
 
     private readonly Dictionary<AudioSource, float> initialSourceVolumes = new Dictionary<AudioSource, float>();
 
@@ -153,32 +161,195 @@ public class PauseMenuController : MonoBehaviour
                 return;
             }
 
-            // เลื่อนปุ่มเมนูด้วยปุ่มทิศทางหรือ Tab
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+            // เลื่อนขึ้น/ลงระหว่างแถวเสียง (Master/BGM/SFX) กับแถวปุ่มด้านล่าง
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
-                Navigate(-1);
+                MoveRow(-1);
             }
-            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
-                Navigate(1);
+                MoveRow(1);
             }
             else if (Input.GetKeyDown(KeyCode.Tab))
             {
                 int dir = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ? -1 : 1;
-                Navigate(dir);
+                if (selectedRow < 3) MoveRow(dir);
+                else Navigate(dir);
             }
 
-            // กดยืนยันปุ่มที่เลือกอยู่
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+            if (selectedRow < 3)
             {
-                SubmitSelectedButton();
+                HandleSliderRowKeyboard();
+
+                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space))
+                {
+                    MoveRow(1);
+                }
+            }
+            else
+            {
+                heldHorizDir = 0;
+                // เลื่อนปุ่มเมนูด้วยปุ่มทิศทาง A/D หรือ Left/Right
+                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+                {
+                    Navigate(-1);
+                }
+                else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+                {
+                    Navigate(1);
+                }
+
+                // กดยืนยันปุ่มที่เลือกอยู่
+                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+                {
+                    SubmitSelectedButton();
+                }
             }
         }
         else
         {
+            heldHorizDir = 0;
             if (Input.GetKeyDown(pauseKey))
             {
                 Pause();
+            }
+        }
+    }
+
+    private void HandleSliderRowKeyboard()
+    {
+        int pressDir = 0;
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) pressDir = -1;
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) pressDir = 1;
+
+        if (pressDir != 0)
+        {
+            AdjustSelectedSlider(pressDir);
+            heldHorizDir = pressDir;
+            horizRepeatTimer = RepeatInitialDelay;
+            return;
+        }
+
+        bool leftHeld = Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A);
+        bool rightHeld = Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D);
+        int holdDir = (leftHeld && !rightHeld) ? -1 : ((rightHeld && !leftHeld) ? 1 : 0);
+
+        if (holdDir == 0 || holdDir != heldHorizDir)
+        {
+            heldHorizDir = holdDir;
+            horizRepeatTimer = RepeatInitialDelay;
+            return;
+        }
+
+        horizRepeatTimer -= Time.unscaledDeltaTime;
+        if (horizRepeatTimer <= 0f)
+        {
+            AdjustSelectedSlider(holdDir);
+            horizRepeatTimer = RepeatInterval;
+        }
+    }
+
+    private void AdjustSelectedSlider(int direction)
+    {
+        Slider target = selectedRow == 0 ? masterVolumeSlider : (selectedRow == 1 ? bgmVolumeSlider : sfxVolumeSlider);
+        if (target == null) return;
+        target.value = Mathf.Clamp(target.value + direction * SliderStepAmount, target.minValue, target.maxValue);
+        PlayAudio(proceduralNavClip);
+    }
+
+    private void MoveRow(int direction)
+    {
+        selectedRow = (selectedRow + direction + 4) % 4;
+        heldHorizDir = 0;
+        SelectRow(selectedRow, true);
+    }
+
+    private void SelectRow(int row, bool playSound)
+    {
+        selectedRow = Mathf.Clamp(row, 0, 3);
+        UpdateSliderRowsVisuals();
+
+        if (selectedRow == 3)
+        {
+            SelectButton(currentButtonIndex, playSound);
+        }
+        else
+        {
+            if (actionButtons != null)
+            {
+                for (int i = 0; i < actionButtons.Length; i++)
+                {
+                    if (actionButtons[i] == null) continue;
+                    var juicy = actionButtons[i].GetComponent<UIJuicyButton>();
+                    if (juicy != null) juicy.TriggerVisualSelection(false);
+                }
+            }
+            if (UnityEngine.EventSystems.EventSystem.current != null)
+            {
+                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+            }
+            if (playSound) PlayAudio(proceduralNavClip);
+        }
+    }
+
+    private void UpdateSliderRowsVisuals()
+    {
+        Transform audioSection = FindAudioSettingsSection();
+        if (audioSection == null) return;
+
+        string[] rowNames = { "MasterRow", "BgmRow", "SfxRow" };
+        for (int i = 0; i < rowNames.Length; i++)
+        {
+            Transform row = audioSection.Find(rowNames[i]);
+            if (row == null) continue;
+            bool active = (selectedRow == i);
+
+            Transform lbl = row.Find("Label");
+            if (lbl != null)
+            {
+                lbl.localScale = Vector3.one * (active ? 1.08f : 1.0f);
+                var tmp = lbl.GetComponent<TextMeshProUGUI>();
+                if (tmp != null) tmp.color = active ? HighlightInkColor : DefaultInkColor;
+            }
+
+            Transform val = row.Find("ValueText");
+            if (val != null)
+            {
+                var tmp = val.GetComponent<TextMeshProUGUI>();
+                if (tmp != null) tmp.color = active ? HighlightInkColor : DefaultInkColor;
+            }
+
+            Transform handle = row.Find("Slider/Handle Slide Area/Handle");
+            if (handle != null)
+            {
+                handle.localScale = Vector3.one * (active ? 1.24f : 1.0f);
+            }
+
+            foreach (string arrowName in new[] { "ArrowLeft", "ArrowRight" })
+            {
+                Transform arrow = row.Find(arrowName);
+                if (arrow == null) continue;
+                float dirX = arrowName == "ArrowLeft" ? -1f : 1f;
+                float scaleFactor = active ? 1.18f : 1.0f;
+                Color iconColor = active ? new Color(1.12f, 0.92f, 0.55f, 1f) : Color.white;
+
+                Transform iconTf = arrow.Find("Icon");
+                if (iconTf != null)
+                {
+                    arrow.localScale = Vector3.one;
+                    var hitImg = arrow.GetComponent<Image>();
+                    if (hitImg != null) hitImg.color = new Color(1f, 1f, 1f, 0f);
+
+                    var iconImg = iconTf.GetComponent<Image>();
+                    if (iconImg != null) iconImg.color = iconColor;
+                    iconTf.localScale = new Vector3(dirX, 1f, 1f) * scaleFactor;
+                }
+                else
+                {
+                    var img = arrow.GetComponent<Image>();
+                    if (img != null && img.sprite != null) img.color = iconColor;
+                    arrow.localScale = new Vector3(dirX, 1f, 1f) * scaleFactor;
+                }
             }
         }
     }
@@ -225,7 +396,9 @@ public class PauseMenuController : MonoBehaviour
             pauseCanvasGroup.blocksRaycasts = true;
         }
 
-        SelectButton(0, false);
+        currentButtonIndex = 0;
+        selectedRow = 3;
+        SelectRow(3, false);
         PlayAudio(pauseClip != null ? pauseClip : proceduralPauseClip);
     }
 
@@ -244,17 +417,39 @@ public class PauseMenuController : MonoBehaviour
             {
                 juicy.onHoverOrSelect = (jb) =>
                 {
+                    selectedRow = 3;
                     currentButtonIndex = index;
+                    UpdateSliderRowsVisuals();
                 };
             }
 
-            Navigation nav = new Navigation();
-            nav.mode = Navigation.Mode.Explicit;
-            int prev = (i - 1 + actionButtons.Length) % actionButtons.Length;
-            int next = (i + 1) % actionButtons.Length;
-            nav.selectOnLeft = actionButtons[prev];
-            nav.selectOnRight = actionButtons[next];
+            Navigation nav = new Navigation { mode = Navigation.Mode.None };
             btn.navigation = nav;
+        }
+
+        Slider[] sliders = { masterVolumeSlider, bgmVolumeSlider, sfxVolumeSlider };
+        for (int i = 0; i < sliders.Length; i++)
+        {
+            if (sliders[i] == null) continue;
+            sliders[i].navigation = new Navigation { mode = Navigation.Mode.None };
+        }
+
+        Transform audioSection = FindAudioSettingsSection();
+        if (audioSection != null)
+        {
+            string[] rowNames = { "MasterRow", "BgmRow", "SfxRow" };
+            for (int r = 0; r < rowNames.Length; r++)
+            {
+                Transform row = audioSection.Find(rowNames[r]);
+                if (row == null) continue;
+                int rowIdx = r;
+                var trigger = row.gameObject.GetComponent<UnityEngine.EventSystems.EventTrigger>();
+                if (trigger == null) trigger = row.gameObject.AddComponent<UnityEngine.EventSystems.EventTrigger>();
+                trigger.triggers.Clear();
+                var entry = new UnityEngine.EventSystems.EventTrigger.Entry { eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter };
+                entry.callback.AddListener(_ => { if (selectedRow != rowIdx) SelectRow(rowIdx, false); });
+                trigger.triggers.Add(entry);
+            }
         }
     }
 
@@ -300,7 +495,11 @@ public class PauseMenuController : MonoBehaviour
             Button btn = actionButtons[currentButtonIndex];
             if (btn != null && btn.interactable)
             {
-                btn.onClick.Invoke();
+                if (UnityEngine.EventSystems.EventSystem.current == null ||
+                    UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject != btn.gameObject)
+                {
+                    btn.onClick.Invoke();
+                }
             }
         }
     }

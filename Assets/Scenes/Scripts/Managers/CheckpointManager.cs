@@ -195,6 +195,7 @@ public class CheckpointManager : MonoBehaviour
         if (QuestManager.Instance != null)
         {
             savedHasKey = QuestManager.Instance.hasKey;
+            QuestManager.Instance.OnCheckpointSaved();
         }
 
         // 2. บันทึกของในกระเป๋า

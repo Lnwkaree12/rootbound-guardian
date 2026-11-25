@@ -84,12 +84,7 @@ public class OpeningCutsceneManager : MonoBehaviour
 
         if (skipButton != null)
         {
-            skipButton.onClick.AddListener(OnSkipClicked);
-            var tmp = skipButton.GetComponentInChildren<TextMeshProUGUI>();
-            if (tmp != null && LocalizationManager.Instance != null)
-            {
-                tmp.text = LocalizationManager.Instance.Get("hint_skip");
-            }
+            skipButton.gameObject.SetActive(false);
         }
 
         if (continuePrompt != null && LocalizationManager.Instance != null)
@@ -126,13 +121,6 @@ public class OpeningCutsceneManager : MonoBehaviour
     private void Update()
     {
         if (isSkipping) return;
-
-        // Skip hotkeys
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab))
-        {
-            OnSkipClicked();
-            return;
-        }
 
         // Advance or skip typing: Space, Enter, E, or Left Mouse Click
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) ||
@@ -201,11 +189,30 @@ public class OpeningCutsceneManager : MonoBehaviour
             continuePrompt.SetActive(false);
         }
 
-        // Run Typewriter Effect for narrative text
-        string textToType = LocalizationManager.Instance != null
-            ? LocalizationManager.Instance.GetOpeningCutsceneSlide(index)
-            : slide.subtitleText;
-        yield return StartCoroutine(TypewriterRoutine(textToType));
+        // Run Typewriter Effect for narrative text (skip when slide has no caption)
+        string textToType = string.IsNullOrWhiteSpace(slide.subtitleText)
+            ? string.Empty
+            : (LocalizationManager.Instance != null
+                ? LocalizationManager.Instance.GetOpeningCutsceneSlide(index)
+                : slide.subtitleText);
+
+        bool hasCaption = !string.IsNullOrEmpty(textToType);
+        if (subtitleTMP != null)
+        {
+            if (subtitleTMP.transform.parent != null && subtitleTMP.transform.parent.GetComponent<Canvas>() == null)
+            {
+                subtitleTMP.transform.parent.gameObject.SetActive(hasCaption);
+            }
+            if (!hasCaption)
+            {
+                subtitleTMP.text = string.Empty;
+            }
+        }
+
+        if (hasCaption)
+        {
+            yield return StartCoroutine(TypewriterRoutine(textToType));
+        }
 
         // Typing finished, show continue prompt
         if (continuePrompt != null)

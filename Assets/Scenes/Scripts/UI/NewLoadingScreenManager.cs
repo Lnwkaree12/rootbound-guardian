@@ -37,6 +37,7 @@ public class NewLoadingScreenManager : MonoBehaviour
     [SerializeField] private float lumiHoverHeight = 0.12f;
 
     [Header("Lumi Dialogue Lines")]
+    [SerializeField] private bool useStaticObjectiveText = true;
     [SerializeField] private List<string> lumiTips = new List<string>()
     {
         "จำปุ่มควบคุมพวกนี้ไว้ให้ดีนะเจ้ามนุษย์! ข้าจะคอยส่องทางให้เจ้าในดันเจี้ยนเอง ฮิๆ~",
@@ -117,6 +118,11 @@ public class NewLoadingScreenManager : MonoBehaviour
             if (tmp != null) tmp.text = LocalizationManager.Instance.Get("load_guide_tag");
         }
 
+        if (useStaticObjectiveText && lumiDialogueTMP != null)
+        {
+            lumiDialogueTMP.text = LocalizationManager.Instance.Get("load_goal_body");
+        }
+
         // Header controls
         GameObject headerObj = GameObject.Find("Header_Text");
         if (headerObj != null)
@@ -125,16 +131,14 @@ public class NewLoadingScreenManager : MonoBehaviour
             if (tmp != null) tmp.text = LocalizationManager.Instance.Get("load_header_controls");
         }
 
-        // Rows 1-7
+        // Rows 1-5 (Objectives & Guide)
         string[] rowKeys = new string[]
         {
-            "load_row_move",
-            "load_row_dash",
-            "load_row_trap",
-            "load_row_chest",
-            "load_row_oxygen_save",
-            "load_row_oxygen_limit",
-            "load_row_climb"
+            "load_row_goal_1",
+            "load_row_goal_2",
+            "load_row_goal_3",
+            "load_row_goal_4",
+            "load_row_goal_5"
         };
 
         for (int i = 0; i < rowKeys.Length; i++)
@@ -169,8 +173,8 @@ public class NewLoadingScreenManager : MonoBehaviour
             StartCoroutine(FadeAudio(bgmSource, maxBgmVolume, 1.5f));
         }
 
-        // Start tip rotation
-        if (lumiDialogueTMP != null && lumiTips.Count > 0)
+        // Start tip rotation only when not using static game objective explanation
+        if (!useStaticObjectiveText && lumiDialogueTMP != null && lumiTips.Count > 0)
         {
             tipCycleRoutine = StartCoroutine(CycleLumiTips());
         }

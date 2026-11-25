@@ -53,11 +53,24 @@ public class TreeSavePoint : MonoBehaviour
     private Inventory playerInventory;
     private Coroutine treeDecayRoutine;
 
+    // Stylized leafy canopy & golden bloom glow references
+    private Transform canopyVisualTransform;
+    private Transform glowBudsTransform;
+    private GameObject bloomAuraObj;
+    private Light bloomPointLight;
+    private Coroutine canopyBloomRoutine;
+    private Vector3 canopyBaseScale = Vector3.one;
+    private Vector3 glowBudsBaseScale = Vector3.one;
+    private Vector3 auraBaseScale = Vector3.one;
+    private float baseBloomLightIntensity = 3.8f;
+    private bool baseBloomCached = false;
+
     private void Awake()
     {
         currentTreeHealth = maxTreeHealth;
         FindVFXReferences();
         FindVisualReferences();
+        EnsureCooldownCanvasAlwaysOnTop();
         UpdateTreeHealthUI();
     }
 
@@ -65,8 +78,33 @@ public class TreeSavePoint : MonoBehaviour
     {
         FindVFXReferences();
         FindVisualReferences();
+        EnsureCooldownCanvasAlwaysOnTop();
         UpdateTreeVisual();
         UpdateTreeHealthUI();
+    }
+
+    private void LateUpdate()
+    {
+        if (!isRestored) return;
+
+        if (bloomAuraObj != null && bloomAuraObj.activeSelf)
+        {
+            Camera cam = Camera.main;
+            if (cam != null)
+            {
+                bloomAuraObj.transform.rotation = cam.transform.rotation;
+            }
+            if (canopyBloomRoutine == null)
+            {
+                float pulse = 1f + Mathf.Sin(Time.time * 2.4f) * 0.045f;
+                bloomAuraObj.transform.localScale = auraBaseScale * pulse;
+            }
+        }
+
+        if (bloomPointLight != null && bloomPointLight.enabled && canopyBloomRoutine == null)
+        {
+            bloomPointLight.intensity = baseBloomLightIntensity + Mathf.Sin(Time.time * 2.8f) * 0.4f;
+        }
     }
 
     private void Update()
@@ -238,6 +276,7 @@ public class TreeSavePoint : MonoBehaviour
 
         SetPromptActive(false);
         UpdateTreeVisual();
+        PlayCanopyBloomAnimation();
         UpdateTreeHealthUI();
         PlayRestoreVFX();
 
@@ -412,14 +451,96 @@ public class TreeSavePoint : MonoBehaviour
 
     private void UpdateTreeVisual()
     {
+        if (!isRestored && canopyBloomRoutine != null)
+        {
+            StopCoroutine(canopyBloomRoutine);
+            canopyBloomRoutine = null;
+        }
+
         if (deadTreeVisual != null) deadTreeVisual.SetActive(!isRestored);
         if (restoredTreeVisual != null) restoredTreeVisual.SetActive(isRestored);
+
+        if (canopyVisualTransform != null && canopyBloomRoutine == null)
+        {
+            canopyVisualTransform.localScale = canopyBaseScale;
+        }
+        if (glowBudsTransform != null && canopyBloomRoutine == null)
+        {
+            glowBudsTransform.localScale = glowBudsBaseScale;
+        }
+        if (bloomAuraObj != null)
+        {
+            bloomAuraObj.SetActive(isRestored);
+            if (canopyBloomRoutine == null) bloomAuraObj.transform.localScale = auraBaseScale;
+        }
+        if (bloomPointLight != null)
+        {
+            bloomPointLight.enabled = isRestored;
+            if (canopyBloomRoutine == null) bloomPointLight.intensity = baseBloomLightIntensity;
+        }
 
         if (ambientFireflies != null)
         {
             ambientFireflies.gameObject.SetActive(isRestored);
             if (isRestored && !ambientFireflies.isPlaying) ambientFireflies.Play(true);
         }
+    }
+
+    private void PlayCanopyBloomAnimation()
+    {
+        FindVisualReferences();
+        if (!Application.isPlaying || !gameObject.activeInHierarchy) return;
+
+        if (canopyBloomRoutine != null) StopCoroutine(canopyBloomRoutine);
+        canopyBloomRoutine = StartCoroutine(CanopyBloomRoutine());
+    }
+
+    private IEnumerator CanopyBloomRoutine()
+    {
+        float duration = 0.55f;
+        float elapsed = 0f;
+
+        if (canopyVisualTransform != null) canopyVisualTransform.localScale = canopyBaseScale * 0.05f;
+        if (glowBudsTransform != null) glowBudsTransform.localScale = glowBudsBaseScale * 0.05f;
+        if (bloomAuraObj != null)
+        {
+            bloomAuraObj.SetActive(true);
+            bloomAuraObj.transform.localScale = auraBaseScale * 0.25f;
+        }
+        if (bloomPointLight != null)
+        {
+            bloomPointLight.enabled = true;
+            bloomPointLight.intensity = 0f;
+        }
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            // Smooth ease-out back bounce (0 -> ~1.12 -> 1.0)
+            float inv = 1f - t;
+            float back = 1f + 1.8f * Mathf.Pow(inv, 3f) * Mathf.Sin(t * Mathf.PI) - Mathf.Pow(inv, 3f);
+            float sproutScale = Mathf.Lerp(0.05f, 1.0f, Mathf.Max(0f, back));
+
+            if (canopyVisualTransform != null) canopyVisualTransform.localScale = canopyBaseScale * sproutScale;
+            if (glowBudsTransform != null) glowBudsTransform.localScale = glowBudsBaseScale * sproutScale;
+            if (bloomAuraObj != null) bloomAuraObj.transform.localScale = auraBaseScale * Mathf.Lerp(0.25f, 1.08f, Mathf.SmoothStep(0f, 1f, t));
+            if (bloomPointLight != null)
+            {
+                float lightCurve = t < 0.45f
+                    ? Mathf.Lerp(0f, baseBloomLightIntensity * 1.95f, t / 0.45f)
+                    : Mathf.Lerp(baseBloomLightIntensity * 1.95f, baseBloomLightIntensity, (t - 0.45f) / 0.55f);
+                bloomPointLight.intensity = lightCurve;
+            }
+
+            yield return null;
+        }
+
+        if (canopyVisualTransform != null) canopyVisualTransform.localScale = canopyBaseScale;
+        if (glowBudsTransform != null) glowBudsTransform.localScale = glowBudsBaseScale;
+        if (bloomAuraObj != null) bloomAuraObj.transform.localScale = auraBaseScale;
+        if (bloomPointLight != null) bloomPointLight.intensity = baseBloomLightIntensity;
+        canopyBloomRoutine = null;
     }
 
     private void FindVisualReferences()
@@ -434,6 +555,23 @@ public class TreeSavePoint : MonoBehaviour
         {
             var rt = transform.Find("SmallTree (1)");
             if (rt != null) restoredTreeVisual = rt.gameObject;
+        }
+
+        if (restoredTreeVisual != null)
+        {
+            if (canopyVisualTransform == null) canopyVisualTransform = restoredTreeVisual.transform.Find("Canopy_Leaves");
+            if (glowBudsTransform == null) glowBudsTransform = restoredTreeVisual.transform.Find("Blossom_GlowBuds");
+            if (bloomAuraObj == null) bloomAuraObj = restoredTreeVisual.transform.Find("BloomAuraHalo")?.gameObject;
+            if (bloomPointLight == null) bloomPointLight = restoredTreeVisual.transform.Find("BloomPointLight")?.GetComponent<Light>();
+
+            if (!baseBloomCached)
+            {
+                baseBloomCached = true;
+                if (canopyVisualTransform != null) canopyBaseScale = canopyVisualTransform.localScale;
+                if (glowBudsTransform != null) glowBudsBaseScale = glowBudsTransform.localScale;
+                if (bloomAuraObj != null) auraBaseScale = bloomAuraObj.transform.localScale;
+                if (bloomPointLight != null && bloomPointLight.intensity > 0.01f) baseBloomLightIntensity = bloomPointLight.intensity;
+            }
         }
 
         if (interactPromptUI == null)
@@ -454,6 +592,83 @@ public class TreeSavePoint : MonoBehaviour
                 {
                     treeHealthSlider = cd.GetComponentInChildren<Slider>(true);
                 }
+            }
+        }
+    }
+
+    private void EnsureCooldownCanvasAlwaysOnTop()
+    {
+        Canvas cdCanvas = null;
+        if (treeHealthCanvasUI != null)
+        {
+            cdCanvas = treeHealthCanvasUI.GetComponent<Canvas>();
+        }
+        if (cdCanvas == null)
+        {
+            foreach (Canvas c in GetComponentsInChildren<Canvas>(true))
+            {
+                if (c.name.IndexOf("CoolDown", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    cdCanvas = c;
+                    break;
+                }
+            }
+        }
+        if (cdCanvas == null) return;
+
+        cdCanvas.overrideSorting = true;
+        cdCanvas.sortingOrder = 60;
+
+        Shader overlayShader = Shader.Find("UI/OverlayAlwaysOnTop");
+        if (overlayShader != null)
+        {
+            Material overlayMat = new Material(overlayShader);
+            foreach (Image img in cdCanvas.GetComponentsInChildren<Image>(true))
+            {
+                img.material = overlayMat;
+            }
+            foreach (RawImage raw in cdCanvas.GetComponentsInChildren<RawImage>(true))
+            {
+                raw.material = overlayMat;
+            }
+        }
+
+        Shader tmpOverlayShader = Shader.Find("TextMeshPro/Distance Field Overlay");
+        foreach (TMPro.TextMeshProUGUI tmp in cdCanvas.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true))
+        {
+            if (tmp.fontSharedMaterial != null)
+            {
+                Material mat = new Material(tmp.fontSharedMaterial);
+                string shaderName = mat.shader != null ? mat.shader.name : string.Empty;
+                bool isDistanceField = shaderName.IndexOf("Distance Field", System.StringComparison.OrdinalIgnoreCase) >= 0;
+
+                if (isDistanceField)
+                {
+                    if (tmpOverlayShader != null)
+                    {
+                        mat.shader = tmpOverlayShader;
+                    }
+                    mat.EnableKeyword("OUTLINE_ON");
+                    if (mat.HasProperty("_OutlineWidth"))
+                    {
+                        mat.SetFloat("_OutlineWidth", 0.22f);
+                    }
+                    if (mat.HasProperty("_OutlineColor"))
+                    {
+                        mat.SetColor("_OutlineColor", new Color(0.16f, 0.08f, 0.04f, 1f));
+                    }
+                    tmp.fontStyle |= TMPro.FontStyles.Bold;
+                }
+                else
+                {
+                    mat.renderQueue = 4000;
+                    if (mat.HasProperty("unity_GUIZTestMode"))
+                    {
+                        mat.SetInt("unity_GUIZTestMode", (int)UnityEngine.Rendering.CompareFunction.Always);
+                    }
+                }
+
+                tmp.fontMaterial = mat;
             }
         }
     }

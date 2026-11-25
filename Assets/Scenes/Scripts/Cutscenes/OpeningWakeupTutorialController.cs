@@ -556,17 +556,29 @@ public class OpeningWakeupTutorialController : MonoBehaviour
                 wateringUiObj.transform.position = firstSaveTree.transform.position + new Vector3(0.65f, 2.75f, -0.25f);
             }
             yield return StartCoroutine(AnimatePouringWaterRoutine(wateringDuration));
-            yield return StartCoroutine(FadeCanvasGroupRoutine(wateringUiObj, wateringUiCg, false, 0.18f));
+            yield return StartCoroutine(FadeCanvasGroupRoutine(wateringUiObj, wateringUiCg, false, 0.16f));
+            wateringUiObj.SetActive(false);
         }
         else
         {
             yield return new WaitForSeconds(wateringDuration);
         }
 
+        // Stop & clear watering VFX immediately once watering finishes, before the tree blooms
         if (activeWaterVfxInstance != null)
         {
-            Destroy(activeWaterVfxInstance, 0.4f);
+            foreach (var ps in activeWaterVfxInstance.GetComponentsInChildren<ParticleSystem>(true))
+            {
+                if (ps != null) ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
+            activeWaterVfxInstance.SetActive(false);
+            Destroy(activeWaterVfxInstance);
             activeWaterVfxInstance = null;
+        }
+
+        if (wasdPromptObj != null && wasdPromptObj.activeSelf)
+        {
+            StartCoroutine(FadeCanvasGroupRoutine(wasdPromptObj, wasdPromptCg, false, 0.18f));
         }
 
         // Step 9: ฟื้นฟูต้นไม้ เติมออกซิเจน และเปิดทางเดินต่อ (ก่อนเปิดให้ผู้เล่นเดินเล่นต่อเต็มรูปแบบ)
@@ -842,9 +854,11 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         while (elapsed < settleTime)
         {
             elapsed += Time.deltaTime;
-            glowLight.intensity = Mathf.Lerp(10f, 2.8f, elapsed / settleTime);
+            glowLight.intensity = Mathf.Lerp(10f, 0f, elapsed / settleTime);
             yield return null;
         }
+
+        Destroy(glowObj);
     }
 
     private IEnumerator FadeCanvasGroupAlphaRoutine(CanvasGroup cg, float from, float to, float duration, bool endInteractable)

@@ -59,6 +59,10 @@ public class PlayerOxygen : MonoBehaviour
     [SerializeField]
     private float minExposure = -2.5f;           // ความมืดของภาพตอนออกซิเจนหมด
 
+    [Header("Game Over Delay Settings")]
+    [SerializeField]
+    private float gameOverAfterDeathDelay = 0.45f;
+
     [Header("Events")]
     public UnityEvent<int, int> onOxygenChanged; // (current, max)
     public UnityEvent onOxygenDepleted;
@@ -259,6 +263,7 @@ public class PlayerOxygen : MonoBehaviour
             oxygenRoutine = null;
         }
 
+        StopLowOxygenPanting();
         onOxygenDepleted?.Invoke();
 
         // เปลี่ยนสถานะตัวละครเป็น Dead และหยุดแรงเคลื่อนที่ทันที
@@ -280,6 +285,14 @@ public class PlayerOxygen : MonoBehaviour
         {
             anim.TriggerDeath();
         }
+
+        StartCoroutine(ShowGameOverAfterDeathAnimRoutine(anim));
+    }
+
+    private IEnumerator ShowGameOverAfterDeathAnimRoutine(PlayerAnimation anim)
+    {
+        float animLength = anim != null ? anim.GetDeadAnimationLength() : 0.5f;
+        yield return new WaitForSeconds(Mathf.Max(animLength, 0.5f) + gameOverAfterDeathDelay);
 
         GameOverUIManager uiManager = GameOverUIManager.Instance;
         if (uiManager == null)

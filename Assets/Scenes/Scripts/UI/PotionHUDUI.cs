@@ -25,7 +25,9 @@ public class PotionHUDUI : MonoBehaviour
     private PlayerStats playerStats;
     private int cachedPotionCount = -1;
     private Coroutine punchRoutine;
+    private Coroutine glowFlashRoutine;
     private Vector3 initialIconScale = Vector3.one;
+    private Vector3 initialGlowScale = Vector3.one;
 
     private void Awake()
     {
@@ -33,6 +35,11 @@ public class PotionHUDUI : MonoBehaviour
 
         if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
         if (potionIcon != null) initialIconScale = potionIcon.transform.localScale;
+        if (auraGlow != null)
+        {
+            initialGlowScale = auraGlow.transform.localScale;
+            auraGlow.gameObject.SetActive(false);
+        }
 
         FindPlayerReferences();
     }
@@ -57,15 +64,6 @@ public class PotionHUDUI : MonoBehaviour
             bool countIncreased = (cachedPotionCount != -1 && currentCount > cachedPotionCount);
             cachedPotionCount = currentCount;
             RefreshDisplay(countIncreased);
-        }
-
-        // Gentle cozy glow pulse when player has potions
-        if (auraGlow != null && currentCount > 0)
-        {
-            float alpha = 0.25f + Mathf.PingPong(Time.time * glowPulseSpeed, 0.35f);
-            Color gc = auraGlow.color;
-            gc.a = alpha;
-            auraGlow.color = gc;
         }
 
         // Quick shortcut to drink potion: H key or 1 key (or Alpha1)
@@ -133,15 +131,26 @@ public class PotionHUDUI : MonoBehaviour
             potionIcon.color = count > 0 ? fullColor : emptyColor;
         }
 
-        if (auraGlow != null)
+        if (auraGlow != null && !triggerPunch)
         {
-            auraGlow.gameObject.SetActive(count > 0);
+            if (glowFlashRoutine == null)
+            {
+                auraGlow.gameObject.SetActive(false);
+            }
         }
 
-        if (triggerPunch && potionIcon != null && gameObject.activeInHierarchy)
+        if (triggerPunch && gameObject.activeInHierarchy)
         {
-            if (punchRoutine != null) StopCoroutine(punchRoutine);
-            punchRoutine = StartCoroutine(PunchScaleRoutine());
+            if (potionIcon != null)
+            {
+                if (punchRoutine != null) StopCoroutine(punchRoutine);
+                punchRoutine = StartCoroutine(PunchScaleRoutine());
+            }
+            if (auraGlow != null)
+            {
+                if (glowFlashRoutine != null) StopCoroutine(glowFlashRoutine);
+                glowFlashRoutine = StartCoroutine(PickupCircularFlashRoutine());
+            }
         }
     }
 
@@ -197,6 +206,34 @@ public class PotionHUDUI : MonoBehaviour
         }
 
         potionIcon.transform.localScale = initialIconScale;
+    }
+
+    private IEnumerator PickupCircularFlashRoutine()
+    {
+        if (auraGlow == null) yield break;
+
+        auraGlow.gameObject.SetActive(true);
+        Color baseColor = new Color(0.28f, 0.82f, 1f, 1f);
+        float totalDuration = 0.85f;
+        float elapsed = 0f;
+
+        while (elapsed < totalDuration)
+        {
+            elapsed += Time.deltaTime;
+            float norm = Mathf.Clamp01(elapsed / totalDuration);
+            // 2 brief circular blue flashes fading out
+            float pulse = Mathf.Abs(Mathf.Sin(norm * Mathf.PI * 2f));
+            float fade = 1f - norm;
+            Color gc = baseColor;
+            gc.a = pulse * fade * 0.9f;
+            auraGlow.color = gc;
+            auraGlow.transform.localScale = initialGlowScale * Mathf.Lerp(0.95f, 1.24f, norm);
+            yield return null;
+        }
+
+        auraGlow.transform.localScale = initialGlowScale;
+        auraGlow.gameObject.SetActive(false);
+        glowFlashRoutine = null;
     }
 
     // Public setter for Editor configuration

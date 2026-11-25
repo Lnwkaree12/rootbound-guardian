@@ -74,8 +74,11 @@ public class EndSceneCutsceneManager : MonoBehaviour
     // Runtime state
     private bool cutsceneTriggered = false;
     private GameObject playerObj;
+    private PlayerInputHandler playerInputHandler;
     private PlayerMovement playerMovement;
     private PlayerController playerController;
+    private PlayerAnimation playerAnimation;
+    private Animator playerAnimator;
     private Rigidbody playerRb;
     private LumiCompanion lumi;
     private Camera mainCamera;
@@ -155,8 +158,11 @@ public class EndSceneCutsceneManager : MonoBehaviour
 
             if (playerObj != null)
             {
+                playerInputHandler = playerObj.GetComponent<PlayerInputHandler>();
                 playerMovement = playerObj.GetComponent<PlayerMovement>();
                 playerController = playerObj.GetComponent<PlayerController>();
+                playerAnimation = playerObj.GetComponent<PlayerAnimation>();
+                playerAnimator = playerObj.GetComponentInChildren<Animator>();
                 playerRb = playerObj.GetComponent<Rigidbody>();
             }
         }
@@ -202,7 +208,20 @@ public class EndSceneCutsceneManager : MonoBehaviour
 
     private void Update()
     {
-        if (cutsceneTriggered) return;
+        if (cutsceneTriggered)
+        {
+            if (playerInputHandler != null && playerInputHandler.enabled)
+            {
+                playerInputHandler.ResetInputState();
+                playerInputHandler.enabled = false;
+            }
+            if (playerRb != null && !playerRb.isKinematic)
+            {
+                playerRb.linearVelocity = Vector3.zero;
+                playerRb.angularVelocity = Vector3.zero;
+            }
+            return;
+        }
 
         if (playerObj == null)
         {
@@ -244,13 +263,40 @@ public class EndSceneCutsceneManager : MonoBehaviour
         // -------------------------------------------------------------
         // Step 1: Lock Player Input & Secure Character Position
         // -------------------------------------------------------------
-        if (playerMovement != null) playerMovement.enabled = false;
+        if (playerInputHandler != null)
+        {
+            playerInputHandler.ResetInputState();
+            playerInputHandler.enabled = false;
+        }
         if (playerController != null) playerController.enabled = false;
+        if (playerMovement != null)
+        {
+            playerMovement.Move(Vector2.zero);
+            playerMovement.enabled = false;
+        }
         if (playerRb != null)
         {
             playerRb.linearVelocity = Vector3.zero;
             playerRb.angularVelocity = Vector3.zero;
             playerRb.isKinematic = true; // Freeze physics to prevent falling or displacement during cutscene
+        }
+        if (playerAnimation != null)
+        {
+            playerAnimation.SetClimbSpeed(0f);
+            playerAnimation.SetClimbing(false);
+        }
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetFloat("Speed", 0f);
+            playerAnimator.SetFloat("ClimbSpeed", 0f);
+            playerAnimator.SetBool("IsClimbing", false);
+        }
+        if (playerObj != null)
+        {
+            foreach (var src in playerObj.GetComponentsInChildren<AudioSource>(true))
+            {
+                if (src != null && src.loop && src.isPlaying) src.Stop();
+            }
         }
 
         // Align player at safe stage position on Cube (2) facing tree/dialogue

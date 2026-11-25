@@ -734,14 +734,44 @@ public class LocalizationManager : MonoBehaviour
             zh: "~ <color=#FFEAA7><b>露米 (LUMI)</b></color> ~\n<size=17><color=#9AE6B4>引路光之精灵</color></size>");
 
         AddKey("load_guide_tag",
-            th: "คำแนะนำจากลูมิ :",
-            en: "Lumi's Guidance:",
-            zh: "露米的指引：");
+            th: "เป้าหมายของเกม :",
+            en: "OBJECTIVE :",
+            zh: "游戏目标 :");
+
+        AddKey("load_goal_body",
+            th: "ออกตามหากุญแจเพื่อเปิดประตู ฝ่าฟันกับดักและมุ่งหน้าไปให้ถึงปลายทาง เพื่อฟื้นฟูรากต้นไม้โลกให้กลับมามีชีวิตอีกครั้ง!",
+            en: "Find the key to unlock the gate, overcome the dungeon traps, and reach the end to restore the World Tree's roots!",
+            zh: "寻找钥匙开启大门，穿越重重陷阱，抵达终点以复苏世界树之根！");
 
         AddKey("load_header_controls",
-            th: "~ <color=#4D2C15><b>คู่มือการผจญภัย & การควบคุม (CONTROLS & SURVIVAL)</b></color> ~\n<size=15><color=#4D2C15>Turtorial เบื้องต้นสำหรับการเล่น</color></size>",
-            en: "~ <color=#4D2C15><b>CONTROLS & SURVIVAL GUIDE</b></color> ~\n<size=15><color=#4D2C15>Basic Tutorial</color></size>",
-            zh: "~ <color=#4D2C15><b>操作与生存指南 (CONTROLS & SURVIVAL)</b></color> ~\n<size=15><color=#4D2C15>新手基础教程</color></size>");
+            th: "<color=#4D2C15><b>เป้าหมายและการเอาชีวิตรอด (OBJECTIVES & GUIDE)</b></color>",
+            en: "<color=#4D2C15><b>OBJECTIVES & SURVIVAL GUIDE</b></color>",
+            zh: "<color=#4D2C15><b>冒险目标与生存指南</b></color>");
+
+        AddKey("load_row_goal_1",
+            th: "ตามหากุญแจเพื่อเปิดประตู",
+            en: "Find the key to open the gate",
+            zh: "寻找钥匙以开启大门");
+
+        AddKey("load_row_goal_2",
+            th: "ห้ามให้ Oxygen และเลือดหมด",
+            en: "Don't let Oxygen or HP run out",
+            zh: "切勿耗尽氧气或生命值");
+
+        AddKey("load_row_goal_3",
+            th: "ระวังกับดัก",
+            en: "Watch out for traps",
+            zh: "小心各种陷阱");
+
+        AddKey("load_row_goal_4",
+            th: "ขวดยาใช้ชุบต้นไม้\n(หาได้จากกล่อง)",
+            en: "Use potions to revive trees\n(Found in chests)",
+            zh: "药水用于复苏小树\n(可在宝箱中获得)");
+
+        AddKey("load_row_goal_5",
+            th: "ต้นไม้คือจุดเซฟ และฟื้นฟู Oxygen\n(มีเวลาจำกัดในการฟื้นฟู)",
+            en: "Trees act as checkpoints & restore Oxygen\n(Limited duration)",
+            zh: "神树既是存档点也能恢复氧气\n(持续时间有限)");
 
         // Row 1: Move
         AddKey("load_row_move",

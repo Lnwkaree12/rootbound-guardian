@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class PlayerAnimation : MonoBehaviour
 {
@@ -6,6 +6,7 @@ public class PlayerAnimation : MonoBehaviour
     private PlayerInputHandler inputHandler;
     private SpriteRenderer spriteRenderer;
     private PlayerOxygen playerOxygen; // 🫧 อ้างอิงระบบออกซิเจน
+    private PlayerController playerController;
 
     // Animator Parameter Hashes
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
@@ -26,11 +27,19 @@ public class PlayerAnimation : MonoBehaviour
         inputHandler = GetComponent<PlayerInputHandler>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         playerOxygen = GetComponent<PlayerOxygen>();
+        playerController = GetComponent<PlayerController>();
     }
 
     private void Update()
     {
         if (animator == null || inputHandler == null) return;
+
+        if ((playerController != null && playerController.CurrentActionState == PlayerActionState.Dead)
+            || (playerOxygen != null && playerOxygen.CurrentOxygen <= 0))
+        {
+            animator.SetFloat(SpeedHash, 0f);
+            return;
+        }
 
         // 1. อัปเดตความเร็วเดิน/วิ่ง
         float speed = inputHandler.MoveInput.sqrMagnitude;

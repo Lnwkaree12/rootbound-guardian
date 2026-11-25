@@ -45,6 +45,9 @@ public class EndCreditController : MonoBehaviour
     private bool isTransitioning = false;
     private float currentSpeed;
     private bool isUserDragging = false;
+    private int selectedEndButtonIndex = 0;
+    private bool endButtonsKeyboardReady = false;
+    private float endButtonsReadyTimer = 0f;
 
     private void Awake()
     {
@@ -76,11 +79,13 @@ public class EndCreditController : MonoBehaviour
         if (mainMenuButton != null)
         {
             mainMenuButton.onClick.AddListener(OnMainMenuClicked);
+            mainMenuButton.navigation = new Navigation { mode = Navigation.Mode.None };
         }
 
         if (replayButton != null)
         {
             replayButton.onClick.AddListener(OnReplayClicked);
+            replayButton.navigation = new Navigation { mode = Navigation.Mode.None };
         }
 
         if (scrollRect != null)
@@ -166,6 +171,80 @@ public class EndCreditController : MonoBehaviour
         if (isTransitioning) return;
 
         HandleInputAndScrolling();
+        HandleEndButtonsKeyboard();
+    }
+
+    private void HandleEndButtonsKeyboard()
+    {
+        if (isAutoScrolling)
+        {
+            endButtonsKeyboardReady = false;
+            endButtonsReadyTimer = 0f;
+            return;
+        }
+
+        if (!endButtonsKeyboardReady)
+        {
+            endButtonsKeyboardReady = true;
+            endButtonsReadyTimer = 0f;
+            SelectEndButton(selectedEndButtonIndex, false);
+        }
+
+        endButtonsReadyTimer += Time.unscaledDeltaTime;
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        {
+            SelectEndButton(0, true);
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        {
+            SelectEndButton(1, true);
+        }
+
+        if (endButtonsReadyTimer >= 0.25f &&
+            (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0)))
+        {
+            Button targetBtn = selectedEndButtonIndex == 0 ? mainMenuButton : replayButton;
+            if (targetBtn != null && targetBtn.interactable)
+            {
+                if (UnityEngine.EventSystems.EventSystem.current == null ||
+                    UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject != targetBtn.gameObject)
+                {
+                    targetBtn.onClick.Invoke();
+                }
+            }
+        }
+    }
+
+    private void SelectEndButton(int index, bool playSfx)
+    {
+        selectedEndButtonIndex = Mathf.Clamp(index, 0, 1);
+        ApplyEndButtonVisual(mainMenuButton, selectedEndButtonIndex == 0);
+        ApplyEndButtonVisual(replayButton, selectedEndButtonIndex == 1);
+
+        Button activeBtn = selectedEndButtonIndex == 0 ? mainMenuButton : replayButton;
+        if (activeBtn != null && UnityEngine.EventSystems.EventSystem.current != null)
+        {
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(activeBtn.gameObject);
+        }
+
+        if (playSfx) PlayButtonSFX();
+    }
+
+    private static void ApplyEndButtonVisual(Button btn, bool selected)
+    {
+        if (btn == null) return;
+        btn.transform.localScale = Vector3.one * (selected ? 1.08f : 1.0f);
+        var img = btn.GetComponent<Image>();
+        if (img != null)
+        {
+            img.color = selected ? new Color(1.08f, 0.96f, 0.78f, 1f) : Color.white;
+        }
+        var juicy = btn.GetComponent<UIJuicyButton>();
+        if (juicy != null)
+        {
+            juicy.TriggerVisualSelection(selected);
+        }
     }
 
     private void HandleInputAndScrolling()
