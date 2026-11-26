@@ -28,7 +28,7 @@ Material:
     - _BlobRoundness: 0.52
     - _CellScale: 2.2
     - _CrustStep: 0.38
-    - _EmissionIntensity: 1.9
+    - _EmissionIntensity: 1
     - _FlowSpeed: 0.25
     - _FoamDistance: 0.35
     - _FoamSharpness: 3

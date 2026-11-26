@@ -127,9 +127,9 @@ Material:
     - _Base_Color: {r: 0.23018861, g: 0.23018861, b: 0.23018861, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Highlight_Color: {r: 1, g: 0.6156863, b: 0, a: 0}
-    - _Outline_Color: {r: 1, g: 0, b: 0, a: 1}
-    - _Shadows_Color: {r: 0.49019608, g: 0, b: 0.03163581, a: 0}
+    - _Highlight_Color: {r: 0.14150941, g: 0.09199944, b: 0.012682444, a: 0}
+    - _Outline_Color: {r: 0.03773582, g: 0.01655392, b: 0.01655392, a: 1}
+    - _Shadows_Color: {r: 0.21698111, g: 0, b: 0.01388682, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
