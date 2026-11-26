@@ -35,7 +35,7 @@ Material:
     - _OrangeStep: 0.62
     - _PulseAmount: 0.15
     - _PulseSpeed: 1.4
-    - _SpecularStrength: 0.85
+    - _SpecularStrength: 0
     - _StepSmoothness: 0.05
     - _WaveFrequency: 1.2
     - _WaveHeight: 0.06
