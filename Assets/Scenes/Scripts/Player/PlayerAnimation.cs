@@ -17,6 +17,13 @@ public class PlayerAnimation : MonoBehaviour
     private static readonly int IsClimbingHash = Animator.StringToHash("IsClimbing"); // 🪜 บันทึก Hash ท่าปีน
     private static readonly int OxygenTierHash = Animator.StringToHash("OxygenTier"); // 🫧 บันทึก Hash Oxygen Tier
     private static readonly int ClimbSpeedHash = Animator.StringToHash("ClimbSpeed"); // 🪜 บันทึก Hash ความเร็วปีน
+    private static readonly int UseTutorialWalkHash = Animator.StringToHash("UseTutorialWalk");
+private static readonly int WalkStateHash = Animator.StringToHash("Walk");
+private static readonly int RunStateHash = Animator.StringToHash("Run");
+private static readonly int Idle3StateHash = Animator.StringToHash("Idle3");
+private static readonly int IdleStateHash = Animator.StringToHash("Idle");
+
+
 
     [Header("Facing Direction Settings")]
     [SerializeField] private bool is3DModel = false;
@@ -144,5 +151,27 @@ public class PlayerAnimation : MonoBehaviour
     {
         HandleFacingDirection(1f); // ส่งค่า 1 (ขวา) ไปบังคับหันหน้า
     }
+
+    public void SetTutorialWalkMode(bool enabled)
+{
+    if (animator == null) return;
+
+    animator.SetBool(UseTutorialWalkHash, enabled);
+
+    if (enabled)
+    {
+        if (inputHandler != null && inputHandler.MoveInput.sqrMagnitude > 0.01f)
+        {
+            animator.CrossFadeInFixedTime(WalkStateHash, 0.08f, 0);
+        }
+    }
+    else
+    {
+        if (inputHandler != null && inputHandler.MoveInput.sqrMagnitude > 0.01f)
+        {
+            animator.CrossFadeInFixedTime(RunStateHash, 0.08f, 0);
+        }
+    }
+}
 
 }

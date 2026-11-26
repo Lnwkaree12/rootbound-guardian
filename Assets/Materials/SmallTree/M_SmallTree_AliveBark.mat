@@ -40,7 +40,7 @@ Material:
     m_Floats:
     - _Alpha: 1
     - _Glow_Size: 0.1
-    - _Highlight_Intensity: 0.35
+    - _Highlight_Intensity: 6.34
     - _Highlight_Size: 0.45
     - _Outline_Size: 0.06
     - _QueueControl: 0

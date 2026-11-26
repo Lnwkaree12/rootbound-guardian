@@ -102,11 +102,11 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Glow_Size: 0.1
-    - _Highlight_Intensity: 1
-    - _Highlight_Size: 0.45
+    - _Highlight_Intensity: 4
+    - _Highlight_Size: 0.35
     - _Metallic: 0
     - _OcclusionStrength: 1
-    - _Outline_Size: 0.3
+    - _Outline_Size: 0.1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -124,12 +124,12 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Base_Color: {r: 0.2901961, g: 0.10980392, b: 0.11372549, a: 0}
+    - _Base_Color: {r: 0.14716971, g: 0.10079736, b: 0.10079736, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Highlight_Color: {r: 0.19245279, g: 0.15446632, b: 0.064998195, a: 0}
-    - _Outline_Color: {r: 1, g: 0.8431373, b: 0, a: 1}
-    - _Shadows_Color: {r: 0.5450981, g: 0.2705882, b: 0.07450981, a: 1}
+    - _Highlight_Color: {r: 0.9490196, g: 0.81960785, b: 0.38039216, a: 1}
+    - _Outline_Color: {r: 0.11698109, g: 0.089689575, b: 0.05893198, a: 1}
+    - _Shadows_Color: {r: 0.23773581, g: 0.23773581, b: 0.23773581, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

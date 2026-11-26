@@ -462,12 +462,18 @@ public class OpeningWakeupTutorialController : MonoBehaviour
             }
         }
 
+        
+
         // รอหลังลุกขึ้นก่อนเปิดให้เดิน
-        if (playerAnimator != null)
-        {
-            playerAnimator.enabled = true;
-            playerAnimator.Play("Idle", 0, 0f);
-        }
+       if (playerAnimator != null)
+{
+    playerAnimator.enabled = true;
+}
+if (playerAnimation != null)
+{
+    playerAnimation.enabled = true;
+    playerAnimation.SetTutorialWalkMode(true); // เล่น Idle3 ตั้งแต่ลุกขึ้นยืน
+}
         if (playerAnimation != null)
         {
             playerAnimation.enabled = true;
@@ -482,6 +488,12 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         yield return new WaitForSeconds(waitAfterStandUp);
 
         // Step 6: แสดงปุ่ม [WASD] และเปิดให้เดิน
+
+        if (playerAnimation != null)
+{
+    playerAnimation.SetTutorialWalkMode(true);
+}
+
         if (playerObj != null)
         {
             wasdPromptBasePos = playerObj.transform.position + new Vector3(1.55f, 1.85f, 0f);
@@ -618,6 +630,11 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         // เก็บทั้ง ตำแหน่งผู้เล่น, สถานะ/เลือดต้นไม้, เลือดผู้เล่น, ออกซิเจนผู้เล่น และของในกระเป๋า
         SaveTutorialCompletionCheckpoint();
 
+        if (playerAnimation != null)
+{
+    playerAnimation.SetTutorialWalkMode(false);
+}
+
         RestoreNormalMoveSpeedIfNeeded();
         SetGameplayControlsEnabled(true, false);
 
@@ -684,6 +701,8 @@ public class OpeningWakeupTutorialController : MonoBehaviour
 
         Debug.Log("[OpeningWakeupTutorialController] เซฟข้อมูลจุดจบ Tutorial Step 9 เรียบร้อย (ต้นไม้, เลือดต้นไม้, เลือดผู้เล่น, ออกซิเจน, ของในกระเป๋า)");
     }
+
+    
 
     private void HandleDeferredWateringStarted(TreeSavePoint tree)
     {
@@ -1013,7 +1032,7 @@ public class OpeningWakeupTutorialController : MonoBehaviour
         TextMeshProUGUI tmp = txtObj.AddComponent<TextMeshProUGUI>();
         tmp.text = "SPACE BAR";
         if (uiFont != null) tmp.font = uiFont;
-        tmp.fontSize = 36f;
+        tmp.fontSize = 29f;
         tmp.fontStyle = FontStyles.Bold;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = new Color(0.227f, 0.133f, 0.071f, 1f);
