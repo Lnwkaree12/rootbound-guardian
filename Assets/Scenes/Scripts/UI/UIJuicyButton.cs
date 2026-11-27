@@ -164,7 +164,7 @@ public class UIJuicyButton : MonoBehaviour,
         transform.localScale = baseScale * currentScale;
 
         // If targetScale wasn't actively held in press, restore desired scale
-        if (targetScale == pressScale && !Input.GetMouseButton(0))
+        if (targetScale == pressScale && !InputSystemInput.GetMouseButton(0))
         {
             targetScale = desiredScale;
         }

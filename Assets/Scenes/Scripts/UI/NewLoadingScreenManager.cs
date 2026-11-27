@@ -85,15 +85,22 @@ public class NewLoadingScreenManager : MonoBehaviour
     private void OnEnable()
     {
         LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
         UpdateLocalizedTutorialUI();
     }
 
     private void OnDisable()
     {
         LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
     }
 
     private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        UpdateLocalizedTutorialUI();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
     {
         UpdateLocalizedTutorialUI();
     }
@@ -210,7 +217,7 @@ public class NewLoadingScreenManager : MonoBehaviour
             }
 
             // Check any key or mouse click to enter game
-            if (Input.anyKeyDown || Input.GetMouseButtonDown(0))
+            if (InputSystemInput.AnyKeyDown || InputSystemInput.GetMouseButtonDown(0))
             {
                 StartCoroutine(EnterGameRoutine());
             }

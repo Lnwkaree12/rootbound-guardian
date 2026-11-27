@@ -93,15 +93,22 @@ public class PauseMenuController : MonoBehaviour
     private void OnEnable()
     {
         LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
         UpdateLocalizedTexts();
     }
 
     private void OnDisable()
     {
         LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
     }
 
     private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        UpdateLocalizedTexts();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
     {
         UpdateLocalizedTexts();
     }
@@ -155,24 +162,30 @@ public class PauseMenuController : MonoBehaviour
         if (isPaused)
         {
             // กด ESC ซ้ำเพื่อปิดเมนู Pause และเล่นต่อ
-            if (Input.GetKeyDown(pauseKey))
+            if (InputSystemInput.GetKeyDown(pauseKey) ||
+                InputSystemInput.PausePressedThisFrame ||
+                InputSystemInput.CancelPressedThisFrame)
             {
                 Resume();
                 return;
             }
 
             // เลื่อนขึ้น/ลงระหว่างแถวเสียง (Master/BGM/SFX) กับแถวปุ่มด้านล่าง
-            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            if (InputSystemInput.GetKeyDown(KeyCode.UpArrow) ||
+                InputSystemInput.GetKeyDown(KeyCode.W) ||
+                InputSystemInput.DpadUpPressedThisFrame)
             {
                 MoveRow(-1);
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            else if (InputSystemInput.GetKeyDown(KeyCode.DownArrow) ||
+                     InputSystemInput.GetKeyDown(KeyCode.S) ||
+                     InputSystemInput.DpadDownPressedThisFrame)
             {
                 MoveRow(1);
             }
-            else if (Input.GetKeyDown(KeyCode.Tab))
+            else if (InputSystemInput.GetKeyDown(KeyCode.Tab))
             {
-                int dir = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ? -1 : 1;
+                int dir = (InputSystemInput.GetKey(KeyCode.LeftShift) || InputSystemInput.GetKey(KeyCode.RightShift)) ? -1 : 1;
                 if (selectedRow < 3) MoveRow(dir);
                 else Navigate(dir);
             }
@@ -181,7 +194,7 @@ public class PauseMenuController : MonoBehaviour
             {
                 HandleSliderRowKeyboard();
 
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space))
+                if (InputSystemInput.GetKeyDown(KeyCode.Return) || InputSystemInput.GetKeyDown(KeyCode.KeypadEnter) || InputSystemInput.GetKeyDown(KeyCode.Space))
                 {
                     MoveRow(1);
                 }
@@ -190,17 +203,21 @@ public class PauseMenuController : MonoBehaviour
             {
                 heldHorizDir = 0;
                 // เลื่อนปุ่มเมนูด้วยปุ่มทิศทาง A/D หรือ Left/Right
-                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+                if (InputSystemInput.GetKeyDown(KeyCode.LeftArrow) ||
+                    InputSystemInput.GetKeyDown(KeyCode.A) ||
+                    InputSystemInput.DpadLeftPressedThisFrame)
                 {
                     Navigate(-1);
                 }
-                else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+                else if (InputSystemInput.GetKeyDown(KeyCode.RightArrow) ||
+                         InputSystemInput.GetKeyDown(KeyCode.D) ||
+                         InputSystemInput.DpadRightPressedThisFrame)
                 {
                     Navigate(1);
                 }
 
                 // กดยืนยันปุ่มที่เลือกอยู่
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+                if (InputSystemInput.GetKeyDown(KeyCode.Return) || InputSystemInput.GetKeyDown(KeyCode.KeypadEnter) || InputSystemInput.GetKeyDown(KeyCode.Space) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton0))
                 {
                     SubmitSelectedButton();
                 }
@@ -209,7 +226,7 @@ public class PauseMenuController : MonoBehaviour
         else
         {
             heldHorizDir = 0;
-            if (Input.GetKeyDown(pauseKey))
+            if (InputSystemInput.GetKeyDown(pauseKey) || InputSystemInput.PausePressedThisFrame)
             {
                 Pause();
             }
@@ -219,8 +236,12 @@ public class PauseMenuController : MonoBehaviour
     private void HandleSliderRowKeyboard()
     {
         int pressDir = 0;
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) pressDir = -1;
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) pressDir = 1;
+        if (InputSystemInput.GetKeyDown(KeyCode.LeftArrow) ||
+            InputSystemInput.GetKeyDown(KeyCode.A) ||
+            InputSystemInput.DpadLeftPressedThisFrame) pressDir = -1;
+        else if (InputSystemInput.GetKeyDown(KeyCode.RightArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.D) ||
+                 InputSystemInput.DpadRightPressedThisFrame) pressDir = 1;
 
         if (pressDir != 0)
         {
@@ -230,8 +251,12 @@ public class PauseMenuController : MonoBehaviour
             return;
         }
 
-        bool leftHeld = Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A);
-        bool rightHeld = Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D);
+        bool leftHeld = InputSystemInput.GetKey(KeyCode.LeftArrow) ||
+                        InputSystemInput.GetKey(KeyCode.A) ||
+                        InputSystemInput.DpadLeftPressed;
+        bool rightHeld = InputSystemInput.GetKey(KeyCode.RightArrow) ||
+                         InputSystemInput.GetKey(KeyCode.D) ||
+                         InputSystemInput.DpadRightPressed;
         int holdDir = (leftHeld && !rightHeld) ? -1 : ((rightHeld && !leftHeld) ? 1 : 0);
 
         if (holdDir == 0 || holdDir != heldHorizDir)
@@ -842,7 +867,7 @@ public class PauseMenuController : MonoBehaviour
         {
             GameObject es = new GameObject("EventSystem");
             es.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            es.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
         }
     }
 

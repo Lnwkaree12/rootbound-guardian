@@ -66,6 +66,7 @@ public class DoorController : MonoBehaviour
     [SerializeField] private bool playerInTrigger = false;
 
     private PlayerMovement cachedPlayer;
+    private PlayerInputHandler cachedInputHandler;
     private readonly HashSet<Collider> playerCollidersInTrigger = new HashSet<Collider>();
     private Coroutine flashCoroutine;
     private Vector3 promptBaseLocalPos;
@@ -279,7 +280,10 @@ public class DoorController : MonoBehaviour
             bool hasKey = CheckPlayerHasKey();
             UpdatePromptDisplay(hasKey);
 
-            bool interactPressed = Input.GetKeyDown(interactKey) || (allowKeyFBackup && Input.GetKeyDown(KeyCode.F));
+            bool interactPressed =
+                (cachedInputHandler != null && cachedInputHandler.InteractPressed) ||
+                InputSystemInput.GetKeyDown(interactKey) ||
+                (allowKeyFBackup && InputSystemInput.GetKeyDown(KeyCode.F));
             if (interactPressed)
             {
                 TryOpenDoor();
@@ -308,9 +312,11 @@ public class DoorController : MonoBehaviour
         {
             if (hasKey)
             {
-                promptTextTMP.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_open") : "กด <color=#FFEE44>[E]</color> เพื่อเปิดประตู";
+                promptTextTMP.text = LocalizationManager.Instance != null
+                    ? LocalizationManager.Instance.Get("door_prompt_open")
+                    : InputSystemInput.FormatControllerPromptText("กด <color=#FFEE44>[E]</color> เพื่อเปิดประตู");
                 promptTextTMP.color = new Color(1f, 0.95f, 0.7f);
-                if (promptKeyIcon != null) promptKeyIcon.gameObject.SetActive(true);
+                if (promptKeyIcon != null) promptKeyIcon.gameObject.SetActive(!InputSystemInput.IsControllerInputActive);
             }
             else
             {
@@ -323,7 +329,7 @@ public class DoorController : MonoBehaviour
         if (promptTextLegacy != null)
         {
             promptTextLegacy.text = hasKey 
-                ? (LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_open") : "กด [E] เพื่อเปิดประตู") 
+                ? (LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_open") : InputSystemInput.FormatControllerPromptText("กด [E] เพื่อเปิดประตู"))
                 : (LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_locked") : "ประตูล็อคแน่นหนา (ต้องหากุญแจก่อน)");
         }
     }
@@ -597,6 +603,7 @@ public class DoorController : MonoBehaviour
         if (player == null || (cachedPlayer != null && cachedPlayer != player)) return;
 
         cachedPlayer = player;
+        cachedInputHandler = player.GetComponent<PlayerInputHandler>();
         playerCollidersInTrigger.Add(other);
         playerInTrigger = playerCollidersInTrigger.Count > 0;
 
@@ -614,6 +621,7 @@ public class DoorController : MonoBehaviour
         if (playerInTrigger) return;
 
         cachedPlayer = null;
+        cachedInputHandler = null;
         if (promptObject != null && promptObject.activeSelf)
         {
             promptObject.SetActive(false);
@@ -624,6 +632,7 @@ public class DoorController : MonoBehaviour
     {
         playerCollidersInTrigger.Clear();
         cachedPlayer = null;
+        cachedInputHandler = null;
         playerInTrigger = false;
     }
 

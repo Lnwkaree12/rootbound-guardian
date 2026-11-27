@@ -60,12 +60,14 @@ public class GameWideLocalization : MonoBehaviour
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
         LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
     }
 
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
         LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
     }
 
     private void Start()
@@ -75,8 +77,10 @@ public class GameWideLocalization : MonoBehaviour
 
     private void Update()
     {
+        InputSystemInput.UpdateLastInputDeviceActivity();
+
         // Global hotkey: Press L to cycle language
-        if (Input.GetKeyDown(KeyCode.L))
+        if (InputSystemInput.GetKeyDown(KeyCode.L))
         {
             CycleLanguage();
         }
@@ -96,6 +100,11 @@ public class GameWideLocalization : MonoBehaviour
     }
 
     private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        ApplyLocalizationToActiveScene();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
     {
         ApplyLocalizationToActiveScene();
     }

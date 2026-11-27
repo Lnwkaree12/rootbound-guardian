@@ -6,12 +6,38 @@ public class PressAnyKeyEffect : MonoBehaviour
 {
     public float fadeSpeed = 2.0f;
     private TextMeshProUGUI textElement;
+    private string keyboardPromptText;
     private bool fadingOut = true;
     private bool isStarting = false; // ป้องกันการกดซ้ำ
 
     void Awake()
     {
         textElement = GetComponent<TextMeshProUGUI>();
+        if (textElement != null) keyboardPromptText = textElement.text;
+    }
+
+    private void OnEnable()
+    {
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
+        RefreshPromptText();
+    }
+
+    private void OnDisable()
+    {
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
+    }
+
+    private void OnInputDeviceChanged(bool isController)
+    {
+        RefreshPromptText();
+    }
+
+    private void RefreshPromptText()
+    {
+        if (textElement == null) return;
+        textElement.text = InputSystemInput.IsControllerInputActive
+            ? InputSystemInput.FormatControllerPromptText(keyboardPromptText)
+            : keyboardPromptText;
     }
 
     void Update()
@@ -19,7 +45,7 @@ public class PressAnyKeyEffect : MonoBehaviour
         HandleFading();
 
         // ตรวจสอบการกดปุ่ม (และยังไม่ได้เริ่มโหลด)
-        if (Input.anyKeyDown && !isStarting)
+        if (InputSystemInput.AnyKeyDown && !isStarting)
         {
             isStarting = true;
             StartGame();

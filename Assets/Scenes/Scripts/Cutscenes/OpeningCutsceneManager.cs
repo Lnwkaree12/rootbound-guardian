@@ -87,13 +87,40 @@ public class OpeningCutsceneManager : MonoBehaviour
             skipButton.gameObject.SetActive(false);
         }
 
-        if (continuePrompt != null && LocalizationManager.Instance != null)
+        RefreshContinuePrompt();
+    }
+
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
+        RefreshContinuePrompt();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        RefreshContinuePrompt();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
+    {
+        RefreshContinuePrompt();
+    }
+
+    private void RefreshContinuePrompt()
+    {
+        if (continuePrompt == null || LocalizationManager.Instance == null) return;
+
+        var tmp = continuePrompt.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (tmp != null)
         {
-            var tmp = continuePrompt.GetComponentInChildren<TextMeshProUGUI>();
-            if (tmp != null)
-            {
-                tmp.text = LocalizationManager.Instance.Get("hint_continue");
-            }
+            tmp.text = LocalizationManager.Instance.Get("hint_continue");
         }
     }
 
@@ -122,9 +149,16 @@ public class OpeningCutsceneManager : MonoBehaviour
     {
         if (isSkipping) return;
 
+        if (InputSystemInput.CancelPressedThisFrame)
+        {
+            OnSkipClicked();
+            return;
+        }
+
         // Advance or skip typing: Space, Enter, E, or Left Mouse Click
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) ||
-            Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0))
+        if (InputSystemInput.SubmitPressedThisFrame ||
+            InputSystemInput.GetKeyDown(KeyCode.Space) || InputSystemInput.GetKeyDown(KeyCode.Return) ||
+            InputSystemInput.GetKeyDown(KeyCode.E) || InputSystemInput.GetMouseButtonDown(0))
         {
             if (isTyping)
             {

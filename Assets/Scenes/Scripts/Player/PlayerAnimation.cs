@@ -152,25 +152,21 @@ private static readonly int IdleStateHash = Animator.StringToHash("Idle");
         HandleFacingDirection(1f); // ส่งค่า 1 (ขวา) ไปบังคับหันหน้า
     }
 
-    public void SetTutorialWalkMode(bool enabled)
+   public void SetTutorialWalkMode(bool enabled)
 {
     if (animator == null) return;
 
     animator.SetBool(UseTutorialWalkHash, enabled);
 
+    bool isMoving = inputHandler != null && inputHandler.MoveInput.sqrMagnitude > 0.01f;
+
     if (enabled)
     {
-        if (inputHandler != null && inputHandler.MoveInput.sqrMagnitude > 0.01f)
-        {
-            animator.CrossFadeInFixedTime(WalkStateHash, 0.08f, 0);
-        }
+        animator.CrossFadeInFixedTime(isMoving ? WalkStateHash : Idle3StateHash, 0.08f, 0);
     }
     else
     {
-        if (inputHandler != null && inputHandler.MoveInput.sqrMagnitude > 0.01f)
-        {
-            animator.CrossFadeInFixedTime(RunStateHash, 0.08f, 0);
-        }
+        animator.CrossFadeInFixedTime(isMoving ? RunStateHash : IdleStateHash, 0.08f, 0);
     }
 }
 

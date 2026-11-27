@@ -100,15 +100,22 @@ public class EndCreditController : MonoBehaviour
     private void OnEnable()
     {
         LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
         UpdateLocalizedTexts();
     }
 
     private void OnDisable()
     {
         LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
     }
 
     private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        UpdateLocalizedTexts();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
     {
         UpdateLocalizedTexts();
     }
@@ -168,6 +175,14 @@ public class EndCreditController : MonoBehaviour
 
     private void Update()
     {
+        if (InputSystemInput.CancelPressedThisFrame &&
+            skipButton != null &&
+            skipButton.gameObject.activeInHierarchy)
+        {
+            OnSkipClicked();
+            return;
+        }
+
         if (isTransitioning) return;
 
         HandleInputAndScrolling();
@@ -192,17 +207,21 @@ public class EndCreditController : MonoBehaviour
 
         endButtonsReadyTimer += Time.unscaledDeltaTime;
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        if (InputSystemInput.GetKeyDown(KeyCode.LeftArrow) ||
+            InputSystemInput.GetKeyDown(KeyCode.A) ||
+            InputSystemInput.DpadLeftPressedThisFrame)
         {
             SelectEndButton(0, true);
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        else if (InputSystemInput.GetKeyDown(KeyCode.RightArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.D) ||
+                 InputSystemInput.DpadRightPressedThisFrame)
         {
             SelectEndButton(1, true);
         }
 
         if (endButtonsReadyTimer >= 0.25f &&
-            (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0)))
+            (InputSystemInput.GetKeyDown(KeyCode.Return) || InputSystemInput.GetKeyDown(KeyCode.KeypadEnter) || InputSystemInput.GetKeyDown(KeyCode.Space) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton0)))
         {
             Button targetBtn = selectedEndButtonIndex == 0 ? mainMenuButton : replayButton;
             if (targetBtn != null && targetBtn.interactable)
@@ -252,10 +271,12 @@ public class EndCreditController : MonoBehaviour
         if (scrollContent == null) return;
 
         // Check if fast forward is held (Space, Enter, down arrow, or holding left mouse button)
-        bool isFastForwarding = Input.GetKey(KeyCode.Space) ||
-                               Input.GetKey(KeyCode.Return) ||
-                               Input.GetKey(KeyCode.DownArrow) ||
-                               (Input.GetMouseButton(0) && !IsPointerOverInteractiveButton());
+        bool isFastForwarding = InputSystemInput.SubmitPressed ||
+                               InputSystemInput.GetKey(KeyCode.Space) ||
+                               InputSystemInput.GetKey(KeyCode.Return) ||
+                               InputSystemInput.GetKey(KeyCode.DownArrow) ||
+                               InputSystemInput.DpadDownPressed ||
+                               (InputSystemInput.GetMouseButton(0) && !IsPointerOverInteractiveButton());
 
         if (fastForwardIndicator != null)
         {

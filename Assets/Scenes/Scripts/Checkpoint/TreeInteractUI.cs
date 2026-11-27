@@ -27,6 +27,7 @@ public class TreeInteractUI : MonoBehaviour
     private Vector3 sproutInitialLocalPos;
     private Coroutine popCoroutine;
     private bool isVisible = false;
+    private TextMeshProUGUI controllerPromptLabel;
 
     private void Awake()
     {
@@ -38,6 +39,7 @@ public class TreeInteractUI : MonoBehaviour
 
         if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        CreateControllerPromptLabel();
 
         Canvas canvas = GetComponent<Canvas>();
         if (canvas != null)
@@ -48,6 +50,17 @@ public class TreeInteractUI : MonoBehaviour
         // Start hidden
         canvasGroup.alpha = 0f;
         transform.localScale = Vector3.zero;
+    }
+
+    private void OnEnable()
+    {
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
+        RefreshInputPrompt();
+    }
+
+    private void OnDisable()
+    {
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
     }
 
     private void Start()
@@ -63,6 +76,53 @@ public class TreeInteractUI : MonoBehaviour
         promptText = text;
         if (keyIcon != null) keyInitialLocalPos = keyIcon.transform.localPosition;
         if (sproutIcon != null) sproutInitialLocalPos = sproutIcon.transform.localPosition;
+        CreateControllerPromptLabel();
+        RefreshInputPrompt();
+    }
+
+    private void CreateControllerPromptLabel()
+    {
+        if (keyIcon == null || controllerPromptLabel != null) return;
+
+        GameObject labelObject = new GameObject(
+            "ControllerPromptLabel",
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(TextMeshProUGUI));
+        labelObject.transform.SetParent(keyIcon.transform, false);
+
+        RectTransform labelRect = labelObject.GetComponent<RectTransform>();
+        labelRect.anchorMin = Vector2.zero;
+        labelRect.anchorMax = Vector2.one;
+        labelRect.offsetMin = Vector2.zero;
+        labelRect.offsetMax = Vector2.zero;
+
+        controllerPromptLabel = labelObject.GetComponent<TextMeshProUGUI>();
+        controllerPromptLabel.alignment = TextAlignmentOptions.Center;
+        controllerPromptLabel.fontSize = 23f;
+        controllerPromptLabel.fontStyle = FontStyles.Bold;
+        controllerPromptLabel.color = new Color(1f, 0.92f, 0.65f);
+        controllerPromptLabel.outlineColor = new Color(0f, 0f, 0f, 0.9f);
+        controllerPromptLabel.outlineWidth = 0.25f;
+        controllerPromptLabel.raycastTarget = false;
+        controllerPromptLabel.enabled = false;
+    }
+
+    private void OnInputDeviceChanged(bool isController)
+    {
+        RefreshInputPrompt();
+    }
+
+    private void RefreshInputPrompt()
+    {
+        bool isController = InputSystemInput.IsControllerInputActive;
+        if (keyIcon != null) keyIcon.enabled = !isController;
+
+        if (controllerPromptLabel != null)
+        {
+            controllerPromptLabel.text = $"[{InputSystemInput.InteractButtonDisplayName}]";
+            controllerPromptLabel.enabled = isController;
+        }
     }
 
     private void LateUpdate()

@@ -113,7 +113,7 @@ public class ChestController : MonoBehaviour
         if (!isPlayerInRange) return;
 
         // Check Interact input (E key or InputHandler)
-        bool interactPressed = (inputHandler != null && inputHandler.InteractPressed) || Input.GetKeyDown(KeyCode.E);
+        bool interactPressed = (inputHandler != null && inputHandler.InteractPressed) || InputSystemInput.GetKeyDown(KeyCode.E);
         if (interactPressed && !isOpened)
         {
             OpenChest();

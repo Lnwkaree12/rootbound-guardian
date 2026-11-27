@@ -67,7 +67,7 @@ public class PotionHUDUI : MonoBehaviour
         }
 
         // Quick shortcut to drink potion: H key or 1 key (or Alpha1)
-        if (Input.GetKeyDown(KeyCode.H) || Input.GetKeyDown(KeyCode.Alpha1))
+        if (InputSystemInput.GetKeyDown(KeyCode.H) || InputSystemInput.GetKeyDown(KeyCode.Alpha1))
         {
             TryUsePotionFromHUD();
         }

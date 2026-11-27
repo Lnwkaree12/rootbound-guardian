@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using TMPro;
 
 public class IntroCinematicManager : MonoBehaviour
 {
@@ -36,6 +37,48 @@ public class IntroCinematicManager : MonoBehaviour
     private Coroutine typingCoroutine;
     private bool isTransitioning = false;
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
+        RefreshContinuePrompt();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        RefreshContinuePrompt();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
+    {
+        RefreshContinuePrompt();
+    }
+
+    private void RefreshContinuePrompt()
+    {
+        if (pressSpacePrompt == null || LocalizationManager.Instance == null) return;
+
+        string prompt = LocalizationManager.Instance.Get("hint_continue");
+        TextMeshProUGUI tmp = pressSpacePrompt.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (tmp != null)
+        {
+            tmp.text = prompt;
+            return;
+        }
+
+        Text text = pressSpacePrompt.GetComponentInChildren<Text>(true);
+        if (text != null)
+        {
+            text.text = prompt;
+        }
+    }
+
     void Start()
     {
         if (slides == null || slides.Length == 0)
@@ -61,7 +104,8 @@ public class IntroCinematicManager : MonoBehaviour
         if (isTransitioning) return;
 
         // Allow skipping text or moving to the next slide via Spacebar or Mouse Click
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+        if (InputSystemInput.SubmitPressedThisFrame ||
+            InputSystemInput.GetKeyDown(KeyCode.Space) || InputSystemInput.GetMouseButtonDown(0))
         {
             if (isTextTyping)
             {

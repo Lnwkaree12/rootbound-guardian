@@ -61,22 +61,26 @@ public class GameOverUIManager : MonoBehaviour
         if (!isGameOver) return;
 
         // เลื่อนปุ่มด้วยปุ่มทิศทางหรือ Tab
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        if (InputSystemInput.GetKeyDown(KeyCode.LeftArrow) ||
+            InputSystemInput.GetKeyDown(KeyCode.A) ||
+            InputSystemInput.DpadLeftPressedThisFrame)
         {
             Navigate(-1);
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        else if (InputSystemInput.GetKeyDown(KeyCode.RightArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.D) ||
+                 InputSystemInput.DpadRightPressedThisFrame)
         {
             Navigate(1);
         }
-        else if (Input.GetKeyDown(KeyCode.Tab))
+        else if (InputSystemInput.GetKeyDown(KeyCode.Tab))
         {
-            int dir = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ? -1 : 1;
+            int dir = (InputSystemInput.GetKey(KeyCode.LeftShift) || InputSystemInput.GetKey(KeyCode.RightShift)) ? -1 : 1;
             Navigate(dir);
         }
 
         // ยืนยันการกดปุ่ม
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+        if (InputSystemInput.GetKeyDown(KeyCode.Return) || InputSystemInput.GetKeyDown(KeyCode.KeypadEnter) || InputSystemInput.GetKeyDown(KeyCode.Space) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton0))
         {
             SubmitSelectedButton();
         }
@@ -254,7 +258,7 @@ public class GameOverUIManager : MonoBehaviour
         {
             GameObject es = new GameObject("EventSystem");
             es.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            es.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
         }
     }
 

@@ -124,7 +124,7 @@ public static class SetupMainGameplayUI
         {
             GameObject esGO = new GameObject("EventSystem");
             esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            esGO.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            esGO.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
             Debug.Log("[SetupMainGameplayUI] Created missing EventSystem in scene.");
         }
 

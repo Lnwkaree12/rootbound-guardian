@@ -182,7 +182,7 @@ public class LoadingManager : MonoBehaviour
             if (statusText != null) statusText.text = readyStr;
             if (statusTextLegacy != null) statusTextLegacy.text = readyStr;
             
-            while (!Input.anyKeyDown)
+            while (!InputSystemInput.AnyKeyDown)
             {
                 yield return null;
             }

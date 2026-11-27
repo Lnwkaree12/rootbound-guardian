@@ -85,7 +85,7 @@ public class LanguageSwitcherUI : MonoBehaviour
     private void Update()
     {
         // Keyboard shortcut: L key = วนเปลี่ยนภาษา
-        if (Input.GetKeyDown(KeyCode.L))
+        if (InputSystemInput.GetKeyDown(KeyCode.L))
         {
             CycleLanguage();
         }

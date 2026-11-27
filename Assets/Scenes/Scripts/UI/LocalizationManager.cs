@@ -90,9 +90,15 @@ public class LocalizationManager : MonoBehaviour
         if (string.IsNullOrEmpty(key)) return "";
         EnsureInitialized();
         var table = GetCurrentTable();
-        if (table != null && table.TryGetValue(key, out string val)) return val;
+        if (table != null && table.TryGetValue(key, out string val))
+        {
+            return FormatInputHint(key, val, CurrentLanguage);
+        }
         // Fallback ไป TH ถ้าหา key ไม่เจอใน EN/ZH
-        if (tablesTH != null && tablesTH.TryGetValue(key, out string thVal)) return thVal;
+        if (tablesTH != null && tablesTH.TryGetValue(key, out string thVal))
+        {
+            return FormatInputHint(key, thVal, Language.TH);
+        }
         return key;
     }
 
@@ -105,9 +111,77 @@ public class LocalizationManager : MonoBehaviour
         if (lang == "EN") targetTable = tablesEN;
         else if (lang == "ZH") targetTable = tablesZH;
 
-        if (targetTable != null && targetTable.TryGetValue(key, out string val)) return val;
-        if (tablesTH != null && tablesTH.TryGetValue(key, out string thVal)) return thVal;
+        Language targetLanguage = lang == "EN" ? Language.EN : lang == "ZH" ? Language.ZH : Language.TH;
+        if (targetTable != null && targetTable.TryGetValue(key, out string val))
+        {
+            return FormatInputHint(key, val, targetLanguage);
+        }
+        if (tablesTH != null && tablesTH.TryGetValue(key, out string thVal))
+        {
+            return FormatInputHint(key, thVal, Language.TH);
+        }
         return key;
+    }
+
+    private static string FormatInputHint(string key, string text, Language language)
+    {
+        if (!InputSystemInput.IsControllerInputActive)
+        {
+            return text;
+        }
+
+        switch (key)
+        {
+            case "press_any_key":
+                switch (language)
+                {
+                    case Language.TH: return "กดปุ่มใดก็ได้บนจอยเพื่อเริ่มต้น";
+                    case Language.EN: return "PRESS ANY BUTTON TO START";
+                    default: return "按任意手柄按钮开始";
+                }
+            case "lang_tip":
+                switch (language)
+                {
+                    case Language.TH: return "ใช้ปุ่มทิศทางเลือกภาษา แล้วกด [ENTER] เพื่อยืนยัน";
+                    case Language.EN: return "Use the D-pad to choose a language, then press [ENTER] to confirm";
+                    default: return "使用方向键选择语言，然后按 [ENTER] 确认";
+                }
+            case "ctrl_swap_normal":
+                return FormatControllerButtonLegend(language, false);
+            case "ctrl_swap_swapped":
+                return FormatControllerButtonLegend(language, true);
+            case "load_lumi_tip_4":
+                switch (language)
+                {
+                    case Language.TH: return "บันไดไม้ให้เดินชนแล้วขยับก้านอนาล็อกหรือปุ่มทิศทางค้างไว้เพื่อปีน!";
+                    case Language.EN: return "For wooden ladders, move into them and hold the left stick or D-pad to climb!";
+                    default: return "爬木梯时，靠近梯子并按住左摇杆或方向键即可攀爬！";
+                }
+        }
+
+        return InputSystemInput.FormatControllerPromptText(text);
+    }
+
+    private static string FormatControllerButtonLegend(Language language, bool swapped)
+    {
+        string confirmButton = swapped
+            ? InputSystemInput.CancelButtonDisplayName
+            : InputSystemInput.SubmitButtonDisplayName;
+        string backButton = swapped
+            ? InputSystemInput.SubmitButtonDisplayName
+            : InputSystemInput.CancelButtonDisplayName;
+        string confirm = $"<color=#58D68D>{confirmButton}</color>";
+        string back = $"<color=#E74C3C>{backButton}</color>";
+
+        switch (language)
+        {
+            case Language.TH:
+                return $"{confirm} ตกลง / {back} ย้อนกลับ";
+            case Language.EN:
+                return $"{confirm} Confirm / {back} Back";
+            default:
+                return $"{confirm} 确认 / {back} 返回";
+        }
     }
 
     /// <summary>เรียกเพื่อสร้างตารางภาษาหากยังไม่ได้สร้าง (ปลอดภัยสำหรับ Editor และ Runtime)</summary>
@@ -455,7 +529,7 @@ public class LocalizationManager : MonoBehaviour
             zh: "<color=#FF3333>大门紧锁！必须使用钥匙</color>");
 
         AddKey("root_prompt_water",
-            th: "กด E รดน้ำต้นไม้",
+            th: "กด [E] รดน้ำต้นไม้",
             en: "Press [E] to water the tree",
             zh: "按 [E] 给神树浇水");
 

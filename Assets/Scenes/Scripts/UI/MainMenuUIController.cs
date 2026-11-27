@@ -337,14 +337,21 @@ public class MainMenuUIController : MonoBehaviour
     private void OnEnable()
     {
         LocalizationManager.OnLanguageChanged += OnLanguageChangedHandler;
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
     }
 
     private void OnDisable()
     {
         LocalizationManager.OnLanguageChanged -= OnLanguageChangedHandler;
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
     }
 
     private void OnLanguageChangedHandler(LocalizationManager.Language lang)
+    {
+        RefreshLocalization();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
     {
         RefreshLocalization();
     }
@@ -1019,7 +1026,7 @@ public class MainMenuUIController : MonoBehaviour
             pressAnyKeyText.color = c;
         }
 
-        if (Input.anyKeyDown && !Input.GetKeyDown(KeyCode.Escape))
+        if (InputSystemInput.AnyKeyDown && !InputSystemInput.GetKeyDown(KeyCode.Escape))
         {
             PunchConfirmBadge();
             SetMenuState(MenuState.MainMenu, true);
@@ -1032,26 +1039,33 @@ public class MainMenuUIController : MonoBehaviour
 
     private void UpdateMainMenuInput()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        if (InputSystemInput.GetKeyDown(KeyCode.LeftArrow) ||
+            InputSystemInput.GetKeyDown(KeyCode.A) ||
+            InputSystemInput.DpadLeftPressedThisFrame)
         {
             mainMenuIndex = (mainMenuIndex - 1 + 3) % 3;
             PlaySound(navSound);
             UpdateMainMenuVisuals();
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        else if (InputSystemInput.GetKeyDown(KeyCode.RightArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.D) ||
+                 InputSystemInput.DpadRightPressedThisFrame)
         {
             mainMenuIndex = (mainMenuIndex + 1) % 3;
             PlaySound(navSound);
             UpdateMainMenuVisuals();
         }
 
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space))
+        if (InputSystemInput.GetKeyDown(KeyCode.Return) ||
+            InputSystemInput.GetKeyDown(KeyCode.KeypadEnter) ||
+            InputSystemInput.GetKeyDown(KeyCode.Space) ||
+            InputSystemInput.SubmitPressedThisFrame)
         {
             PunchConfirmBadge();
             TriggerMainMenuSelection();
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (InputSystemInput.GetKeyDown(KeyCode.Escape) || InputSystemInput.CancelPressedThisFrame)
         {
             PunchBackBadge();
             PlaySound(backSound);
@@ -1226,12 +1240,12 @@ public class MainMenuUIController : MonoBehaviour
     private void UpdateSettingsInput()
     {
         // Category switching with Q / E, LB / RB, or Tab
-        if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.JoystickButton4))
+        if (InputSystemInput.GetKeyDown(KeyCode.Q) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton4))
         {
             SwitchSettingsCategory((currentSettingsCategory - 1 + 3) % 3);
             return;
         }
-        else if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.JoystickButton5) || Input.GetKeyDown(KeyCode.Tab))
+        else if (InputSystemInput.GetKeyDown(KeyCode.E) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton5) || InputSystemInput.GetKeyDown(KeyCode.Tab))
         {
             SwitchSettingsCategory((currentSettingsCategory + 1) % 3);
             return;
@@ -1254,13 +1268,17 @@ public class MainMenuUIController : MonoBehaviour
     private void UpdateAudioSettingsInput()
     {
         // Up / Down
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        if (InputSystemInput.GetKeyDown(KeyCode.UpArrow) ||
+            InputSystemInput.GetKeyDown(KeyCode.W) ||
+            InputSystemInput.DpadUpPressedThisFrame)
         {
             settingsIndex = (settingsIndex - 1 + 6) % 6;
             PlaySound(navSound);
             UpdateSettingsVisuals();
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        else if (InputSystemInput.GetKeyDown(KeyCode.DownArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.S) ||
+                 InputSystemInput.DpadDownPressedThisFrame)
         {
             settingsIndex = (settingsIndex + 1) % 6;
             PlaySound(navSound);
@@ -1269,8 +1287,12 @@ public class MainMenuUIController : MonoBehaviour
 
         // Left / Right adjustments with tactile arrow punch + hold-to-repeat on sliders
         int pressDir = 0;
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) pressDir = -1;
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) pressDir = 1;
+        if (InputSystemInput.GetKeyDown(KeyCode.LeftArrow) ||
+            InputSystemInput.GetKeyDown(KeyCode.A) ||
+            InputSystemInput.DpadLeftPressedThisFrame) pressDir = -1;
+        else if (InputSystemInput.GetKeyDown(KeyCode.RightArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.D) ||
+                 InputSystemInput.DpadRightPressedThisFrame) pressDir = 1;
 
         if (pressDir != 0)
         {
@@ -1288,8 +1310,12 @@ public class MainMenuUIController : MonoBehaviour
         }
         else if (settingsIndex <= 2)
         {
-            bool leftHeld = Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A);
-            bool rightHeld = Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D);
+            bool leftHeld = InputSystemInput.GetKey(KeyCode.LeftArrow) ||
+                            InputSystemInput.GetKey(KeyCode.A) ||
+                            InputSystemInput.DpadLeftPressed;
+            bool rightHeld = InputSystemInput.GetKey(KeyCode.RightArrow) ||
+                             InputSystemInput.GetKey(KeyCode.D) ||
+                             InputSystemInput.DpadRightPressed;
             int holdDir = (leftHeld && !rightHeld) ? -1 : ((rightHeld && !leftHeld) ? 1 : 0);
 
             if (holdDir != 0 && holdDir == audioHeldDir)
@@ -1314,7 +1340,7 @@ public class MainMenuUIController : MonoBehaviour
         }
 
         // Confirm
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+        if (InputSystemInput.GetKeyDown(KeyCode.Return) || InputSystemInput.GetKeyDown(KeyCode.KeypadEnter) || InputSystemInput.GetKeyDown(KeyCode.Space) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton0))
         {
             PunchConfirmBadge();
             if (settingsIndex == 5)
@@ -1334,7 +1360,7 @@ public class MainMenuUIController : MonoBehaviour
         }
 
         // Back: ESC or Gamepad B
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton1))
+        if (InputSystemInput.GetKeyDown(KeyCode.Escape) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton1))
         {
             PunchBackBadge();
             OnSettingsBackClicked();
@@ -1344,24 +1370,28 @@ public class MainMenuUIController : MonoBehaviour
     private void UpdateControllerSettingsInput()
     {
         // 1 / 2 direct mode switch
-        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+        if (InputSystemInput.GetKeyDown(KeyCode.Alpha1) || InputSystemInput.GetKeyDown(KeyCode.Keypad1))
         {
             SetControllerMode(0);
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+        else if (InputSystemInput.GetKeyDown(KeyCode.Alpha2) || InputSystemInput.GetKeyDown(KeyCode.Keypad2))
         {
             SetControllerMode(1);
         }
 
         // Up / Down navigation among controller settings rows
         // 0: Mode Tabs, 1: Vibration, 2: Sensitivity, 3: Swap, 4: Reset, 5: Back
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        if (InputSystemInput.GetKeyDown(KeyCode.UpArrow) ||
+            InputSystemInput.GetKeyDown(KeyCode.W) ||
+            InputSystemInput.DpadUpPressedThisFrame)
         {
             controllerNavRowIndex = (controllerNavRowIndex - 1 + 6) % 6;
             PlaySound(navSound);
             UpdateControllerNavVisuals();
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        else if (InputSystemInput.GetKeyDown(KeyCode.DownArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.S) ||
+                 InputSystemInput.DpadDownPressedThisFrame)
         {
             controllerNavRowIndex = (controllerNavRowIndex + 1) % 6;
             PlaySound(navSound);
@@ -1369,7 +1399,9 @@ public class MainMenuUIController : MonoBehaviour
         }
 
         // Left / Right adjustments
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        if (InputSystemInput.GetKeyDown(KeyCode.LeftArrow) ||
+            InputSystemInput.GetKeyDown(KeyCode.A) ||
+            InputSystemInput.DpadLeftPressedThisFrame)
         {
             if (controllerNavRowIndex == 0)
             {
@@ -1388,7 +1420,9 @@ public class MainMenuUIController : MonoBehaviour
                 ToggleButtonSwap();
             }
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        else if (InputSystemInput.GetKeyDown(KeyCode.RightArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.D) ||
+                 InputSystemInput.DpadRightPressedThisFrame)
         {
             if (controllerNavRowIndex == 0)
             {
@@ -1409,7 +1443,7 @@ public class MainMenuUIController : MonoBehaviour
         }
 
         // Confirm: Enter, Space, or Gamepad A
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+        if (InputSystemInput.GetKeyDown(KeyCode.Return) || InputSystemInput.GetKeyDown(KeyCode.KeypadEnter) || InputSystemInput.GetKeyDown(KeyCode.Space) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton0))
         {
             PunchConfirmBadge();
             if (controllerNavRowIndex == 0)
@@ -1439,7 +1473,7 @@ public class MainMenuUIController : MonoBehaviour
         }
 
         // Back: ESC or Gamepad B
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton1))
+        if (InputSystemInput.GetKeyDown(KeyCode.Escape) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton1))
         {
             PunchBackBadge();
             OnSettingsBackClicked();
@@ -1590,27 +1624,34 @@ public class MainMenuUIController : MonoBehaviour
 
     private void UpdateExitConfirmInput()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        if (InputSystemInput.GetKeyDown(KeyCode.LeftArrow) ||
+            InputSystemInput.GetKeyDown(KeyCode.A) ||
+            InputSystemInput.DpadLeftPressedThisFrame)
         {
             exitModalIndex = 0; // Confirm
             PlaySound(navSound);
             UpdateExitModalVisuals();
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        else if (InputSystemInput.GetKeyDown(KeyCode.RightArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.D) ||
+                 InputSystemInput.DpadRightPressedThisFrame)
         {
             exitModalIndex = 1; // Cancel
             PlaySound(navSound);
             UpdateExitModalVisuals();
         }
 
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space))
+        if (InputSystemInput.GetKeyDown(KeyCode.Return) ||
+            InputSystemInput.GetKeyDown(KeyCode.KeypadEnter) ||
+            InputSystemInput.GetKeyDown(KeyCode.Space) ||
+            InputSystemInput.SubmitPressedThisFrame)
         {
             PunchConfirmBadge();
             if (exitModalIndex == 0) OnConfirmExitClicked();
             else OnCancelExitClicked();
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (InputSystemInput.GetKeyDown(KeyCode.Escape) || InputSystemInput.CancelPressedThisFrame)
         {
             PunchBackBadge();
             OnCancelExitClicked();
@@ -2134,24 +2175,26 @@ public class MainMenuUIController : MonoBehaviour
     private void UpdateLanguageSettingsInput()
     {
         // Direct language hotkeys 1, 2, 3
-        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+        if (InputSystemInput.GetKeyDown(KeyCode.Alpha1) || InputSystemInput.GetKeyDown(KeyCode.Keypad1))
         {
             SelectLanguageByIndex(0);
             return;
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+        else if (InputSystemInput.GetKeyDown(KeyCode.Alpha2) || InputSystemInput.GetKeyDown(KeyCode.Keypad2))
         {
             SelectLanguageByIndex(1);
             return;
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
+        else if (InputSystemInput.GetKeyDown(KeyCode.Alpha3) || InputSystemInput.GetKeyDown(KeyCode.Keypad3))
         {
             SelectLanguageByIndex(2);
             return;
         }
 
         // Navigation Up/Down/Left/Right
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        if (InputSystemInput.GetKeyDown(KeyCode.LeftArrow) ||
+            InputSystemInput.GetKeyDown(KeyCode.A) ||
+            InputSystemInput.DpadLeftPressedThisFrame)
         {
             if (languageNavIndex < 3)
             {
@@ -2160,7 +2203,9 @@ public class MainMenuUIController : MonoBehaviour
                 UpdateLanguageSettingsVisuals();
             }
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        else if (InputSystemInput.GetKeyDown(KeyCode.RightArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.D) ||
+                 InputSystemInput.DpadRightPressedThisFrame)
         {
             if (languageNavIndex < 3)
             {
@@ -2169,13 +2214,17 @@ public class MainMenuUIController : MonoBehaviour
                 UpdateLanguageSettingsVisuals();
             }
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        else if (InputSystemInput.GetKeyDown(KeyCode.DownArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.S) ||
+                 InputSystemInput.DpadDownPressedThisFrame)
         {
             languageNavIndex = 3; // Back button
             PlaySound(navSound);
             UpdateLanguageSettingsVisuals();
         }
-        else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        else if (InputSystemInput.GetKeyDown(KeyCode.UpArrow) ||
+                 InputSystemInput.GetKeyDown(KeyCode.W) ||
+                 InputSystemInput.DpadUpPressedThisFrame)
         {
             if (languageNavIndex == 3)
             {
@@ -2186,7 +2235,7 @@ public class MainMenuUIController : MonoBehaviour
         }
 
         // Confirm
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+        if (InputSystemInput.GetKeyDown(KeyCode.Return) || InputSystemInput.GetKeyDown(KeyCode.KeypadEnter) || InputSystemInput.GetKeyDown(KeyCode.Space) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton0))
         {
             PunchConfirmBadge();
             if (languageNavIndex == 3)
@@ -2200,7 +2249,7 @@ public class MainMenuUIController : MonoBehaviour
         }
 
         // Back
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton1))
+        if (InputSystemInput.GetKeyDown(KeyCode.Escape) || InputSystemInput.GetKeyDown(KeyCode.JoystickButton1))
         {
             PunchBackBadge();
             OnSettingsBackClicked();
@@ -2396,9 +2445,8 @@ public class MainMenuUIController : MonoBehaviour
 
         if (controllerConnectedStatusText != null)
         {
-            string[] joysticks = Input.GetJoystickNames();
-            bool connected = joysticks != null && joysticks.Length > 0 && !string.IsNullOrEmpty(joysticks[0]);
-            string joyName = connected ? joysticks[0] : "XBOX WIRELESS CONTROLLER";
+            bool connected = InputSystemInput.IsControllerConnected;
+            string joyName = connected ? InputSystemInput.ControllerDisplayName : "XBOX WIRELESS CONTROLLER";
             string ctrlLabel = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_connected") : "จอยที่เชื่อมต่อ";
             string ctrlReady = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_ready") : "พร้อมใช้งาน";
             controllerConnectedStatusText.text = $"{ctrlLabel}: <color=#58A6FF>{joyName.ToUpper()}</color> ({ctrlReady})";

@@ -107,7 +107,7 @@ public class WinUIManager : MonoBehaviour
         {
             GameObject es = new GameObject("EventSystem");
             es.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            es.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
         }
     }
 

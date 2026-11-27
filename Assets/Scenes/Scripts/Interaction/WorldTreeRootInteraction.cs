@@ -84,6 +84,7 @@ public class WorldTreeRootInteraction : MonoBehaviour
     private Transform playerTransform;
     private GameObject playerRootObject;
     private PlayerMovement playerMovement;
+    private PlayerInputHandler playerInputHandler;
     private Camera mainCamera;
     private Vector3 initialPromptLocalPos;
     private Vector3 initialPromptScale;
@@ -127,15 +128,22 @@ public class WorldTreeRootInteraction : MonoBehaviour
     private void OnEnable()
     {
         LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
         RefreshPromptText();
     }
 
     private void OnDisable()
     {
         LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
     }
 
     private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        RefreshPromptText();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
     {
         RefreshPromptText();
     }
@@ -146,7 +154,12 @@ public class WorldTreeRootInteraction : MonoBehaviour
         {
             promptTextTMP.text = LocalizationManager.Instance != null 
                 ? LocalizationManager.Instance.Get("root_prompt_water") 
-                : "กด E รดน้ำต้นไม้";
+                : InputSystemInput.FormatControllerPromptText("กด [E] รดน้ำต้นไม้");
+        }
+
+        if (promptKeyIcon != null)
+        {
+            promptKeyIcon.enabled = !InputSystemInput.IsControllerInputActive;
         }
     }
 
@@ -252,6 +265,8 @@ public class WorldTreeRootInteraction : MonoBehaviour
             playerTransform = playerObj.transform;
             playerMovement = playerObj.GetComponentInParent<PlayerMovement>();
             if (playerMovement == null) playerMovement = playerObj.GetComponent<PlayerMovement>();
+            playerInputHandler = playerObj.GetComponentInParent<PlayerInputHandler>();
+            if (playerInputHandler == null) playerInputHandler = playerObj.GetComponentInChildren<PlayerInputHandler>();
         }
     }
 
@@ -284,8 +299,9 @@ public class WorldTreeRootInteraction : MonoBehaviour
         {
             UpdateBillboardAndAnimation();
 
-            bool ePressed = Input.GetKeyDown(interactKey);
-            bool fPressed = allowKeyFBackup && Input.GetKeyDown(KeyCode.F);
+            bool ePressed = (playerInputHandler != null && playerInputHandler.InteractPressed) ||
+                            InputSystemInput.GetKeyDown(interactKey);
+            bool fPressed = allowKeyFBackup && InputSystemInput.GetKeyDown(KeyCode.F);
 
             if (ePressed || fPressed)
             {

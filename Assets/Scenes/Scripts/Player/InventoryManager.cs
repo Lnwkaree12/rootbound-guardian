@@ -50,19 +50,23 @@ public class InventoryManager : MonoBehaviour
     void Update()
     {
         // Toggle Inventory Panel with 'I' or 'Tab'
-        if (Input.GetKeyDown(KeyCode.I) || Input.GetKeyDown(KeyCode.Tab))
+        if (InputSystemInput.GetKeyDown(KeyCode.I) ||
+            InputSystemInput.GetKeyDown(KeyCode.Tab) ||
+            InputSystemInput.InventoryPressedThisFrame)
         {
             ToggleInventory();
         }
 
         // Use Potion on 'H' or '1'
-        if (Input.GetKeyDown(KeyCode.H) || Input.GetKeyDown(KeyCode.Alpha1))
+        if (InputSystemInput.GetKeyDown(KeyCode.H) ||
+            InputSystemInput.GetKeyDown(KeyCode.Alpha1) ||
+            InputSystemInput.UsePotionPressedThisFrame)
         {
             UsePotion();
         }
         
         // Testing inputs
-        if (Input.GetKeyDown(KeyCode.P))
+        if (InputSystemInput.GetKeyDown(KeyCode.P))
         {
             AddPotion();
         }

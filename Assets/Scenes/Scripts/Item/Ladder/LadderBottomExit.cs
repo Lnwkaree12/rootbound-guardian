@@ -15,7 +15,7 @@ public class LadderBottomExit : MonoBehaviour
             {
                 // 🌟 เช็คเพิ่มเติมว่า: ตัวละครต้องกำลังปีนอยู่ และกำลังกดปุ่ม S (ไต่ลง) หรือมีความเร็วพุ่งลงข้างล่าง
                 // วิธีนี้ต่อให้เดินมาชนเฉยๆ หรือกระโดดลงมาจากที่อื่น ก็จะไม่ถูกดีดมั่วซั่วครับ
-                if (Input.GetKey(KeyCode.S))
+                if (player.VerticalInput < -0.5f)
                 {
                     player.ExitClimbingWithForce(customBottomExitForce);
                 }

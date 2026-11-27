@@ -1,7 +1,6 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
@@ -93,10 +92,12 @@ public class OpeningWakeupTutorialController : MonoBehaviour
     private GameObject spacePromptObj;
     private CanvasGroup spacePromptCg;
     private Vector3 spacePromptBasePos;
+    private TextMeshProUGUI spacePromptText;
 
     private GameObject wasdPromptObj;
     private CanvasGroup wasdPromptCg;
     private Vector3 wasdPromptBasePos;
+    private TextMeshProUGUI controllerMovePromptText;
 
     private GameObject wateringUiObj;
     private CanvasGroup wateringUiCg;
@@ -201,6 +202,9 @@ public class OpeningWakeupTutorialController : MonoBehaviour
 
     private void OnEnable()
     {
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
+        RefreshControllerPrompts();
+
         if (skipTutorialButton != null)
         {
             skipTutorialButton.onClick.AddListener(RequestSkipTutorial);
@@ -209,28 +213,28 @@ public class OpeningWakeupTutorialController : MonoBehaviour
 
     private void OnDisable()
     {
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
+
         if (skipTutorialButton != null)
         {
             skipTutorialButton.onClick.RemoveListener(RequestSkipTutorial);
         }
     }
 
+    private void OnInputDeviceChanged(bool isController)
+    {
+        RefreshControllerPrompts();
+    }
+
     private bool WasEnterPressedThisFrame()
     {
         if (!allowEnterToSkip) return false;
 
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        if (InputSystemInput.SubmitPressedThisFrame ||
+            InputSystemInput.GetKeyDown(KeyCode.Return) ||
+            InputSystemInput.GetKeyDown(KeyCode.KeypadEnter))
         {
             return true;
-        }
-
-        if (Keyboard.current != null)
-        {
-            if (Keyboard.current.enterKey.wasPressedThisFrame ||
-                Keyboard.current.numpadEnterKey.wasPressedThisFrame)
-            {
-                return true;
-            }
         }
 
         return false;
@@ -752,9 +756,7 @@ if (playerAnimation != null)
 
     private bool WasSpacePressedThisFrame()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) return true;
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) return true;
-        return false;
+        return InputSystemInput.SubmitPressedThisFrame || InputSystemInput.GetKeyDown(KeyCode.Space);
     }
 
     private IEnumerator LerpCameraRoutine(Vector3 fromPos, Quaternion fromRot, float fromFov, Vector3 toPos, Quaternion toRot, float toFov, float duration)
@@ -1029,16 +1031,16 @@ if (playerAnimation != null)
         RectTransform txtRt = txtObj.AddComponent<RectTransform>();
         txtRt.anchoredPosition = new Vector2(0f, -12f);
         txtRt.sizeDelta = new Vector2(300f, 70f);
-        TextMeshProUGUI tmp = txtObj.AddComponent<TextMeshProUGUI>();
-        tmp.text = "SPACE BAR";
-        if (uiFont != null) tmp.font = uiFont;
-        tmp.fontSize = 29f;
-        tmp.fontStyle = FontStyles.Bold;
-        tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = new Color(0.227f, 0.133f, 0.071f, 1f);
-        tmp.raycastTarget = false;
+        spacePromptText = txtObj.AddComponent<TextMeshProUGUI>();
+        if (uiFont != null) spacePromptText.font = uiFont;
+        spacePromptText.fontSize = 29f;
+        spacePromptText.fontStyle = FontStyles.Bold;
+        spacePromptText.alignment = TextAlignmentOptions.Center;
+        spacePromptText.color = new Color(0.227f, 0.133f, 0.071f, 1f);
+        spacePromptText.raycastTarget = false;
 
         spacePromptObj.SetActive(false);
+        RefreshControllerPrompts();
     }
 
     private void BuildWasdPrompt()
@@ -1062,7 +1064,56 @@ if (playerAnimation != null)
         CreateKeyTile(wasdPromptObj.transform, "S", new Vector2(0f, -42f));
         CreateKeyTile(wasdPromptObj.transform, "D", new Vector2(88f, -42f));
 
+        GameObject controllerPromptObject = new GameObject(
+            "ControllerMovePrompt",
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(TextMeshProUGUI));
+        controllerPromptObject.transform.SetParent(wasdPromptObj.transform, false);
+        RectTransform controllerPromptRect = controllerPromptObject.GetComponent<RectTransform>();
+        controllerPromptRect.anchorMin = Vector2.zero;
+        controllerPromptRect.anchorMax = Vector2.one;
+        controllerPromptRect.offsetMin = Vector2.zero;
+        controllerPromptRect.offsetMax = Vector2.zero;
+
+        controllerMovePromptText = controllerPromptObject.GetComponent<TextMeshProUGUI>();
+        controllerMovePromptText.text = "LEFT STICK\nOR D-PAD";
+        if (uiFont != null) controllerMovePromptText.font = uiFont;
+        controllerMovePromptText.fontSize = 28f;
+        controllerMovePromptText.fontStyle = FontStyles.Bold;
+        controllerMovePromptText.alignment = TextAlignmentOptions.Center;
+        controllerMovePromptText.color = new Color(0.227f, 0.133f, 0.071f, 1f);
+        controllerMovePromptText.raycastTarget = false;
+
         wasdPromptObj.SetActive(false);
+        RefreshControllerPrompts();
+    }
+
+    private void RefreshControllerPrompts()
+    {
+        bool isController = InputSystemInput.IsControllerInputActive;
+        if (spacePromptText != null)
+        {
+            spacePromptText.text = isController
+                ? $"[{InputSystemInput.SubmitButtonDisplayName}]"
+                : "SPACE BAR";
+        }
+
+        if (wasdPromptObj != null)
+        {
+            foreach (Transform child in wasdPromptObj.transform)
+            {
+                if (child.name.StartsWith("Key_"))
+                {
+                    child.gameObject.SetActive(!isController);
+                }
+            }
+        }
+
+        if (controllerMovePromptText != null)
+        {
+            controllerMovePromptText.enabled = isController;
+        }
     }
 
     private void CreateKeyTile(Transform parent, string keyLetter, Vector2 anchoredPos)

@@ -107,7 +107,8 @@ public class EndGameVictoryUI : MonoBehaviour
     private void Update()
     {
         // Allow pressing ESC to toggle Victory screen once it has been triggered
-        if (hasVictoryTriggered && Input.GetKeyDown(KeyCode.Escape))
+        if (hasVictoryTriggered &&
+            (InputSystemInput.GetKeyDown(KeyCode.Escape) || InputSystemInput.CancelPressedThisFrame))
         {
             if (isPanelShowing)
             {

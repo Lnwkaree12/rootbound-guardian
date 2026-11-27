@@ -49,7 +49,7 @@ public class PlayerStats : MonoBehaviour
         UpdateHUD();
         
         // Keyboard inputs for testing damage
-        if (Input.GetKeyDown(KeyCode.T))
+        if (InputSystemInput.GetKeyDown(KeyCode.T))
         {
             TakeDamage(15f);
         }

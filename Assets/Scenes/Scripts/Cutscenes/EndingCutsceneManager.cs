@@ -95,14 +95,7 @@ public class EndingCutsceneManager : MonoBehaviour
             skipButton.gameObject.SetActive(false);
         }
 
-        if (continuePrompt != null && LocalizationManager.Instance != null)
-        {
-            var tmp = continuePrompt.GetComponentInChildren<TextMeshProUGUI>();
-            if (tmp != null)
-            {
-                tmp.text = LocalizationManager.Instance.Get("hint_continue");
-            }
-        }
+        RefreshContinuePrompt();
 
         if (mainMenuButton != null)
         {
@@ -112,6 +105,40 @@ public class EndingCutsceneManager : MonoBehaviour
         if (playAgainButton != null)
         {
             playAgainButton.onClick.AddListener(OnPlayAgainClicked);
+        }
+    }
+
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
+        RefreshContinuePrompt();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
+    }
+
+    private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        RefreshContinuePrompt();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
+    {
+        RefreshContinuePrompt();
+    }
+
+    private void RefreshContinuePrompt()
+    {
+        if (continuePrompt == null || LocalizationManager.Instance == null) return;
+
+        var tmp = continuePrompt.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (tmp != null)
+        {
+            tmp.text = LocalizationManager.Instance.Get("hint_continue");
         }
 
         if (replayCutsceneButton != null)
@@ -139,8 +166,15 @@ public class EndingCutsceneManager : MonoBehaviour
     {
         if (isCutsceneFinished) return;
 
+        if (InputSystemInput.CancelPressedThisFrame)
+        {
+            OnSkipClicked();
+            return;
+        }
+
         // Spacebar or mouse click interaction
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+        if (InputSystemInput.SubmitPressedThisFrame ||
+            InputSystemInput.GetKeyDown(KeyCode.Space) || InputSystemInput.GetMouseButtonDown(0))
         {
             if (isTyping)
             {

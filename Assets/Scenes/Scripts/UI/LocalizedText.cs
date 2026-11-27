@@ -5,7 +5,7 @@ using TMPro;
 /// <summary>
 /// LocalizedText — Component ผูก TextMeshProUGUI หรือ UnityEngine.UI.Text กับ localization key
 /// วิธีใช้: ติดบน GameObject ที่มี TextMeshProUGUI หรือ Text แล้วกำหนด localizationKey
-/// ข้อความจะอัปเดตอัตโนมัติทุกครั้งที่ภาษาเปลี่ยน
+/// ข้อความจะอัปเดตอัตโนมัติเมื่อภาษาเปลี่ยนหรือเปลี่ยนอุปกรณ์อินพุต
 /// </summary>
 [DisallowMultipleComponent]
 public class LocalizedText : MonoBehaviour
@@ -27,12 +27,14 @@ public class LocalizedText : MonoBehaviour
     private void OnEnable()
     {
         LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
         Refresh();
     }
 
     private void OnDisable()
     {
         LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
     }
 
     private void Start()
@@ -47,6 +49,11 @@ public class LocalizedText : MonoBehaviour
     }
 
     private void OnLanguageChanged(LocalizationManager.Language lang)
+    {
+        Refresh();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
     {
         Refresh();
     }

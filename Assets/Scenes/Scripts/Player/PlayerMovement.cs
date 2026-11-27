@@ -54,14 +54,17 @@ public class PlayerMovement : MonoBehaviour
     private float targetLadderPos;
     private bool useXAlignment = true;
     private PlayerAnimation playerAnim;
+    private PlayerInputHandler inputHandler;
 
     public bool IsGrounded { get; private set; }
+    public float VerticalInput => inputHandler != null ? inputHandler.MoveInput.y : currentInput.y;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         playerAnim = GetComponent<PlayerAnimation>();
+        inputHandler = GetComponent<PlayerInputHandler>();
         gapWalkTimer = maxGapWalkTime;
     }
 
@@ -117,16 +120,9 @@ public class PlayerMovement : MonoBehaviour
 
         if (isClimbing)
         {
-            float verticalInput = 0f;
-
-            if (Input.GetKey(KeyCode.W))
-            {
-                verticalInput = 1f;
-            }
-            else if (Input.GetKey(KeyCode.S))
-            {
-                verticalInput = -1f;
-            }
+            float verticalInput = inputHandler != null
+                ? Mathf.Clamp(inputHandler.MoveInput.y, -1f, 1f)
+                : (InputSystemInput.GetKey(KeyCode.W) ? 1f : (InputSystemInput.GetKey(KeyCode.S) ? -1f : 0f));
 
             float moveX = 0f;
             float moveZ = 0f;

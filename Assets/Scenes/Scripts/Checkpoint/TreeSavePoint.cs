@@ -126,7 +126,7 @@ public class TreeSavePoint : MonoBehaviour
         // ไม่รับอินพุตหากต้นไม้ฟื้นฟูแล้ว ผู้เล่นอยู่นอกระยะ หรือกำลังประมวลผล
         if (isRestored || !isPlayerInRange || isProcessing) return;
 
-        bool interactPressed = (inputHandler != null && inputHandler.InteractPressed) || Input.GetKeyDown(KeyCode.E);
+        bool interactPressed = (inputHandler != null && inputHandler.InteractPressed) || InputSystemInput.GetKeyDown(KeyCode.E);
 
         if (interactPressed)
         {
