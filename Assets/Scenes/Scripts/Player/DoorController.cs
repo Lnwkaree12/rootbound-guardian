@@ -329,7 +329,10 @@ public class DoorController : MonoBehaviour
         if (promptTextLegacy != null)
         {
             promptTextLegacy.text = hasKey 
-                ? (LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_open") : InputSystemInput.FormatControllerPromptText("กด [E] เพื่อเปิดประตู"))
+                ? InputSystemInput.FormatControllerPromptTextForLegacyUI(
+                    LocalizationManager.Instance != null
+                        ? LocalizationManager.Instance.Get("door_prompt_open")
+                        : "กด [E] เพื่อเปิดประตู")
                 : (LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_locked") : "ประตูล็อคแน่นหนา (ต้องหากุญแจก่อน)");
         }
     }

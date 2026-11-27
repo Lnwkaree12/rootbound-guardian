@@ -2453,6 +2453,14 @@ public class MainMenuUIController : MonoBehaviour
         }
     }
 
+    private static string GetControllerGuideText(string key, string fallback)
+    {
+        string text = LocalizationManager.Instance != null
+            ? LocalizationManager.Instance.Get(key)
+            : fallback;
+        return InputSystemInput.FormatControllerGuideText(text);
+    }
+
     private void UpdateControllerCalloutsVisuals()
     {
         if (analogCalloutText == null && controllerContent != null)
@@ -2490,60 +2498,82 @@ public class MainMenuUIController : MonoBehaviour
 
         if (controllerModeIndex == 0) // GAMEPLAY MODE
         {
-            if (analogCalloutText != null) analogCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_analog_gameplay") : "<b><color=#58A6FF>Analog</color></b> ควบคุมทิศทาง";
-            if (lbCalloutText != null) lbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lb_gameplay") : "<b><color=#58A6FF>LB</color></b>  ก่อนหน้า / สลับไอเทม";
-            if (ltCalloutText != null) ltCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lt_gameplay") : "<b><color=#58A6FF>LT</color></b>  เล็ง / วิ่งเร็ว / ป้องกัน";
-            if (rbCalloutText != null) rbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rb_gameplay") : "<b><color=#58A6FF>RB</color></b>  ถัดไป / แดชหลบหลีก";
-            if (rtCalloutText != null) rtCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rt_gameplay") : "<b><color=#58A6FF>RT</color></b>  โจมตีหลัก / ท่าพิเศษ";
-            if (viewCalloutText != null) viewCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_view_gameplay") : "<b><color=#F1C40F>VIEW</color></b>  ภารกิจ & ข้อมูล";
-            if (menuCalloutText != null) menuCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_menu_gameplay") : "<b><color=#F1C40F>MENU</color></b>  หยุดชั่วคราว";
+            if (analogCalloutText != null) analogCalloutText.text = GetControllerGuideText("ctrl_analog_gameplay", "<b><color=#58A6FF>Analog</color></b> ควบคุมทิศทาง");
+            if (lbCalloutText != null) lbCalloutText.text = GetControllerGuideText("ctrl_lb_gameplay", "<b><color=#58A6FF>LB</color></b>  ก่อนหน้า / สลับไอเทม");
+            if (ltCalloutText != null) ltCalloutText.text = GetControllerGuideText("ctrl_lt_gameplay", "<b><color=#58A6FF>LT</color></b>  เล็ง / วิ่งเร็ว / ป้องกัน");
+            if (rbCalloutText != null) rbCalloutText.text = GetControllerGuideText("ctrl_rb_gameplay", "<b><color=#58A6FF>RB</color></b>  ถัดไป / แดชหลบหลีก");
+            if (rtCalloutText != null) rtCalloutText.text = GetControllerGuideText("ctrl_rt_gameplay", "<b><color=#58A6FF>RT</color></b>  โจมตีหลัก / ท่าพิเศษ");
+            if (viewCalloutText != null) viewCalloutText.text = GetControllerGuideText("ctrl_view_gameplay", "<b><color=#F1C40F>VIEW</color></b>  ภารกิจ & ข้อมูล");
+            if (menuCalloutText != null) menuCalloutText.text = GetControllerGuideText("ctrl_menu_gameplay", "<b><color=#F1C40F>MENU</color></b>  หยุดชั่วคราว");
 
             if (leftStickCalloutText != null)
             {
-                leftStickCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lstick_gameplay") : "<b>LEFT JOYSTICK</b>\n<color=#E0E6ED>โยก: เดิน / เคลื่อนที่\nกด L3: วิ่งสปรินต์</color>";
+                leftStickCalloutText.text = GetControllerGuideText("ctrl_lstick_gameplay", "<b>LEFT JOYSTICK</b>\n<color=#E0E6ED>โยก: เดิน / เคลื่อนที่\nกด L3: วิ่งสปรินต์</color>");
             }
             if (rightStickCalloutText != null)
             {
-                rightStickCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rstick_gameplay") : "<b>RIGHT JOYSTICK</b>\n<color=#E0E6ED>โยก: หมุนมุมกล้องรอบตัว\nกด R3: รีเซ็ตมุมมอง / ล็อกเป้า</color>";
+                rightStickCalloutText.text = GetControllerGuideText("ctrl_rstick_gameplay", "<b>RIGHT JOYSTICK</b>\n<color=#E0E6ED>โยก: หมุนมุมกล้องรอบตัว\nกด R3: รีเซ็ตมุมมอง / ล็อกเป้า</color>");
             }
             if (dpadCalloutText != null)
             {
-                dpadCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_dpad_gameplay") : "<b>DIRECTIONAL PAD</b>\n<color=#E0E6ED>[Up] ช่อง 1  [Down] ช่อง 2\n[Left] ก่อนหน้า  [Right] ถัดไป</color>";
+                dpadCalloutText.text = GetControllerGuideText("ctrl_dpad_gameplay", "<b>DIRECTIONAL PAD</b>\n<color=#E0E6ED>[Up] ช่อง 1  [Down] ช่อง 2\n[Left] ก่อนหน้า  [Right] ถัดไป</color>");
             }
             if (abxyCalloutText != null)
             {
-                string aDesc = controllerSwapAB ? "<color=#E74C3C>(B)</color> กลิ้งตัว / ยกเลิก (Roll)" : "<color=#58D68D>(A)</color> กระโดด / ตรวจสอบ (Jump)";
-                string bDesc = controllerSwapAB ? "<color=#58D68D>(A)</color> กระโดด / ตรวจสอบ (Jump)" : "<color=#E74C3C>(B)</color> กลิ้งตัว / ยกเลิก (Roll)";
-                abxyCalloutText.text = "<b>A, B, X, Y</b>\n<color=#E0E6ED>" + aDesc + "\n" + bDesc + "\n<color=#58A6FF>(X)</color> โจมตีเบา (Attack)\n<color=#F1C40F>(Y)</color> โต้ตอบ / สกิล (Interact)</color>";
+                string confirm = controllerSwapAB
+                    ? InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Back)
+                    : InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Confirm);
+                string back = controllerSwapAB
+                    ? InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Confirm)
+                    : InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Back);
+                string aDesc = controllerSwapAB
+                    ? $"<color=#E74C3C>({back})</color> กลิ้งตัว / ยกเลิก (Roll)"
+                    : $"<color=#58D68D>({confirm})</color> กระโดด / ตรวจสอบ (Jump)";
+                string bDesc = controllerSwapAB
+                    ? $"<color=#58D68D>({confirm})</color> กระโดด / ตรวจสอบ (Jump)"
+                    : $"<color=#E74C3C>({back})</color> กลิ้งตัว / ยกเลิก (Roll)";
+                string interact = InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Interact);
+                abxyCalloutText.text = $"<b>{confirm}, {back}, X, {interact}</b>\n<color=#E0E6ED>{aDesc}\n{bDesc}\n<color=#58A6FF>(X)</color> โจมตีเบา (Attack)\n<color=#F1C40F>({interact})</color> โต้ตอบ / สกิล (Interact)</color>";
             }
         }
         else // MENU MODE
         {
-            if (analogCalloutText != null) analogCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_analog_menu") : "<b><color=#58A6FF>Analog</color></b> เลื่อนเลือกเมนู";
-            if (lbCalloutText != null) lbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lb_menu") : "<b><color=#58A6FF>LB</color></b>  แท็บก่อนหน้า (Prev Tab)";
-            if (ltCalloutText != null) ltCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lt_menu") : "<b><color=#58A6FF>LT</color></b>  เลื่อนหน้าขึ้น (Page Up)";
-            if (rbCalloutText != null) rbCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rb_menu") : "<b><color=#58A6FF>RB</color></b>  แท็บถัดไป (Next Tab)";
-            if (rtCalloutText != null) rtCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rt_menu") : "<b><color=#58A6FF>RT</color></b>  เลื่อนหน้าลง (Page Down)";
-            if (viewCalloutText != null) viewCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_view_menu") : "<b><color=#F1C40F>VIEW</color></b>  ข้อมูลเพิ่มเติม (Info)";
-            if (menuCalloutText != null) menuCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_menu_menu") : "<b><color=#F1C40F>MENU</color></b>  ปิดเมนู / ดำเนินการต่อ";
+            if (analogCalloutText != null) analogCalloutText.text = GetControllerGuideText("ctrl_analog_menu", "<b><color=#58A6FF>Analog</color></b> เลื่อนเลือกเมนู");
+            if (lbCalloutText != null) lbCalloutText.text = GetControllerGuideText("ctrl_lb_menu", "<b><color=#58A6FF>LB</color></b>  แท็บก่อนหน้า (Prev Tab)");
+            if (ltCalloutText != null) ltCalloutText.text = GetControllerGuideText("ctrl_lt_menu", "<b><color=#58A6FF>LT</color></b>  เลื่อนหน้าขึ้น (Page Up)");
+            if (rbCalloutText != null) rbCalloutText.text = GetControllerGuideText("ctrl_rb_menu", "<b><color=#58A6FF>RB</color></b>  แท็บถัดไป (Next Tab)");
+            if (rtCalloutText != null) rtCalloutText.text = GetControllerGuideText("ctrl_rt_menu", "<b><color=#58A6FF>RT</color></b>  เลื่อนหน้าลง (Page Down)");
+            if (viewCalloutText != null) viewCalloutText.text = GetControllerGuideText("ctrl_view_menu", "<b><color=#F1C40F>VIEW</color></b>  ข้อมูลเพิ่มเติม (Info)");
+            if (menuCalloutText != null) menuCalloutText.text = GetControllerGuideText("ctrl_menu_menu", "<b><color=#F1C40F>MENU</color></b>  ปิดเมนู / ดำเนินการต่อ");
 
             if (leftStickCalloutText != null)
             {
-                leftStickCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_lstick_menu") : "<b>LEFT JOYSTICK</b>\n<color=#E0E6ED>โยก: เลื่อนเลือกหัวข้อเมนู\nกด L3: คำสั่งด่วน</color>";
+                leftStickCalloutText.text = GetControllerGuideText("ctrl_lstick_menu", "<b>LEFT JOYSTICK</b>\n<color=#E0E6ED>โยก: เลื่อนเลือกหัวข้อเมนู\nกด L3: คำสั่งด่วน</color>");
             }
             if (rightStickCalloutText != null)
             {
-                rightStickCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_rstick_menu") : "<b>RIGHT JOYSTICK</b>\n<color=#E0E6ED>โยก: เลื่อนหน้าต่าง / ซูม\nกด R3: รีเซ็ตตำแหน่ง</color>";
+                rightStickCalloutText.text = GetControllerGuideText("ctrl_rstick_menu", "<b>RIGHT JOYSTICK</b>\n<color=#E0E6ED>โยก: เลื่อนหน้าต่าง / ซูม\nกด R3: รีเซ็ตตำแหน่ง</color>");
             }
             if (dpadCalloutText != null)
             {
-                dpadCalloutText.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("ctrl_dpad_menu") : "<b>DIRECTIONAL PAD</b>\n<color=#E0E6ED>[Up] เลื่อนขึ้น  [Down] เลื่อนลง\n[Left] ปรับลด  [Right] ปรับเพิ่ม</color>";
+                dpadCalloutText.text = GetControllerGuideText("ctrl_dpad_menu", "<b>DIRECTIONAL PAD</b>\n<color=#E0E6ED>[Up] เลื่อนขึ้น  [Down] เลื่อนลง\n[Left] ปรับลด  [Right] ปรับเพิ่ม</color>");
             }
             if (abxyCalloutText != null)
             {
-                string aDesc = controllerSwapAB ? "<color=#E74C3C>(B)</color> ย้อนกลับ / ปิด (Back)" : "<color=#58D68D>(A)</color> ตกลง / เลือก (Select)";
-                string bDesc = controllerSwapAB ? "<color=#58D68D>(A)</color> ตกลง / เลือก (Select)" : "<color=#E74C3C>(B)</color> ย้อนกลับ / ปิด (Back)";
-                abxyCalloutText.text = "<b>A, B, X, Y</b>\n<color=#E0E6ED>" + aDesc + "\n" + bDesc + "\n<color=#58A6FF>(X)</color> คืนค่าเดิม (Reset)\n<color=#F1C40F>(Y)</color> สลับหมวด (Toggle)</color>";
+                string confirm = controllerSwapAB
+                    ? InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Back)
+                    : InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Confirm);
+                string back = controllerSwapAB
+                    ? InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Confirm)
+                    : InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Back);
+                string aDesc = controllerSwapAB
+                    ? $"<color=#E74C3C>({back})</color> ย้อนกลับ / ปิด (Back)"
+                    : $"<color=#58D68D>({confirm})</color> ตกลง / เลือก (Select)";
+                string bDesc = controllerSwapAB
+                    ? $"<color=#58D68D>({confirm})</color> ตกลง / เลือก (Select)"
+                    : $"<color=#E74C3C>({back})</color> ย้อนกลับ / ปิด (Back)";
+                string interact = InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Interact);
+                abxyCalloutText.text = $"<b>{confirm}, {back}, X, {interact}</b>\n<color=#E0E6ED>{aDesc}\n{bDesc}\n<color=#58A6FF>(X)</color> คืนค่าเดิม (Reset)\n<color=#F1C40F>({interact})</color> สลับหมวด (Toggle)</color>";
             }
         }
     }

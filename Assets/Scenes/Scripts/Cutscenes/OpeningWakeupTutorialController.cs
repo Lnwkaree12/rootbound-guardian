@@ -1077,7 +1077,8 @@ if (playerAnimation != null)
         controllerPromptRect.offsetMax = Vector2.zero;
 
         controllerMovePromptText = controllerPromptObject.GetComponent<TextMeshProUGUI>();
-        controllerMovePromptText.text = "LEFT STICK\nOR D-PAD";
+        controllerMovePromptText.text =
+            $"{InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Move)}\nOR {InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Dpad)}";
         if (uiFont != null) controllerMovePromptText.font = uiFont;
         controllerMovePromptText.fontSize = 28f;
         controllerMovePromptText.fontStyle = FontStyles.Bold;
@@ -1095,7 +1096,7 @@ if (playerAnimation != null)
         if (spacePromptText != null)
         {
             spacePromptText.text = isController
-                ? $"[{InputSystemInput.SubmitButtonDisplayName}]"
+                ? InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Confirm)
                 : "SPACE BAR";
         }
 

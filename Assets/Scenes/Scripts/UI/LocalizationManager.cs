@@ -159,19 +159,21 @@ public class LocalizationManager : MonoBehaviour
                 }
         }
 
-        return InputSystemInput.FormatControllerPromptText(text);
+        return key.StartsWith("ctrl_")
+            ? InputSystemInput.FormatControllerGuideText(text)
+            : InputSystemInput.FormatControllerPromptText(text);
     }
 
     private static string FormatControllerButtonLegend(Language language, bool swapped)
     {
-        string confirmButton = swapped
-            ? InputSystemInput.CancelButtonDisplayName
-            : InputSystemInput.SubmitButtonDisplayName;
-        string backButton = swapped
-            ? InputSystemInput.SubmitButtonDisplayName
-            : InputSystemInput.CancelButtonDisplayName;
-        string confirm = $"<color=#58D68D>{confirmButton}</color>";
-        string back = $"<color=#E74C3C>{backButton}</color>";
+        string confirmPrompt = swapped
+            ? InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Back)
+            : InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Confirm);
+        string backPrompt = swapped
+            ? InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Confirm)
+            : InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Back);
+        string confirm = $"<color=#58D68D>{confirmPrompt}</color>";
+        string back = $"<color=#E74C3C>{backPrompt}</color>";
 
         switch (language)
         {

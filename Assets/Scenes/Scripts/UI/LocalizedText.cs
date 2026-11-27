@@ -79,7 +79,7 @@ public class LocalizedText : MonoBehaviour
         }
         else if (legacyText != null)
         {
-            legacyText.text = localizedString;
+            legacyText.text = InputSystemInput.FormatControllerPromptTextForLegacyUI(localizedString);
         }
     }
 }

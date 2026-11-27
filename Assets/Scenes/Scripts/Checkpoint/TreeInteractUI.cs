@@ -25,6 +25,7 @@ public class TreeInteractUI : MonoBehaviour
     private Vector3 initialScale;
     private Vector3 keyInitialLocalPos;
     private Vector3 sproutInitialLocalPos;
+    private Sprite keyboardKeyIconSprite;
     private Coroutine popCoroutine;
     private bool isVisible = false;
     private TextMeshProUGUI controllerPromptLabel;
@@ -34,7 +35,11 @@ public class TreeInteractUI : MonoBehaviour
         initialLocalPos = transform.localPosition;
         initialScale = transform.localScale;
 
-        if (keyIcon != null) keyInitialLocalPos = keyIcon.transform.localPosition;
+        if (keyIcon != null)
+        {
+            keyInitialLocalPos = keyIcon.transform.localPosition;
+            keyboardKeyIconSprite = keyIcon.sprite;
+        }
         if (sproutIcon != null) sproutInitialLocalPos = sproutIcon.transform.localPosition;
 
         if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
@@ -66,6 +71,7 @@ public class TreeInteractUI : MonoBehaviour
     private void Start()
     {
         targetCamera = GetBestCamera();
+        RefreshInputPrompt();
     }
 
     public void ConfigureElements(Image bg, Image key, Image sprout, TextMeshProUGUI text)
@@ -74,7 +80,11 @@ public class TreeInteractUI : MonoBehaviour
         keyIcon = key;
         sproutIcon = sprout;
         promptText = text;
-        if (keyIcon != null) keyInitialLocalPos = keyIcon.transform.localPosition;
+        if (keyIcon != null)
+        {
+            keyInitialLocalPos = keyIcon.transform.localPosition;
+            keyboardKeyIconSprite = keyIcon.sprite;
+        }
         if (sproutIcon != null) sproutInitialLocalPos = sproutIcon.transform.localPosition;
         CreateControllerPromptLabel();
         RefreshInputPrompt();
@@ -116,12 +126,20 @@ public class TreeInteractUI : MonoBehaviour
     private void RefreshInputPrompt()
     {
         bool isController = InputSystemInput.IsControllerInputActive;
-        if (keyIcon != null) keyIcon.enabled = !isController;
+        Sprite controllerSprite = isController
+            ? InputSystemInput.GetControllerPromptSprite(InputSystemInput.PromptAction.Interact)
+            : null;
+
+        if (keyIcon != null)
+        {
+            keyIcon.sprite = controllerSprite != null ? controllerSprite : keyboardKeyIconSprite;
+            keyIcon.enabled = !isController || controllerSprite != null;
+        }
 
         if (controllerPromptLabel != null)
         {
-            controllerPromptLabel.text = $"[{InputSystemInput.InteractButtonDisplayName}]";
-            controllerPromptLabel.enabled = isController;
+            controllerPromptLabel.text = InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Interact);
+            controllerPromptLabel.enabled = isController && controllerSprite == null;
         }
     }
 

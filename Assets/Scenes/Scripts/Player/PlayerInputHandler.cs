@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
@@ -7,6 +8,20 @@ public class PlayerInputHandler : MonoBehaviour
 {
     [Header("Input Setup")]
     [SerializeField] private InputActionAsset inputActions;
+
+    [Header("Controller Prompt Sprites")]
+    [SerializeField] private Sprite southButtonSprite;
+    [SerializeField] private Sprite eastButtonSprite;
+    [SerializeField] private Sprite westButtonSprite;
+    [SerializeField] private Sprite northButtonSprite;
+    [SerializeField] private Sprite rightShoulderButtonSprite;
+    [SerializeField] private Sprite rightTriggerButtonSprite;
+    [SerializeField] private Sprite leftStickPressButtonSprite;
+    [SerializeField] private Sprite selectButtonSprite;
+    [SerializeField] private Sprite startButtonSprite;
+    [SerializeField] private Sprite leftStickSprite;
+    [SerializeField] private Sprite rightStickSprite;
+    [SerializeField] private Sprite dpadSprite;
 
     public Vector2 MoveInput { get; private set; }
     public bool DashPressed { get; private set; }
@@ -17,6 +32,7 @@ public class PlayerInputHandler : MonoBehaviour
     private InputAction moveAction;
     private InputAction dashAction;
     private InputAction interactAction;
+    private static PlayerInputHandler activeInstance;
 
     private void Awake()
     {
@@ -34,6 +50,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void OnEnable()
     {
+        activeInstance = this;
         moveAction?.Enable();
         dashAction?.Enable();
         interactAction?.Enable();
@@ -44,12 +61,44 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void OnDisable()
     {
+        if (activeInstance == this)
+        {
+            activeInstance = null;
+        }
+
         moveAction?.Disable();
         dashAction?.Disable();
         interactAction?.Disable();
 
         if (dashAction != null)
             dashAction.performed -= OnDashPerformed;
+    }
+
+    public static Sprite GetControllerPromptSprite(InputSystemInput.PromptAction action)
+    {
+        return activeInstance != null ? activeInstance.GetPromptSprite(action) : null;
+    }
+
+    private Sprite GetPromptSprite(InputSystemInput.PromptAction action)
+    {
+        switch (action)
+        {
+            case InputSystemInput.PromptAction.Confirm:
+            case InputSystemInput.PromptAction.Jump: return southButtonSprite;
+            case InputSystemInput.PromptAction.Back:
+            case InputSystemInput.PromptAction.Crouch: return eastButtonSprite;
+            case InputSystemInput.PromptAction.Attack: return westButtonSprite;
+            case InputSystemInput.PromptAction.Interact: return northButtonSprite;
+            case InputSystemInput.PromptAction.Sprint:
+                return rightShoulderButtonSprite != null ? rightShoulderButtonSprite : leftStickPressButtonSprite;
+            case InputSystemInput.PromptAction.Inventory: return selectButtonSprite;
+            case InputSystemInput.PromptAction.Pause: return startButtonSprite;
+            case InputSystemInput.PromptAction.Potion: return rightTriggerButtonSprite;
+            case InputSystemInput.PromptAction.Move: return leftStickSprite;
+            case InputSystemInput.PromptAction.Look: return rightStickSprite;
+            case InputSystemInput.PromptAction.Dpad: return dpadSprite;
+            default: return null;
+        }
     }
 
     private void Update()
@@ -79,7 +128,28 @@ public class PlayerInputHandler : MonoBehaviour
 
 public static class InputSystemInput
 {
+    private const string ControllerPromptSpriteAssetResourcePath = "Sprite Assets/ControllerPromptIcons";
+
+    public enum PromptAction
+    {
+        Confirm,
+        Back,
+        Jump,
+        Interact,
+        Attack,
+        Crouch,
+        Sprint,
+        Inventory,
+        Pause,
+        Potion,
+        Move,
+        Look,
+        Dpad
+    }
+
     private static InputDevice lastControllerDevice;
+    private static TMP_SpriteAsset controllerPromptSpriteAsset;
+    private static bool controllerPromptSpriteAssetChecked;
 
     public static bool IsControllerInputActive { get; private set; }
     public static event Action<bool> OnLastInputDeviceChanged;
@@ -90,6 +160,14 @@ public static class InputSystemInput
         IsControllerInputActive = false;
         lastControllerDevice = null;
         OnLastInputDeviceChanged = null;
+        controllerPromptSpriteAsset = null;
+        controllerPromptSpriteAssetChecked = false;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void InitializeControllerPromptSpriteAsset()
+    {
+        EnsureControllerPromptSpriteAsset();
     }
 
     public static bool SubmitPressedThisFrame => IsGamepadButtonPressedThisFrame(0);
@@ -113,6 +191,48 @@ public static class InputSystemInput
     public static string PotionButtonDisplayName => GetControllerTriggerDisplayName("RT");
     public static string SprintButtonDisplayName => GetControllerButtonDisplayName(5, "RB");
 
+    public static Sprite GetControllerPromptSprite(PromptAction action)
+    {
+        return PlayerInputHandler.GetControllerPromptSprite(action);
+    }
+
+    public static string GetControllerPromptTag(PromptAction action)
+    {
+        string spriteName = GetControllerPromptSpriteName(action);
+        return GetControllerPromptTag(spriteName, $"[{GetControllerPromptFallback(action)}]");
+    }
+
+    public static string FormatControllerGuideText(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return text;
+        }
+
+        const string rightStickLabelPlaceholder = "__RIGHT_STICK_LABEL__";
+        string moveTag = GetControllerPromptTag("analogL", "[Left Stick]");
+        string dpadTag = GetControllerPromptTag("bottonArrow5", "[D-pad]");
+        return text
+            .Replace("RB</color>", $"{GetControllerPromptTag(PromptAction.Sprint)}</color>")
+            .Replace("[RB]", GetControllerPromptTag(PromptAction.Sprint))
+            .Replace("Analog", moveTag)
+            .Replace("右摇杆", rightStickLabelPlaceholder)
+            .Replace("左摇杆", moveTag)
+            .Replace("摇杆", moveTag)
+            .Replace("LEFT JOYSTICK", moveTag)
+            .Replace("DIRECTIONAL PAD", dpadTag)
+            .Replace("方向键", dpadTag)
+            .Replace("[Up]", GetControllerPromptTag("bottonArrowUp", "[Up]"))
+            .Replace("[Down]", GetControllerPromptTag("bottonArrowDown", "[Down]"))
+            .Replace("[Left]", GetControllerPromptTag("bottonArrowLeft", "[Left]"))
+            .Replace("[Right]", GetControllerPromptTag("bottonArrowRight", "[Right]"))
+            .Replace("[上]", GetControllerPromptTag("bottonArrowUp", "[上]"))
+            .Replace("[下]", GetControllerPromptTag("bottonArrowDown", "[下]"))
+            .Replace("[左]", GetControllerPromptTag("bottonArrowLeft", "[左]"))
+            .Replace("[右]", GetControllerPromptTag("bottonArrowRight", "[右]"))
+            .Replace(rightStickLabelPlaceholder, "右摇杆");
+    }
+
     internal static void SetLastInputDevice(bool isController, InputDevice device = null)
     {
         if (IsControllerInputActive == isController &&
@@ -134,24 +254,129 @@ public static class InputSystemInput
         }
 
         return text
-            .Replace("[SPACEBAR]", $"[{SprintButtonDisplayName}]")
-            .Replace("[Space]", $"[{SubmitButtonDisplayName}]")
-            .Replace("[SPACE]", $"[{SubmitButtonDisplayName}]")
-            .Replace("[空格键]", $"[{SubmitButtonDisplayName}]")
-            .Replace("[ENTER]", $"[{SubmitButtonDisplayName}]")
-            .Replace("[E]", $"[{InteractButtonDisplayName}]")
-            .Replace("[ESC]", $"[{CancelButtonDisplayName}]")
+            .Replace("[SPACEBAR]", GetControllerPromptTag(PromptAction.Sprint))
+            .Replace("[Space]", GetControllerPromptTag(PromptAction.Confirm))
+            .Replace("[SPACE]", GetControllerPromptTag(PromptAction.Confirm))
+            .Replace("[空格键]", GetControllerPromptTag(PromptAction.Confirm))
+            .Replace("[ENTER]", GetControllerPromptTag(PromptAction.Confirm))
+            .Replace("[E]", GetControllerPromptTag(PromptAction.Interact))
+            .Replace("[ESC]", GetControllerPromptTag(PromptAction.Back))
             .Replace("[Tab]", $"[{InventoryButtonDisplayName}]")
             .Replace("[I]", $"[{InventoryButtonDisplayName}]")
-            .Replace("[1]", $"[{PotionButtonDisplayName}]")
-            .Replace("[H]", $"[{PotionButtonDisplayName}]")
-            .Replace("Space / Click", $"[{SubmitButtonDisplayName}] / Click")
-            .Replace("Space / คลิก", $"[{SubmitButtonDisplayName}] / คลิก")
-            .Replace("空格 / 点击", $"[{SubmitButtonDisplayName}] / 点击")
+            .Replace("[1]", GetControllerPromptTag(PromptAction.Potion))
+            .Replace("[H]", GetControllerPromptTag(PromptAction.Potion))
+            .Replace("Space / Click", $"{GetControllerPromptTag(PromptAction.Confirm)} / Click")
+            .Replace("Space / คลิก", $"{GetControllerPromptTag(PromptAction.Confirm)} / คลิก")
+            .Replace("空格 / 点击", $"{GetControllerPromptTag(PromptAction.Confirm)} / 点击")
             .Replace("ANY KEY", "ANY BUTTON")
             .Replace("Any key", "Any button")
             .Replace("any key", "any button")
             .Replace("任意键", "任意按钮");
+    }
+
+    public static string FormatControllerPromptTextForLegacyUI(string text)
+    {
+        if (!IsControllerInputActive || string.IsNullOrEmpty(text))
+        {
+            return text;
+        }
+
+        return FormatControllerPromptText(text)
+            .Replace("<sprite name=\"buttonJoyA\">", $"[{SubmitButtonDisplayName}]")
+            .Replace("<sprite name=\"buttonJoyB\">", $"[{CancelButtonDisplayName}]")
+            .Replace("<sprite name=\"buttonJoyY\">", $"[{InteractButtonDisplayName}]")
+            .Replace("<sprite name=\"buttonJoyRB\">", $"[{SprintButtonDisplayName}]")
+            .Replace("<sprite name=\"analogL\">", "[Left Stick]")
+            .Replace("<sprite name=\"bottonArrow5\">", "[D-pad]")
+            .Replace("<sprite name=\"bottonArrowUp\">", "[Up]")
+            .Replace("<sprite name=\"bottonArrowDown\">", "[Down]")
+            .Replace("<sprite name=\"bottonArrowLeft\">", "[Left]")
+            .Replace("<sprite name=\"bottonArrowRight\">", "[Right]");
+    }
+
+    private static bool EnsureControllerPromptSpriteAsset()
+    {
+        if (controllerPromptSpriteAsset != null)
+        {
+            return true;
+        }
+
+        controllerPromptSpriteAsset = Resources.Load<TMP_SpriteAsset>(ControllerPromptSpriteAssetResourcePath);
+        if (controllerPromptSpriteAsset == null)
+        {
+            if (!controllerPromptSpriteAssetChecked)
+            {
+                Debug.LogWarning("[InputSystemInput] Controller prompt sprite asset is missing. Generate it with Tools > SproutScout > Generate Controller Prompt Sprite Asset.");
+                controllerPromptSpriteAssetChecked = true;
+            }
+
+            return false;
+        }
+
+        TMP_SpriteAsset defaultSpriteAsset = TMP_Settings.defaultSpriteAsset;
+        if (defaultSpriteAsset == null)
+        {
+            TMP_Settings.defaultSpriteAsset = controllerPromptSpriteAsset;
+        }
+        else if (defaultSpriteAsset != controllerPromptSpriteAsset)
+        {
+            if (defaultSpriteAsset.fallbackSpriteAssets == null)
+            {
+                defaultSpriteAsset.fallbackSpriteAssets = new System.Collections.Generic.List<TMP_SpriteAsset>();
+            }
+
+            if (!defaultSpriteAsset.fallbackSpriteAssets.Contains(controllerPromptSpriteAsset))
+            {
+                defaultSpriteAsset.fallbackSpriteAssets.Add(controllerPromptSpriteAsset);
+            }
+        }
+
+        controllerPromptSpriteAssetChecked = true;
+        return true;
+    }
+
+    private static string GetControllerPromptSpriteName(PromptAction action)
+    {
+        switch (action)
+        {
+            case PromptAction.Confirm:
+            case PromptAction.Jump: return "buttonJoyA";
+            case PromptAction.Back:
+            case PromptAction.Crouch: return "buttonJoyB";
+            case PromptAction.Interact: return "buttonJoyY";
+            case PromptAction.Sprint: return "buttonJoyRB";
+            case PromptAction.Move: return "analogL";
+            case PromptAction.Dpad: return "bottonArrow5";
+            default: return null;
+        }
+    }
+
+    private static string GetControllerPromptTag(string spriteName, string fallback)
+    {
+        return !string.IsNullOrEmpty(spriteName) && EnsureControllerPromptSpriteAsset()
+            ? $"<sprite name=\"{spriteName}\">"
+            : fallback;
+    }
+
+    private static string GetControllerPromptFallback(PromptAction action)
+    {
+        switch (action)
+        {
+            case PromptAction.Confirm:
+            case PromptAction.Jump: return SubmitButtonDisplayName;
+            case PromptAction.Back:
+            case PromptAction.Crouch: return CancelButtonDisplayName;
+            case PromptAction.Interact: return InteractButtonDisplayName;
+            case PromptAction.Attack: return "X";
+            case PromptAction.Sprint: return SprintButtonDisplayName;
+            case PromptAction.Inventory: return InventoryButtonDisplayName;
+            case PromptAction.Pause: return PauseButtonDisplayName;
+            case PromptAction.Potion: return PotionButtonDisplayName;
+            case PromptAction.Move: return "Left Stick";
+            case PromptAction.Look: return "Right Stick";
+            case PromptAction.Dpad: return "D-pad";
+            default: return string.Empty;
+        }
     }
 
     public static bool AnyKeyDown

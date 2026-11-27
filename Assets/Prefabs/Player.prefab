@@ -394,6 +394,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputHandler
   inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  southButtonSprite: {fileID: 21300000, guid: ee05369c12953604e8828922d423c47c, type: 3}
+  eastButtonSprite: {fileID: 21300000, guid: b2bba16c63923a146960792390028276, type: 3}
+  westButtonSprite: {fileID: 0}
+  northButtonSprite: {fileID: 21300000, guid: c7b9ae94911560743a1d4b476de87857, type: 3}
+  rightShoulderButtonSprite: {fileID: 21300000, guid: 8dadc039d5067cd4181470b7560365d0, type: 3}
+  rightTriggerButtonSprite: {fileID: 0}
+  leftStickPressButtonSprite: {fileID: 0}
+  selectButtonSprite: {fileID: 0}
+  startButtonSprite: {fileID: 0}
+  leftStickSprite: {fileID: 21300000, guid: 7e8617a0dfd16a047aaf2949ac51da6d, type: 3}
+  rightStickSprite: {fileID: 0}
+  dpadSprite: {fileID: 21300000, guid: 272f61d2b7a4b10438d66008f06f1cd8, type: 3}
 --- !u!114 &3168087101343134898
 MonoBehaviour:
   m_ObjectHideFlags: 0
