@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7591276065030572438}
-  - component: {fileID: 8667990920478199423}
   m_Layer: 0
   m_Name: Castle_Stone_Wall
   m_TagString: Untagged
@@ -58,27 +57,6 @@ Transform:
   - {fileID: 1689999189979535390}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &8667990920478199423
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 122510211346004270}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &210412918961903824
 GameObject:
   m_ObjectHideFlags: 0
@@ -424,7 +402,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1608960077451149109}
-  - component: {fileID: 8467661742021363167}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (21)
   m_TagString: Untagged
@@ -458,27 +435,6 @@ Transform:
   - {fileID: 7409669509232959278}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
---- !u!65 &8467661742021363167
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 508918691650058984}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &739232139544968764
 GameObject:
   m_ObjectHideFlags: 0
@@ -712,7 +668,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2434233500663304755}
-  - component: {fileID: 2096701743644106251}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (6)
   m_TagString: Untagged
@@ -751,27 +706,6 @@ Transform:
   - {fileID: 6791011613335409850}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: -6.821, z: 0}
---- !u!65 &2096701743644106251
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1529380458484352887}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1548436606849289191
 GameObject:
   m_ObjectHideFlags: 0
@@ -1172,7 +1106,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3115034558427823629}
-  - component: {fileID: 3776567060389211185}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (11)
   m_TagString: Untagged
@@ -1216,27 +1149,6 @@ Transform:
   - {fileID: 7206266654645401452}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!65 &3776567060389211185
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2293091702192654455}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2552922973507719411
 GameObject:
   m_ObjectHideFlags: 0
@@ -1246,7 +1158,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6338729621546449109}
-  - component: {fileID: 8559716555228411385}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (7)
   m_TagString: Untagged
@@ -1271,27 +1182,6 @@ Transform:
   - {fileID: 6876081627767542190}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 20.624, z: 0}
---- !u!65 &8559716555228411385
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2552922973507719411}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2632664787142670550
 GameObject:
   m_ObjectHideFlags: 0
@@ -1301,7 +1191,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5028657720698662071}
-  - component: {fileID: 4572508262494279929}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (22)
   m_TagString: Untagged
@@ -1350,27 +1239,6 @@ Transform:
   - {fileID: 7744554041387646053}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &4572508262494279929
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2632664787142670550}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2644554381713163665
 GameObject:
   m_ObjectHideFlags: 0
@@ -1492,7 +1360,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3630086806534989144}
-  - component: {fileID: 2352472812279181011}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (18)
   m_TagString: Untagged
@@ -1576,27 +1443,6 @@ Transform:
   - {fileID: 7875771816794594899}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &2352472812279181011
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2676645430606687099}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2812864927091637322
 GameObject:
   m_ObjectHideFlags: 0
@@ -1718,7 +1564,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1821194753563532629}
-  - component: {fileID: 696279913810066207}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (20)
   m_TagString: Untagged
@@ -1752,27 +1597,6 @@ Transform:
   - {fileID: 958181477747187220}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!65 &696279913810066207
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2927965308799992247}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2968075482336195027
 GameObject:
   m_ObjectHideFlags: 0
@@ -2232,7 +2056,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 77067473440338592}
-  - component: {fileID: 3392201945494652604}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (9)
   m_TagString: Untagged
@@ -2258,27 +2081,6 @@ Transform:
   - {fileID: 1483648629184003729}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: -10.682, z: 0}
---- !u!65 &3392201945494652604
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3494145441448782848}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3763574069769635086
 GameObject:
   m_ObjectHideFlags: 0
@@ -2378,7 +2180,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5531883721363230149}
-  - component: {fileID: 7975681721735264442}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (13)
   m_TagString: Untagged
@@ -2405,27 +2206,6 @@ Transform:
   - {fileID: 2519520423815494608}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: -13.424, z: 0}
---- !u!65 &7975681721735264442
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3834168199359864413}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3895784193201268456
 GameObject:
   m_ObjectHideFlags: 0
@@ -2547,7 +2327,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2103157098472966890}
-  - component: {fileID: 7975732184401422496}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (14)
   m_TagString: Untagged
@@ -2581,27 +2360,6 @@ Transform:
   - {fileID: 1112558742344404622}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &7975732184401422496
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3973609606467757354}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4033094083532997884
 GameObject:
   m_ObjectHideFlags: 0
@@ -2611,7 +2369,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1218588523759864766}
-  - component: {fileID: 2518182047528767676}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (5)
   m_TagString: Untagged
@@ -2645,27 +2402,6 @@ Transform:
   - {fileID: 4273826281463033729}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!65 &2518182047528767676
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4033094083532997884}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4173291703917026584
 GameObject:
   m_ObjectHideFlags: 0
@@ -2675,7 +2411,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2640790480424920849}
-  - component: {fileID: 2515008965825017293}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (2)
   m_TagString: Untagged
@@ -2709,27 +2444,6 @@ Transform:
   - {fileID: 3841286442525013109}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: -45, z: 0}
---- !u!65 &2515008965825017293
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4173291703917026584}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4185457515336188362
 GameObject:
   m_ObjectHideFlags: 0
@@ -2739,7 +2453,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6657068387817746111}
-  - component: {fileID: 180972708028015667}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (16)
   m_TagString: Untagged
@@ -2778,27 +2491,6 @@ Transform:
   - {fileID: 6915844231138355017}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &180972708028015667
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4185457515336188362}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4646442317092360661
 GameObject:
   m_ObjectHideFlags: 0
@@ -2808,7 +2500,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7079310506256224676}
-  - component: {fileID: 6314685148704918327}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (4)
   m_TagString: Untagged
@@ -2842,27 +2533,6 @@ Transform:
   - {fileID: 3824187354719154146}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: -48.461, z: 0}
---- !u!65 &6314685148704918327
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4646442317092360661}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4788435990201589817
 GameObject:
   m_ObjectHideFlags: 0
@@ -2872,7 +2542,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7148629632254264458}
-  - component: {fileID: 6413011181445680191}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (15)
   m_TagString: Untagged
@@ -2899,27 +2568,6 @@ Transform:
   - {fileID: 4635263169693490942}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 13.319, z: 0}
---- !u!65 &6413011181445680191
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4788435990201589817}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5256335723458484534
 GameObject:
   m_ObjectHideFlags: 0
@@ -2929,7 +2577,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6066687678550905688}
-  - component: {fileID: 5901759384041330695}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (1)
   m_TagString: Untagged
@@ -2978,27 +2625,6 @@ Transform:
   - {fileID: 7416510692468474176}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
---- !u!65 &5901759384041330695
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5256335723458484534}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5951941669514776829
 GameObject:
   m_ObjectHideFlags: 0
@@ -3232,7 +2858,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5107838072164412695}
-  - component: {fileID: 4093005783027952427}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (12)
   m_TagString: Untagged
@@ -3266,27 +2891,6 @@ Transform:
   - {fileID: 7353308898939181327}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &4093005783027952427
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6389686472873482063}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6743457722161151496
 GameObject:
   m_ObjectHideFlags: 0
@@ -3408,7 +3012,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 364336022028849540}
-  - component: {fileID: 3090980329826212335}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (17)
   m_TagString: Untagged
@@ -3442,27 +3045,6 @@ Transform:
   - {fileID: 4704360584212618065}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
---- !u!65 &3090980329826212335
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7222001086070618224}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7519775692215761125
 GameObject:
   m_ObjectHideFlags: 0
@@ -3584,7 +3166,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1366795973176591156}
-  - component: {fileID: 7285846081933182316}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (3)
   m_TagString: Untagged
@@ -3648,27 +3229,6 @@ Transform:
   - {fileID: 6079342216691103376}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &7285846081933182316
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7553684588791208796}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7582515305630494044
 GameObject:
   m_ObjectHideFlags: 0
@@ -4126,7 +3686,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8414921098131929360}
-  - component: {fileID: 2935576531241131471}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (19)
   m_TagString: Untagged
@@ -4160,27 +3719,6 @@ Transform:
   - {fileID: 192949421939743328}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!65 &2935576531241131471
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8347713308461747409}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8502249683358337934
 GameObject:
   m_ObjectHideFlags: 0
@@ -4190,7 +3728,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8212854305652463171}
-  - component: {fileID: 4427047337023911939}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (23)
   m_TagString: Untagged
@@ -4224,27 +3761,6 @@ Transform:
   - {fileID: 4581403360124975617}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!65 &4427047337023911939
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8502249683358337934}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8595466360824104681
 GameObject:
   m_ObjectHideFlags: 0
@@ -4254,7 +3770,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7094074685075407988}
-  - component: {fileID: 3507608645389043016}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (10)
   m_TagString: Untagged
@@ -4308,27 +3823,6 @@ Transform:
   - {fileID: 3462676655874331350}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 0.763, z: 0}
---- !u!65 &3507608645389043016
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8595466360824104681}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8661036083191242439
 GameObject:
   m_ObjectHideFlags: 0
@@ -4450,7 +3944,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 41566881366320249}
-  - component: {fileID: 1613956478291199072}
   m_Layer: 0
   m_Name: Castle_Stone_Wall (8)
   m_TagString: Untagged
@@ -4489,27 +3982,6 @@ Transform:
   - {fileID: 7913200365527454042}
   m_Father: {fileID: 7565055617642483020}
   m_LocalEulerAnglesHint: {x: 0, y: 0.763, z: 0}
---- !u!65 &1613956478291199072
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8721837213007181567}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &9158694543811622901
 GameObject:
   m_ObjectHideFlags: 0
