@@ -619,20 +619,6 @@ public class TreeSavePoint : MonoBehaviour
         cdCanvas.overrideSorting = true;
         cdCanvas.sortingOrder = 60;
 
-        Shader overlayShader = Shader.Find("UI/OverlayAlwaysOnTop");
-        if (overlayShader != null)
-        {
-            Material overlayMat = new Material(overlayShader);
-            foreach (Image img in cdCanvas.GetComponentsInChildren<Image>(true))
-            {
-                img.material = overlayMat;
-            }
-            foreach (RawImage raw in cdCanvas.GetComponentsInChildren<RawImage>(true))
-            {
-                raw.material = overlayMat;
-            }
-        }
-
         Shader tmpOverlayShader = Shader.Find("TextMeshPro/Distance Field Overlay");
         foreach (TMPro.TextMeshProUGUI tmp in cdCanvas.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true))
         {

@@ -18,7 +18,6 @@ public class Ladder : MonoBehaviour
     [SerializeField] private Vector3 promptOffset = new Vector3(0f, 1.35f, -0.35f);
     [SerializeField] private Sprite keycapSprite;
     [SerializeField] private TMP_FontAsset promptFont;
-    [SerializeField] private Material overlayUiMaterial;
 
     private BoxCollider ladderCollider;
     private GameObject promptCanvasObj;
@@ -153,15 +152,6 @@ public class Ladder : MonoBehaviour
         }
         bgImg.preserveAspect = true;
         bgImg.raycastTarget = false;
-        if (overlayUiMaterial != null)
-        {
-            bgImg.material = overlayUiMaterial;
-        }
-        else
-        {
-            Shader overlayShader = Shader.Find("UI/OverlayAlwaysOnTop");
-            if (overlayShader != null) bgImg.material = new Material(overlayShader);
-        }
 
         GameObject txtObj = new GameObject("Key_Label_W");
         txtObj.transform.SetParent(bgObj.transform, false);
@@ -180,13 +170,6 @@ public class Ladder : MonoBehaviour
         tmp.raycastTarget = false;
         climbPromptText = tmp;
 
-        Shader tmpOverlayShader = Shader.Find("TextMeshPro/Distance Field Overlay");
-        if (tmpOverlayShader != null && tmp.fontSharedMaterial != null)
-        {
-            Material mat = new Material(tmp.fontSharedMaterial);
-            mat.shader = tmpOverlayShader;
-            tmp.fontMaterial = mat;
-        }
         RefreshClimbPrompt();
     }
 
