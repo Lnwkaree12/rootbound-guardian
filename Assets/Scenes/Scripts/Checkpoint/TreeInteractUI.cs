@@ -19,11 +19,14 @@ public class TreeInteractUI : MonoBehaviour
     [SerializeField] private float pulseSpeed = 3.6f;
     [SerializeField] private float pulseScale = 0.05f;
     [SerializeField] private float wobbleAngle = 0f; // 0 = perfectly straight & level (no tilt)
+    [SerializeField, Min(1f)] private float controllerPromptScale = 1.35f;
 
     private Camera targetCamera;
     private Vector3 initialLocalPos;
     private Vector3 initialScale;
     private Vector3 keyInitialLocalPos;
+    private Vector3 keyInitialLocalScale = Vector3.one;
+    private bool isControllerPromptActive;
     private Vector3 sproutInitialLocalPos;
     private Sprite keyboardKeyIconSprite;
     private Coroutine popCoroutine;
@@ -38,6 +41,7 @@ public class TreeInteractUI : MonoBehaviour
         if (keyIcon != null)
         {
             keyInitialLocalPos = keyIcon.transform.localPosition;
+            keyInitialLocalScale = keyIcon.transform.localScale;
             keyboardKeyIconSprite = keyIcon.sprite;
         }
         if (sproutIcon != null) sproutInitialLocalPos = sproutIcon.transform.localPosition;
@@ -83,6 +87,7 @@ public class TreeInteractUI : MonoBehaviour
         if (keyIcon != null)
         {
             keyInitialLocalPos = keyIcon.transform.localPosition;
+            keyInitialLocalScale = keyIcon.transform.localScale;
             keyboardKeyIconSprite = keyIcon.sprite;
         }
         if (sproutIcon != null) sproutInitialLocalPos = sproutIcon.transform.localPosition;
@@ -129,11 +134,15 @@ public class TreeInteractUI : MonoBehaviour
         Sprite controllerSprite = isController
             ? InputSystemInput.GetControllerPromptSprite(InputSystemInput.PromptAction.Interact)
             : null;
+        isControllerPromptActive = isController && controllerSprite != null;
 
         if (keyIcon != null)
         {
             keyIcon.sprite = controllerSprite != null ? controllerSprite : keyboardKeyIconSprite;
             keyIcon.enabled = !isController || controllerSprite != null;
+            keyIcon.transform.localScale = isControllerPromptActive
+                ? keyInitialLocalScale * controllerPromptScale
+                : keyInitialLocalScale;
         }
 
         if (controllerPromptLabel != null)
@@ -183,12 +192,20 @@ public class TreeInteractUI : MonoBehaviour
                     float hopY = Mathf.Sin(hopT * Mathf.PI) * 10f;
                     keyIcon.transform.localPosition = keyInitialLocalPos + new Vector3(0f, hopY, 0f);
                     float squash = Mathf.Sin(hopT * Mathf.PI) * 0.12f;
-                    keyIcon.transform.localScale = new Vector3(1f - squash, 1f + squash * 1.2f, 1f);
+                    Vector3 baseScale = isControllerPromptActive
+                        ? keyInitialLocalScale * controllerPromptScale
+                        : keyInitialLocalScale;
+                    keyIcon.transform.localScale = new Vector3(
+                        baseScale.x * (1f - squash),
+                        baseScale.y * (1f + squash * 1.2f),
+                        baseScale.z);
                 }
                 else
                 {
                     keyIcon.transform.localPosition = keyInitialLocalPos;
-                    keyIcon.transform.localScale = Vector3.one;
+                    keyIcon.transform.localScale = isControllerPromptActive
+                        ? keyInitialLocalScale * controllerPromptScale
+                        : keyInitialLocalScale;
                 }
             }
 

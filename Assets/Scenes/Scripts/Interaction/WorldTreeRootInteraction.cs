@@ -88,6 +88,7 @@ public class WorldTreeRootInteraction : MonoBehaviour
     private Camera mainCamera;
     private Vector3 initialPromptLocalPos;
     private Vector3 initialPromptScale;
+    private Sprite keyboardPromptKeySprite;
     private bool playerInRange = false;
     private bool isWatered = false;
     private List<Material> dynamicRootMaterials = new List<Material>();
@@ -96,6 +97,11 @@ public class WorldTreeRootInteraction : MonoBehaviour
 
     private void Awake()
     {
+        if (promptKeyIcon != null)
+        {
+            keyboardPromptKeySprite = promptKeyIcon.sprite;
+        }
+
         if (promptCanvasObject != null)
         {
             initialPromptLocalPos = promptCanvasObject.transform.localPosition;
@@ -150,17 +156,39 @@ public class WorldTreeRootInteraction : MonoBehaviour
 
     private void RefreshPromptText()
     {
+        bool isController = InputSystemInput.IsControllerInputActive;
+        Sprite controllerSprite = isController
+            ? InputSystemInput.GetControllerPromptSprite(InputSystemInput.PromptAction.Interact)
+            : null;
+
         if (promptTextTMP != null && !isWatered)
         {
-            promptTextTMP.text = LocalizationManager.Instance != null 
+            string promptText = LocalizationManager.Instance != null
                 ? LocalizationManager.Instance.Get("root_prompt_water") 
                 : InputSystemInput.FormatControllerPromptText("กด [E] รดน้ำต้นไม้");
+            promptTextTMP.text = isController && controllerSprite != null
+                ? RemoveControllerPromptIcon(promptText)
+                : promptText;
         }
 
         if (promptKeyIcon != null)
         {
-            promptKeyIcon.enabled = !InputSystemInput.IsControllerInputActive;
+            promptKeyIcon.sprite = controllerSprite != null
+                ? controllerSprite
+                : keyboardPromptKeySprite;
+            promptKeyIcon.enabled = !isController || controllerSprite != null;
         }
+    }
+
+    private static string RemoveControllerPromptIcon(string text)
+    {
+        int iconStart = text.IndexOf("<sprite", System.StringComparison.Ordinal);
+        if (iconStart < 0) return text;
+
+        int iconEnd = text.IndexOf('>', iconStart);
+        return iconEnd < 0
+            ? text
+            : text.Substring(iconEnd + 1).TrimStart();
     }
 
     private void Start()

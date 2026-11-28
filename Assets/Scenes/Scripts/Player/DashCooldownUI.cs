@@ -13,6 +13,10 @@ public class DashCooldownUI : MonoBehaviour
     [SerializeField] private Image readyGlow;
     [SerializeField] private Text cooldownText;
     [SerializeField] private Text keybindText;
+    [SerializeField, Min(1f)] private float controllerKeybindIconScale = 1.45f;
+    private Image controllerKeybindIcon;
+    private RectTransform controllerKeybindIconRect;
+    private bool controllerKeybindIconCreated;
 
     [Header("Colors")]
     [SerializeField] private Color normalColor = Color.white;
@@ -27,6 +31,9 @@ public class DashCooldownUI : MonoBehaviour
         {
             playerController = Object.FindAnyObjectByType<PlayerController>();
         }
+
+        EnsureControllerKeybindIcon();
+        RefreshKeybindPrompt();
 
         // Configure radial fill on overlay if not set
         if (cooldownOverlay != null)
@@ -44,10 +51,81 @@ public class DashCooldownUI : MonoBehaviour
         {
             playerController = Object.FindAnyObjectByType<PlayerController>();
         }
+
+        RefreshKeybindPrompt();
+    }
+
+    private void OnEnable()
+    {
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
+        EnsureControllerKeybindIcon();
+        RefreshKeybindPrompt();
+    }
+
+    private void OnDisable()
+    {
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
+    }
+
+    private void OnInputDeviceChanged(bool isController)
+    {
+        RefreshKeybindPrompt();
+    }
+
+    private void EnsureControllerKeybindIcon()
+    {
+        if (controllerKeybindIconCreated) return;
+
+        GameObject iconObject = new GameObject("ControllerKeybindIcon");
+        iconObject.transform.SetParent(transform, false);
+
+        controllerKeybindIconRect = iconObject.AddComponent<RectTransform>();
+        controllerKeybindIconRect.anchorMin = new Vector2(0.5f, 0f);
+        controllerKeybindIconRect.anchorMax = new Vector2(0.5f, 0f);
+        controllerKeybindIconRect.pivot = new Vector2(0.5f, 0.5f);
+        controllerKeybindIconRect.anchoredPosition = new Vector2(0f, 12f);
+        controllerKeybindIconRect.sizeDelta = new Vector2(72f, 72f);
+        controllerKeybindIconRect.localScale = Vector3.one * controllerKeybindIconScale;
+
+        controllerKeybindIcon = iconObject.AddComponent<Image>();
+        controllerKeybindIcon.preserveAspect = true;
+        controllerKeybindIcon.raycastTarget = false;
+        controllerKeybindIconCreated = true;
+    }
+
+    private void RefreshKeybindPrompt()
+    {
+        EnsureControllerKeybindIcon();
+
+        bool isController = InputSystemInput.IsControllerInputActive;
+        Sprite sprintSprite = isController
+            ? InputSystemInput.GetControllerPromptSprite(InputSystemInput.PromptAction.Sprint)
+            : null;
+
+        Transform keybindBadge = keybindText != null
+            ? keybindText.transform.parent
+            : transform.Find("KeybindBadge");
+
+        if (keybindBadge != null)
+        {
+            keybindBadge.gameObject.SetActive(!isController);
+        }
+
+        if (controllerKeybindIcon != null)
+        {
+            controllerKeybindIcon.sprite = sprintSprite;
+            controllerKeybindIcon.enabled = isController && sprintSprite != null;
+        }
     }
 
     private void Update()
     {
+        if (InputSystemInput.IsControllerInputActive &&
+            (controllerKeybindIcon == null || controllerKeybindIcon.sprite == null))
+        {
+            RefreshKeybindPrompt();
+        }
+
         if (playerController == null)
         {
             playerController = Object.FindAnyObjectByType<PlayerController>();
@@ -119,5 +197,7 @@ public class DashCooldownUI : MonoBehaviour
         readyGlow = glow;
         cooldownText = cdText;
         keybindText = keyText;
+        EnsureControllerKeybindIcon();
+        RefreshKeybindPrompt();
     }
 }

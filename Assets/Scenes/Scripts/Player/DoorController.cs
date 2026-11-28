@@ -70,6 +70,7 @@ public class DoorController : MonoBehaviour
     private readonly HashSet<Collider> playerCollidersInTrigger = new HashSet<Collider>();
     private Coroutine flashCoroutine;
     private Vector3 promptBaseLocalPos;
+    private Sprite keyboardPromptKeySprite;
 
     public bool IsOpen => isOpen;
 
@@ -78,6 +79,10 @@ public class DoorController : MonoBehaviour
         InitializeDoors();
         InitializeAudio();
         SetupFloatingPrompt();
+        if (promptKeyIcon != null)
+        {
+            keyboardPromptKeySprite = promptKeyIcon.sprite;
+        }
     }
 
     private void InitializeDoors()
@@ -312,17 +317,15 @@ public class DoorController : MonoBehaviour
         {
             if (hasKey)
             {
-                promptTextTMP.text = LocalizationManager.Instance != null
-                    ? LocalizationManager.Instance.Get("door_prompt_open")
-                    : InputSystemInput.FormatControllerPromptText("กด <color=#FFEE44>[E]</color> เพื่อเปิดประตู");
+                promptTextTMP.text = GetDoorOpenPromptText();
                 promptTextTMP.color = new Color(1f, 0.95f, 0.7f);
-                if (promptKeyIcon != null) promptKeyIcon.gameObject.SetActive(!InputSystemInput.IsControllerInputActive);
+                UpdatePromptKeyIcon(true);
             }
             else
             {
                 promptTextTMP.text = LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_locked") : "<color=#FFAA77>ประตูล็อคแน่นหนา (ต้องหากุญแจก่อน)</color>";
                 promptTextTMP.color = new Color(1f, 0.7f, 0.5f);
-                if (promptKeyIcon != null) promptKeyIcon.gameObject.SetActive(false);
+                UpdatePromptKeyIcon(false);
             }
         }
 
@@ -335,6 +338,38 @@ public class DoorController : MonoBehaviour
                         : "กด [E] เพื่อเปิดประตู")
                 : (LocalizationManager.Instance != null ? LocalizationManager.Instance.Get("door_prompt_locked") : "ประตูล็อคแน่นหนา (ต้องหากุญแจก่อน)");
         }
+    }
+
+    private string GetDoorOpenPromptText()
+    {
+        string text = LocalizationManager.Instance != null
+            ? LocalizationManager.Instance.Get("door_prompt_open")
+            : InputSystemInput.FormatControllerPromptText("กด <color=#FFEE44>[E]</color> เพื่อเปิดประตู");
+        if (!InputSystemInput.IsControllerInputActive ||
+            InputSystemInput.GetControllerPromptSprite(InputSystemInput.PromptAction.Interact) == null)
+        {
+            return text;
+        }
+
+        int buttonMarkupEnd = text.IndexOf("</color>");
+        return buttonMarkupEnd >= 0
+            ? text.Substring(buttonMarkupEnd + "</color>".Length).TrimStart()
+            : text;
+    }
+
+    private void UpdatePromptKeyIcon(bool hasKey)
+    {
+        if (promptKeyIcon == null) return;
+
+        bool isController = InputSystemInput.IsControllerInputActive;
+        Sprite controllerSprite = isController
+            ? InputSystemInput.GetControllerPromptSprite(InputSystemInput.PromptAction.Interact)
+            : null;
+
+        promptKeyIcon.sprite = controllerSprite != null
+            ? controllerSprite
+            : keyboardPromptKeySprite;
+        promptKeyIcon.gameObject.SetActive(hasKey && (!isController || controllerSprite != null));
     }
 
     private Inventory GetPlayerInventory()

@@ -93,6 +93,7 @@ public class OpeningWakeupTutorialController : MonoBehaviour
     private CanvasGroup spacePromptCg;
     private Vector3 spacePromptBasePos;
     private TextMeshProUGUI spacePromptText;
+    private UnityEngine.UI.Image spacePromptBgImage;
 
     private GameObject wasdPromptObj;
     private CanvasGroup wasdPromptCg;
@@ -1025,6 +1026,7 @@ if (playerAnimation != null)
         bgImg.sprite = spacePlankSprite;
         bgImg.preserveAspect = true;
         bgImg.raycastTarget = false;
+        spacePromptBgImage = bgImg;
 
         GameObject txtObj = new GameObject("Label");
         txtObj.transform.SetParent(spacePromptObj.transform, false);
@@ -1078,7 +1080,7 @@ if (playerAnimation != null)
 
         controllerMovePromptText = controllerPromptObject.GetComponent<TextMeshProUGUI>();
         controllerMovePromptText.text =
-            $"{InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Move)}\nOR {InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Dpad)}";
+            InputSystemInput.GetControllerPromptTag(InputSystemInput.PromptAction.Move);
         if (uiFont != null) controllerMovePromptText.font = uiFont;
         controllerMovePromptText.fontSize = 28f;
         controllerMovePromptText.fontStyle = FontStyles.Bold;
@@ -1093,6 +1095,11 @@ if (playerAnimation != null)
     private void RefreshControllerPrompts()
     {
         bool isController = InputSystemInput.IsControllerInputActive;
+        if (spacePromptBgImage != null)
+        {
+            spacePromptBgImage.enabled = !isController;
+        }
+
         if (spacePromptText != null)
         {
             spacePromptText.text = isController

@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 1024
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -139,8 +139,8 @@ TextureImporter:
       name: analogL
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
+        x: 191
+        y: 191
         width: 384
         height: 384
       alignment: 0
@@ -161,8 +161,8 @@ TextureImporter:
       name: analogL4
       rect:
         serializedVersion: 2
-        x: 386
-        y: 0
+        x: 975
+        y: 207
         width: 384
         height: 384
       alignment: 0
@@ -183,8 +183,8 @@ TextureImporter:
       name: analogLUp
       rect:
         serializedVersion: 2
-        x: 772
-        y: 0
+        x: 1736
+        y: 191
         width: 384
         height: 384
       alignment: 0
@@ -205,8 +205,8 @@ TextureImporter:
       name: bottonArrow5
       rect:
         serializedVersion: 2
-        x: 1158
-        y: 0
+        x: 2512
+        y: 191
         width: 384
         height: 384
       alignment: 0
@@ -227,8 +227,8 @@ TextureImporter:
       name: bottonArrowDown
       rect:
         serializedVersion: 2
-        x: 1544
-        y: 0
+        x: 3280
+        y: 191
         width: 384
         height: 384
       alignment: 0
@@ -249,8 +249,8 @@ TextureImporter:
       name: bottonArrowLeft
       rect:
         serializedVersion: 2
-        x: 0
-        y: 386
+        x: 207
+        y: 967
         width: 384
         height: 384
       alignment: 0
@@ -271,8 +271,8 @@ TextureImporter:
       name: bottonArrowRight
       rect:
         serializedVersion: 2
-        x: 0
-        y: 772
+        x: 199
+        y: 1743
         width: 384
         height: 384
       alignment: 0
@@ -293,8 +293,8 @@ TextureImporter:
       name: bottonArrowUp
       rect:
         serializedVersion: 2
-        x: 0
-        y: 1158
+        x: 199
+        y: 2520
         width: 384
         height: 384
       alignment: 0
@@ -315,8 +315,8 @@ TextureImporter:
       name: buttonJoyA
       rect:
         serializedVersion: 2
-        x: 0
-        y: 1544
+        x: 199
+        y: 3273
         width: 384
         height: 384
       alignment: 0
@@ -337,8 +337,8 @@ TextureImporter:
       name: buttonJoyB
       rect:
         serializedVersion: 2
-        x: 386
-        y: 386
+        x: 967
+        y: 960
         width: 384
         height: 384
       alignment: 0
@@ -359,8 +359,8 @@ TextureImporter:
       name: buttonJoyRB
       rect:
         serializedVersion: 2
-        x: 772
-        y: 386
+        x: 1736
+        y: 952
         width: 384
         height: 384
       alignment: 0
@@ -381,8 +381,8 @@ TextureImporter:
       name: buttonJoyY
       rect:
         serializedVersion: 2
-        x: 1158
-        y: 386
+        x: 2512
+        y: 967
         width: 384
         height: 384
       alignment: 0

@@ -24,9 +24,21 @@ public class Ladder : MonoBehaviour
     private GameObject promptCanvasObj;
     private CanvasGroup promptCanvasGroup;
     private Vector3 promptBaseWorldPos;
+    private TextMeshProUGUI climbPromptText;
+    private Image climbPromptBackground;
 
     private Transform cachedPlayerTransform;
     private PlayerMovement cachedPlayerMovement;
+
+    private void OnEnable()
+    {
+        InputSystemInput.OnLastInputDeviceChanged += OnInputDeviceChanged;
+    }
+
+    private void OnDisable()
+    {
+        InputSystemInput.OnLastInputDeviceChanged -= OnInputDeviceChanged;
+    }
 
     private void Start()
     {
@@ -34,6 +46,26 @@ public class Ladder : MonoBehaviour
         if (showClimbPrompt)
         {
             BuildClimbPromptUI();
+        }
+        RefreshClimbPrompt();
+    }
+
+    private void OnInputDeviceChanged(bool isController)
+    {
+        RefreshClimbPrompt();
+    }
+
+    private void RefreshClimbPrompt()
+    {
+        if (climbPromptText == null) return;
+
+        bool isController = InputSystemInput.IsControllerInputActive;
+        climbPromptText.text = isController
+            ? "<sprite name=\"analogLUp\">"
+            : "W";
+        if (climbPromptBackground != null)
+        {
+            climbPromptBackground.enabled = !isController;
         }
     }
 
@@ -109,6 +141,7 @@ public class Ladder : MonoBehaviour
         bgRect.sizeDelta = new Vector2(130f, 130f);
 
         Image bgImg = bgObj.AddComponent<Image>();
+        climbPromptBackground = bgImg;
         if (keycapSprite != null)
         {
             bgImg.sprite = keycapSprite;
@@ -145,6 +178,7 @@ public class Ladder : MonoBehaviour
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = new Color(0.227f, 0.133f, 0.071f, 1f);
         tmp.raycastTarget = false;
+        climbPromptText = tmp;
 
         Shader tmpOverlayShader = Shader.Find("TextMeshPro/Distance Field Overlay");
         if (tmpOverlayShader != null && tmp.fontSharedMaterial != null)
@@ -153,6 +187,7 @@ public class Ladder : MonoBehaviour
             mat.shader = tmpOverlayShader;
             tmp.fontMaterial = mat;
         }
+        RefreshClimbPrompt();
     }
 
     private void OnTriggerEnter(Collider other)
